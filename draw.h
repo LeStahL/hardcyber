@@ -6,7 +6,7 @@ if(scene_override)
     else t = t_now + start_times[override_index - 2];
 }
 
-if(t < 0)
+if(t < 11)
 {
     glUseProgram(logo210_program);
     glUniform1f(logo210_iTime_location, t);
@@ -27,7 +27,7 @@ if(t < 0)
     }
 #endif
 }
-else if(t < 11)
+else if(t < 22)
 {
     glUseProgram(graffiti_program);
     glUniform1f(graffiti_iTime_location, t);
@@ -48,7 +48,7 @@ else if(t < 11)
     }
 #endif
 }
-else if(t < 22)
+else if(t < 33)
 {
     glUseProgram(starsky_program);
     glUniform1f(starsky_iTime_location, t);
