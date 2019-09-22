@@ -24,80 +24,11 @@ const float pi = acos(-1.);
 const vec3 c = vec3(1.,0.,-1.);
 float a = 1.0;
 
-void rand(in vec2 x, out float n)
-{
-    x += 400.;
-    n = fract(sin(dot(sign(x)*abs(x) ,vec2(12.9898,78.233)))*43758.5453);
-}
-
-void lfnoise(in vec2 t, out float n)
-{
-    vec2 i = floor(t);
-    t = fract(t);
-    t = smoothstep(c.yy, c.xx, t);
-    vec2 v1, v2;
-    rand(i, v1.x);
-    rand(i+c.xy, v1.y);
-    rand(i+c.yx, v2.x);
-    rand(i+c.xx, v2.y);
-    v1 = c.zz+2.*mix(v1, v2, t.y);
-    n = mix(v1.x, v1.y, t.x);
-}
-
-void mfnoise(in vec2 x, in float d, in float b, in float e, out float n)
-{
-    n = 0.;
-    float a = 1., nf = 0., buf;
-    for(float f = d; f<b; f *= 2.)
-    {
-        lfnoise(f*x, buf);
-        n += a*buf;
-        a *= e;
-        nf += 1.;
-    }
-    n *= (1.-e)/(1.-pow(e, nf));
-}
-
-void dvoronoi(in vec2 x, out float d, out vec2 z)
-{
-    vec2 y = floor(x);
-       float ret = 1.;
-    vec2 pf=c.yy, p;
-    float df=10.;
-    
-    for(int i=-1; i<=1; i+=1)
-        for(int j=-1; j<=1; j+=1)
-        {
-            p = y + vec2(float(i), float(j));
-            float pa;
-            rand(p, pa);
-            p += pa;
-            
-            d = length(x-p);
-            
-            if(d < df)
-            {
-                df = d;
-                pf = p;
-            }
-        }
-    for(int i=-1; i<=1; i+=1)
-        for(int j=-1; j<=1; j+=1)
-        {
-            p = y + vec2(float(i), float(j));
-            float pa;
-            rand(p, pa);
-            p += pa;
-            
-            vec2 o = p - pf;
-            d = length(.5*o-dot(x-pf, o)/dot(o,o)*o);
-            ret = min(ret, d);
-        }
-    
-    d = ret;
-    z = pf;
-}
-
+void hash22(in vec2 x, out vec2 y);
+void rand(in vec2 x, out float n);
+void lfnoise(in vec2 t, out float n);
+void mfnoise(in vec2 x, in float d, in float b, in float e, out float n);
+void dvoronoi(in vec2 x, out float d, out vec2 z, out float dv);
 float dspiral(vec2 x, float a, float d)
 {
     float p = atan(x.y, x.x),
@@ -105,22 +36,17 @@ float dspiral(vec2 x, float a, float d)
     p += (n*2.+1.)*pi;
     return -abs(length(x)-a*p)+d*p;
 }
-
 float sm(float d)
 {
     return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);
 }
 
-void stroke(in float d0, in float s, out float d)
-{
-    d = abs(d0)-s;
-}
-
+void stroke(in float d0, in float s, out float d);
 void colorize(in vec2 x, inout vec3 col)
 {
-    float v, n = 64., r;
+    float v, n = 64., r, vn;
     vec2 ind;
-    dvoronoi(n*x, v, ind);
+    dvoronoi(n*x, v, ind, vn);
     rand(ind, r);
     vec2 y = x-ind/n;
     vec3 c1;
@@ -140,7 +66,7 @@ void colorize(in vec2 x, inout vec3 col)
         col = mix(col, mix(col, 3.*c1, .4), sm(d-.01*r*r));
     }
     
-    dvoronoi(2.*n*x, v, ind);
+    dvoronoi(2.*n*x, v, ind, vn);
     y = x-ind/n/2.;
     rand(ind, r);
     d = length(y)-.002*r;
@@ -157,12 +83,7 @@ void colorize(in vec2 x, inout vec3 col)
     col = mix(col, 2.5*col, sm(v*2.e-3));
 }
 
-void dbox(in vec2 x, in vec2 b, out float d)
-{
-    vec2 da = abs(x)-b;
-    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);
-}
-
+void dbox(in vec2 x, in vec2 b, out float d);
 void street(in vec2 x, out vec3 col)
 {
     float dx;
@@ -182,24 +103,14 @@ void street(in vec2 x, out vec3 col)
     col = mix(col, .6*c.xxx, abs(n)-.1);
     
     vec2 ind;
-    float v;
-    dvoronoi(256.*x, v, ind);
+    float v, vn;
+    dvoronoi(256.*x, v, ind, vn);
     ind = x-ind/256.;
     col = mix(col, .0*c.xxx, sm(length(ind)-.0001));
 }
 
-void dbox3(in vec3 x, in vec3 b, out float d)
-{
-  vec3 da = abs(x) - b;
-  d = length(max(da,0.0))
-         + min(max(da.x,max(da.y,da.z)),0.0);
-}
-
-void add(in vec2 sda, in vec2 sdb, out vec2 sdf)
-{
-    sdf = (sda.x<sdb.x)?sda:sdb;
-}
-
+void dbox3(in vec3 x, in vec3 b, out float d);
+void add(in vec2 sda, in vec2 sdb, out vec2 sdf);
 void scene(in vec3 x, out vec2 sdf)
 {
     float dx;
@@ -221,20 +132,7 @@ void scene(in vec3 x, out vec2 sdf)
     add(sdf, vec2(d, 2.), sdf);
 }
 
-void normal(in vec3 x, out vec3 n, in float dx)
-{
-    vec2 s, na;
-    
-    scene(x,s);
-    scene(x+dx*c.xyy, na);
-    n.x = na.x;
-    scene(x+dx*c.yxy, na);
-    n.y = na.x;
-    scene(x+dx*c.yyx, na);
-    n.z = na.x;
-    n = normalize(n-s.x);
-}
-
+void normal(in vec3 x, out vec3 n, in float dx);
 void palette(in float scale, out vec3 col)
 {
     const int N = 5;

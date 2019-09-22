@@ -62,7 +62,7 @@ float sm(float d)
     return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);
 }
 
-void dvoronoi(in vec2 x, out float d, out vec2 z);
+void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
 void colorize(in vec2 x, out vec3 col)
 {
     vec3 c1;
@@ -88,7 +88,8 @@ void colorize(in vec2 x, out vec3 col)
     col = mix(1.e-4*c.xxx, vec3(0.04,0.18,0.24), s);
     
     // Background circles
-    dvoronoi(vs*x, d, ind);
+    float vn;
+    dvoronoi(vs*x, d, ind, vn);
     xv = ind/vs-x;
     lfnoise(vec2(3.,33.)*ind/vs-3.*iTime*c.xy,n);
     n = .5+.5*n;

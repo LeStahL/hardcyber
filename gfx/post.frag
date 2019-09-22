@@ -38,7 +38,8 @@ float iScale;
 void rand(in vec2 x, out float n);
 void lfnoise(in vec2 t, out float n);
 void stroke(in float d0, in float s, out float d);
-void dvoronoi(in vec2 x, out float d, out vec2 z);
+void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
+void hash22(in vec2 x, out vec2 y);
 float sm(float d)
 {
     return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);
@@ -135,9 +136,9 @@ void scene(in vec3 x, out vec2 sdf)
 
 void scene2(in vec3 x, out vec2 sdf)
 {
-    float v = 0.;
+    float v = 0., vn;
     vec2 vi = c.yy;
-    dvoronoi(x.xy/size, v, vi);
+    dvoronoi(x.xy/size, v, vi, vn);
     vec3 y = vec3(x.xy-vi*size, x.z);
     vec2 yi = vi*size;
     
@@ -395,9 +396,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord_ )
             
                 if(s.y == 1.)
                 {
-                    float v;
+                    float v, vn;
                     vec2 vi;
-                    dvoronoi(x.xy/size, v, vi);
+                    dvoronoi(x.xy/size, v, vi, vn);
                     vec3 y = vec3(x.xy-vi*size, x.z);
                     vec2 yi = vi*size;
                     

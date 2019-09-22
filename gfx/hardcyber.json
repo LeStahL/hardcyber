@@ -17,6 +17,12 @@
             "prefix": "starsky",
             "t_end": 33,
             "t_start": 22
+        },
+        {
+            "name": "Ocean Scene",
+            "prefix": "ocean",
+            "t_end": 44,
+            "t_start": 33
         }
     ]
 }

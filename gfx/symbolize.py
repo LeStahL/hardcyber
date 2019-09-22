@@ -39,6 +39,7 @@ for symbol_file in symbol_files:
         symbol_code = f.read()
         f.close()
     symbol_codes += [ Compressor.compress(symbol_code).replace('\"','\\\"').replace('\n', '\\n\"\n\"').replace('#version 130', '#version 130\\n')  + "\\0"]
+    print("Symbol file: ", symbol_file)
 
 # Parse command line args
 parser = argparse.ArgumentParser(description='Team210 symbol packer.')
@@ -48,6 +49,8 @@ args, rest = parser.parse_known_args()
 if rest == []:
     print("Error: No input files present.")
     exit()
+
+print("Packing: ",rest)
 
 # Generate compilation header
 header_source = "//Generated with Symbolize (c) 2019 Alexander Kraus <nr4@z10.info>.\n#ifndef "

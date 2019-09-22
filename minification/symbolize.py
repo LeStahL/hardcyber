@@ -37,6 +37,8 @@ if rest == []:
     print("Error: No input files passed on commandline.")
     exit()
 
+print("Packing: ",rest)
+
 # Get available symbols
 symbol_files = os.listdir(args.symbols)
 
@@ -100,7 +102,7 @@ for inputfile in rest:
                 modified_line = modified_line.replace(types, '')
             scene_uniform_list += modified_line.split()
     scene_uniform_lists += [ scene_uniform_list ]
-    print(scene_uniform_list)
+    print("Contained uniforms: ",scene_uniform_list)
 
 # Remove unused symbols
 symIdx = 0

@@ -17,11 +17,13 @@
 import GLSLLexer130
 
 def compress(source):
-    #return source
+    return source
     newcode = ""
     lexer = GLSLLexer130.GLSLLexer130(source)
     token = lexer.token()
+    ids = []
     while token != None:
+        if token.tokenName == "IDENTIFIER" : ids += [token.tokenData]
         if (token.tokenName != "SINGLELINE_COMMENT") and (token.tokenName != "MULTILINE_COMMENT"):
             newcode += token.tokenData
         if token.tokenName in [ "VOID", "FLOAT", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", "MAT4", "SAMPLER2D", "UNIFORM", "IN_QUALIFIER", "OUT_QUALIFIER", "INOUT_QUALIFIER", "VOID", "VERSION_DIRECTIVE", "DEFINE_DIRECTIVE", "CONST", "INT", "ELSE", "RETURN" ]:

@@ -27,7 +27,7 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h)
 set(SFX_SHADER sfx.frag)
 set(STRINGS_FILE font/strings.txt)
-set(FRAGMENT_SHADER_FILES logo210.frag graffiti.frag starsky.frag text.frag post.frag)
+set(FRAGMENT_SHADER_FILES ocean.frag logo210.frag graffiti.frag starsky.frag text.frag post.frag)
 
 set(FRAGMENT_SHADERS "")
 foreach(shader ${FRAGMENT_SHADER_FILES})
@@ -39,7 +39,7 @@ endforeach(shader)
 # Demo executable
 #################################
 
-set(DEMO_HEADERS common.h draw.h pal_linux.h pal_win32.h sequence.h gfx/logo210.h gfx/post.h gfx/text.h)
+set(DEMO_HEADERS common.h draw.h scenes.h pal_linux.h pal_win32.h sequence.h)
 
 set(SFX_HEADER sfx.h)
 add_custom_target(minification
@@ -104,7 +104,8 @@ if(MSVC)
         target_link_libraries(hardcyber User32.lib Winmm.lib ucrt.lib msvcrt.lib)
     endif()
 
-    if (CMAKE_SIZEOF_VOID_P EQUAL 32)
+    message("CMAKE_SIZEOF_VOID_P: ${CMAKE_SIZEOF_VOID_P}")
+    if (${CMAKE_SIZEOF_VOID_P} EQUAL 32)
         find_program(KKRUNCHY_K7 kkrunchy_k7.exe HINTS "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}")
         add_custom_command(TARGET hardcyber COMMAND "${KKRUNCHY_K7}" --best "$<TARGET_FILE:hardcyber>" --out "$<TARGET_FILE_DIR:hardcyber>/hardcyberc.exe" POST_BUILD)
     endif()
