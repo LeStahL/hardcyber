@@ -353,7 +353,7 @@ void main()
         
         col = mix(col, mix(col,c1,mix(.6,.1,.8+.2*m)* mix(1., 0., clamp(length(uv),0.,1.))), sm(d));
         stroke(d, .001, d);
-        col = mix(col, orange, sm(d));
+        col = mix(col, mix(orange,c.xxx,decs), sm(d));
     }
     
     col = mix(col, c.yyy, .2);
