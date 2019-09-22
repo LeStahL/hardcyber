@@ -185,7 +185,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
         if(s.y == 1.)
         {
-            col = vec3(0.81,0.15,0.18);
+            // cube color
+            col = vec3(0.27,0.36,0.48);
             col = .3*col
                 + .4*col * abs(dot(l,n))
                 + .6 * col * abs(pow(dot(reflect(-l,n),dir),3.));
@@ -220,7 +221,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
                 if(s.y == 1.)
                 {
-                    c1 = vec3(0.81,0.15,0.18);
+                    c1 = vec3(0.27,0.36,0.48);
                     c1 = .3*c1
                         + .4*c1 * abs(dot(l,n))
                         + .6 * c1 * abs(pow(dot(reflect(-l,n),dir),3.));
@@ -241,7 +242,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         }
         
     }
-    col = mix(col,vec3(0.20,0.01,0.14),smoothstep(0.,1.,iTime-10.));
+    col = mix(col,vec3(0.14,0.01,0.2),smoothstep(0.,1.,iTime-10.));
     
     fragColor = vec4(clamp(col,0.,1.),1.0);
 }
