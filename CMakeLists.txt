@@ -39,7 +39,7 @@ endforeach(shader)
 # Demo executable
 #################################
 
-set(DEMO_HEADERS common.h pal_linux.h pal_win32.h sequence.h gfx/logo210.h gfx/post.h gfx/text.h)
+set(DEMO_HEADERS common.h draw.h pal_linux.h pal_win32.h sequence.h gfx/logo210.h gfx/post.h gfx/text.h)
 
 set(SFX_HEADER sfx.h)
 add_custom_target(minification
