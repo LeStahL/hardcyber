@@ -1,5 +1,5 @@
-/* Lightcyber - 64k Intro by Team210 at Evoke 2k19
- * Copyright (C) 2019 DaDummy <>
+/* Hardcyber - PC-64k-Intro by Team210 at Deadline 2k19
+ * Copyright (C) 2019 DaDummy <c.anselm@paindevs.com>
  * Copyright (C) 2019 Alexander Kraus <nr4@z10.info>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,13 @@
 
 #ifndef COMMON_H
 #define COMMON_H
+
+#include "config.h"
+#include "engine/renderer.h"
+#include "engine/shader.h"
+#include "engine/loader.h"
+#include "engine/orchestrator.h"
+
 
 #define FALSE (0)
 #define TRUE (1)
@@ -38,44 +45,6 @@
 #include <GL/gl.h>
 #include <glext.h>
 
-// OpenGL extensions
-PFNGLGETPROGRAMIVPROC glGetProgramiv;
-PFNGLGETSHADERIVPROC glGetShaderiv;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
-PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
-PFNGLCREATESHADERPROC glCreateShader;
-PFNGLCREATEPROGRAMPROC glCreateProgram;
-PFNGLSHADERSOURCEPROC glShaderSource;
-PFNGLCOMPILESHADERPROC glCompileShader;
-PFNGLATTACHSHADERPROC glAttachShader;
-PFNGLLINKPROGRAMPROC glLinkProgram;
-PFNGLUSEPROGRAMPROC glUseProgram;
-PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLUNIFORM2FPROC glUniform2f;
-PFNGLUNIFORM1FPROC glUniform1f;
-PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
-PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
-PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-PFNGLNAMEDRENDERBUFFERSTORAGEEXTPROC glNamedRenderbufferStorageEXT;
-PFNGLUNIFORM1IPROC glUniform1i;
-#ifdef WIN32
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-#endif
-
-// Standard library and CRT rewrite for saving executable size
-void *memset(void *ptr, int value, size_t num)
-{
-	for(int i=num-1; i>=0; i--)
-		((unsigned char *)ptr)[i] = value;
-	return ptr;
-}
-
-size_t strlen(const char *str)
-{
-	int len = 0;
-	while(str[len] != '\0') ++len;
-	return len;
-}
 
 #ifdef DEBUG
 #include <stdio.h>
@@ -124,8 +93,6 @@ void debugp(int program)
 #else // DEBUG
 #define printf(a)
 #endif //DEBUG
-
-int w = 1280, h = 720;
 
 // Supported resolutions
 const int nresolutions = 9;
@@ -230,13 +197,6 @@ int
     // Sequence
     sequence_texture_handle,
 
-    // Loading bar
-    load_handle,
-    load_program,
-    load_resolution_location,
-    load_time_location,
-    load_progress_location,
-    
     // Antialiasing
     fsaa = 36,
     txaa = 1,
@@ -247,11 +207,7 @@ int
 double mx, my;
 
 // Demo globals
-#define duration 187.061354
-double t_start = 0.,
-    t_now = 0.,
-    t_end = duration,
-    t
+double t
 #ifdef MIDI
     ,
     time_dial = 0.,
@@ -283,7 +239,6 @@ int block_size = 512 * 512,
 nblocks1;
 unsigned int paused = 0, 
     recording = 0;
-float progress = .0;
 char record_filename[1024];
 
 double t_paused;
@@ -295,8 +250,7 @@ GLenum error;
 float t_load_end = 0.;
 
 void load_demo();
-unsigned long __stdcall LoadMusicThread(void *lpParam);
-unsigned long __stdcall LoadTextThread(void * lpParam);
+void load_font();
 void quad();
 void updateBar();
 void draw();
@@ -312,11 +266,6 @@ void draw();
 #define SFX_VAR_ISEQUENCEWIDTH "iSequenceWidth"
 
 #include "font/font.h"
-
-#include "gfx/load.h"
-#define LOAD_VAR_ITIME "iTime"
-#define LOAD_VAR_IPROGRESS "iProgress"
-#define LOAD_VAR_IRESOLUTION "iResolution"
 
 #include "gfx/symbols.h"
 
