@@ -396,6 +396,9 @@ void load_demo()
 
     updateBar();
 
+    lLoadAllSymbols();
+    lLoadAllPrograms();
+
     LoadSymbols();
     LoadPrograms();
 
@@ -488,20 +491,6 @@ void load_font()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, font_texture_size, font_texture_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, font_texture);
 
     progress += .1/NSHADERS;
-}
-
-void updateBar()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
-    // Render first pass
-    glViewport(0,0,w,h);
-
-    lRenderLoadingScreen();
-    
-	flip_buffers();
-    
-    glUseProgram(0);
 }
 
 // Pure opengl drawing code, essentially cross-platform

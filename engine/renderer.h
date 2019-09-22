@@ -61,6 +61,8 @@ static void rInitializeRenderer()
     glUniform1i = (PFNGLUNIFORM1IPROC) wglGetProcAddress("glUniform1i");
 }
 
+int flip_buffers();
+
 void quad()
 {
     glBegin(GL_QUADS);
