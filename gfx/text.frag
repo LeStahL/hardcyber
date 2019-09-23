@@ -46,16 +46,7 @@ void smoothmin(in float a, in float b, in float k, out float dst);
 void dint(in vec2 x, in float num, in float size, in float ndigits, out float dst);
 void dtime(in vec2 x, in float num, in float size, out float dst);
 
-// Fixme: remove vec4 technique in favor of separate distance
-// void blendadd(in vec4 src1, in vec4 src2, in float tlo, in float thi, out vec4 dst)
-// {
-//     vec4 added;
-//     add(src1, src2, added);
-//     dst = mix(src1, added, smoothstep(tlo-.5,tlo+.5,iTime)*(1.-smoothstep(thi-.5,thi+.5,iTime)));
-// }
-
-void window(in vec2 x, in vec2 size, in vec3 bg, in float title_index, out vec4 col);
-void progressbar(in vec2 x, in float width, in float progress, out vec4 col);
+void addwindow(in vec2 uv, inout vec3 col, in vec2 dimension);
 
 float sm(float d)
 {
@@ -63,97 +54,6 @@ float sm(float d)
 }
 
 void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
-void colorize(in vec2 x, out vec3 col)
-{
-    vec3 c1;
-    vec2 ind,
-        xv,
-        xi;
-    float d,
-        vs = 16.,
-        n,
-        size = .1,
-        xix = mod(x.x, size)-.5*size,
-        xixj = (x.x - xix),
-        ri,
-        rim1,
-        rip1,
-        lines = 8.,
-        da,
-        op,
-        s;
-    
-    // Background blending
-    s = smoothstep(0.,.5,.5-abs(x.y));
-    col = mix(1.e-4*c.xxx, vec3(0.04,0.18,0.24), s);
-    
-    // Background circles
-    float vn;
-    dvoronoi(vs*x, d, ind, vn);
-    xv = ind/vs-x;
-    lfnoise(vec2(3.,33.)*ind/vs-3.*iTime*c.xy,n);
-    n = .5+.5*n;
-    d = length(xv)-mix(.0,.35,n)/vs;
-    col = mix(col, n*.5*vec3(1.00,0.40,0.39), sm(d));
-    d = abs(d-.005) -.002;
-    col = mix(col, (1.-n)*vec3(0.49,0.71,0.78), sm(d));
-    
-    for(float i = 1.; i < 9.; i += 1.)
-    {
-        rand((9.-i)*c.xx, op);
-        op = .5+.5*round(16.*op)/16.;
-        x += -.1+.2*op;
-        
-        xix = mod(x.x, size)-.5*size;
-        xixj = (x.x - xix);
-        
-        // Edges
-        lfnoise(2.e0*xixj*c.xx+14.*i, ri);
-        lfnoise(2.e0*(xixj+size)*c.xx+14.*i, rip1);
-        lfnoise(2.e0*(xixj-size)*c.xx+14.*i, rim1);
-
-        float h = .2;
-        
-        ri = h*round(lines*ri)/lines;
-        rip1 = h*round(lines*rip1)/lines;
-        rim1 = h*round(lines*rim1)/lines;
-
-        //if(ri < 0.)
-        {
-            dlinesegment(vec2(xix, x.y), vec2(-.5*size, mix(ri,rim1,.5)), vec2(-.25*size, ri), d);
-            dlinesegment(vec2(xix, x.y), vec2(-.25*size, ri), vec2(.25*size, ri), da);
-            d = min(d, da);
-            dlinesegment(vec2(xix, x.y), vec2(.25*size, ri), vec2(.5*size, mix(ri,rip1,.5)), da);
-            d = min(d, da);
-            stroke(d, .002+.002*op, d);
-            col = mix(col, op*(1.-n)*vec3(1.00,0.40,0.39), sm(d));
-
-            // Dots
-            lfnoise(8.*xixj*c.xx-3.*iTime*c.xy+14.*i, n);
-            n = .5+.5*n;
-            d = length(vec2(xix, x.y-ri))-mix(.0,.35,n)/vs;
-            c1 = mix(vec3(1.00,0.40,0.39), vec3(0.85,0.87,0.89), n);
-            col = mix(col, op*(1.-n)*c1, sm(d));
-            stroke(d - .009, (1.-n)*.005, d);
-            c1 *= 2.4;
-            col = mix(col, op*(1.-n)*c1, sm(d));
-        }
-        
-        x -= -.1+.2*op;
-    }
-    
-    //mix to blackish
-    lfnoise(3.*x.xy-vec2(1.,.1)*iTime, n);
-    stroke(n, .3, n);
-    col = mix(col, 1.e-4*c.xxx, n);
-    col = mix(col, .1*col, 1.-s);
-    
-    col = mix(col, mix(col, vec3(1.00,0.40,0.39), mix(.4,.8,.5+.5*x.y/.1)), sm(abs(x.y)-.1));
-    col = mix(col, c.xxx, sm(abs(abs(x.y)-.11)-.001));
-    
-    col = mix(col, col*col, clamp(-x.y/.1,0.,1.));
-    col *= col;
-}
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -176,15 +76,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     new = old;
     
-//     if(uv.y < -.3 && iTime > 12.)
-//     {
-//         // Add overlay
-//         colorize(2.*(c.xz*uv-.45*vec2(-a,1.)-12.*c.xy), new.gba);
-//         new.gba = mix(old.gba, mix(old.gba, new.gba,.4), smoothstep(3.e-2, 5.e-2,length(new.gba)));
-//     }
-    
-    if(uv.y > .4)
+    if(uv.y > .38)
     {
+        addwindow(uv-.45*vec2(-.45*a,1.-2.*.008*c.yx), new.gba, vec2(.4,.04));
+        addwindow((uv-.45*vec2(.97*a,1.-2.*.008*c.yx))*c.zx, new.gba, vec2(.1,.04));
         float da;
         dstring((uv-.45*vec2(-.55*a,1.+4.*.008)), 9., .004, d);
         dstring((uv-.45*vec2(-.55*a,1.+2.*.008)), 10., .004, da);
@@ -195,12 +90,13 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         d = min(d,da);
         dstring((uv-.45*vec2(-.55*a,1.-4.*.008)), 13., .004, da);
         d = min(d,da);
-        new.gba = mix(new.gba, mix(new.gba, c.xxx, .5), sm(d));
+        new.gba = mix(new.gba, mix(new.gba, c.xxx, 1.), sm(d));
         
         // Add Static text
         dstring((uv-.45*vec2(-.85*a,1.)), 3., .02, d); // Team210
         
-        stroke(d-.002, .001, d);
+        new.gba = mix(new.gba, mix(new.gba,c.xxx,.5), sm(d));
+        stroke(d-.002, .002, d);
         new.gba = mix(new.gba, vec3(1.00,0.40,0.39), sm(d));
 
         // Add time overlay
@@ -216,7 +112,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     if(iTime < 0.) 
     {
-        new.gba = old.gba;
+//         new.gba = old.gba;
         
         float sc = smoothstep(0.,1.,clamp(iTime+3.,0.,1.))*(1.-smoothstep(0.,1.,clamp(iTime+1.,0.,1.)));
         

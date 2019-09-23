@@ -18,12 +18,16 @@ void addwindow(in vec2 uv, inout vec3 col, in vec2 dimensions)
     dbox(uv, dimensions, d);
     vec3 gcol = length(col)/sqrt(3.)*c.xxx;
     const vec3 window_raw = vec3(0.08,0.07,0.16);
-    vec3 window_background = mix(mix(col,window_raw,.2), mix(gcol,window_raw,.8), clamp((.5-uv.y/.4),0.,1.));
+    vec3 window_background = mix(mix(col,window_raw,.2), mix(gcol,window_raw,.8), clamp((.5-uv.y/dimensions.y*.5),0.,1.));
+    
+    // Shadow
+    col = mix(col, .1*gcol, sm(d/8.));
+    // Window
     col = mix(col, window_background, sm(d));
     
     // White border on loading bar window
     d = abs(d-.002)-.002;
-    d = mix(d, 1., step(abs(uv.y),.19));
+    d = mix(d, 1., step(abs(uv.y),dimensions.y-.01));
     col = mix(col, c.xxx, sm(d));
     
     // X box
