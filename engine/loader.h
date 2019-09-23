@@ -7,7 +7,6 @@
 // Generated resources
 #include "shaders.gen.h"
 
-
 static float progress = 0.f;
 
 static void lInitializeLoader()
@@ -48,7 +47,7 @@ static void lLoadAllSymbols()
 {
     for (unsigned int symbolIndex = 0; symbolIndex < lNumberOfSymbols; ++symbolIndex)
     {
-        sCompileSymbol(&shader_symbols[symbolIndex]);
+        sCompileSymbol(shader_symbols + symbolIndex);
 
         // TODO(ca) Implement progress tracking for the new loader (will probably just recycle the loading bar section currently used by the loader for gfx/symbolize.py)
 

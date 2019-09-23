@@ -2,8 +2,8 @@
 #ifndef SYMBOLIZE_H
 #define SYMBOLIZE_H
 
-extern float progress;int rand_handle, hash11_handle, hash12_handle, hash21_handle, hash22_handle, hash31_handle, stroke_handle, lfnoise_handle, dvoronoi_handle, dbox_handle, dlinesegment_handle, smoothmin_handle, add_handle, normal_handle, dbox3_handle, rot3_handle, dspline2_handle, zextrude_handle, mfnoise_handle, rshort_handle, rfloat_handle, dcircle_handle, drhomboid_handle, dcirclesegment_handle, dglyph_handle, dstring_handle, dfloat_handle, dint_handle, dtime_handle, window_handle, progressbar_handle;
-const int nsymbols = 31;
+extern float progress;int rand_handle, hash11_handle, hash12_handle, hash21_handle, hash22_handle, hash31_handle, stroke_handle, lfnoise_handle, dvoronoi_handle, dbox_handle, dlinesegment_handle, smoothmin_handle, add_handle, normal_handle, dbox3_handle, rot3_handle, dbox210_handle, dspline2_handle, zextrude_handle, mfnoise_handle, rshort_handle, rfloat_handle, dcircle_handle, drhomboid_handle, dcirclesegment_handle, dglyph_handle, dstring_handle, dfloat_handle, dint_handle, dtime_handle, window_handle, progressbar_handle;
+const int nsymbols = 32;
 const char *rand_source = "#version 130\n\n"
 "void rand(in vec2 x, out float n)\n"
 "{\n"
@@ -198,6 +198,79 @@ const char *rot3_source = "const vec3 c = vec3(1.,0.,-1.);\n"
 "    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))\n"
 "        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))\n"
 "        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);\n"
+"}\n"
+"\0";
+const char *dbox210_source = "#version 130\n\n"
+"\n"
+"const vec3 c = vec3(1.,0.,-1.);\n"
+"\n"
+"void dbox3(in vec3 x, in vec3 b, out float d);\n"
+"\n"
+"void dbox210(in vec3 x, in float size, out vec2 sdf)\n"
+"{\n"
+"    x /= size;\n"
+"    \n"
+"    float d = 1.;\n"
+"    \n"
+"    // Big red box    \n"
+"    dbox3(x, .2*c.xxx, sdf.x);\n"
+"    sdf.y = 1.;\n"
+"    \n"
+"    // Holes\n"
+"    \n"
+"    // 2 upper bar\n"
+"    dbox3(x-.1*c.xyy, vec3(.02,.3,.12), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 right bar\n"
+"    dbox3(x-.05*c.xyy-.1*c.yyx, vec3(.07,.3,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 mid bar\n"
+"    dbox3(x, vec3(.02,.3,.1), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 left bar\n"
+"    dbox3(x+.05*c.xyy+.1*c.yyx, vec3(.07,.3,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 dot\n"
+"    dbox3(x+.1*c.xyy-.1*c.yyx, vec3(.02,.3,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 1 bar\n"
+"    dbox3(x+.04*c.yyx, vec3(.3,.02,.08), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 1 dot\n"
+"    dbox3(x-.1*c.yyx, vec3(.3,.02,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 0 big stripes\n"
+"    vec3 y = vec3(x.x, abs(x.y), x.z);\n"
+"    dbox3(y-.05*c.yxy, vec3(.1,.03,.3), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"\n"
+"	// 0 small stripes\n"
+"    dbox3(y-.1*c.yxy-.06*c.xyy, vec3(.08,.021,.3), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"\n"
+"    // 0 upper/lower stripes\n"
+"    vec3 z = vec3(abs(x.x), x.yz);\n"
+"	dbox3(z-.119*c.xyy, vec3(.021,.08,.3), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    sdf.x *= size;\n"
 "}\n"
 "\0";
 const char *dspline2_source = "#version 130\n\n"
@@ -1061,72 +1134,7 @@ const char *logo210_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline
 "void rot3(in vec3 p, out mat3 rot);\n"
 "void stroke(in float d0, in float s, out float d);\n"
 "void add(in vec2 sda, in vec2 sdb, out vec2 sdf);\n"
-"void dbox210(in vec3 x, in float size, out vec2 sdf)\n"
-"{\n"
-"    x /= size;\n"
-"    \n"
-"    float d = 1.;\n"
-"    \n"
-"    // Big red box    \n"
-"    dbox3(x, .2*c.xxx, sdf.x);\n"
-"    sdf.y = 1.;\n"
-"    \n"
-"    // Holes\n"
-"    \n"
-"    // 2 upper bar\n"
-"    dbox3(x-.1*c.xyy, vec3(.02,.3,.12), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 right bar\n"
-"    dbox3(x-.05*c.xyy-.1*c.yyx, vec3(.07,.3,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 mid bar\n"
-"    dbox3(x, vec3(.02,.3,.1), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 left bar\n"
-"    dbox3(x+.05*c.xyy+.1*c.yyx, vec3(.07,.3,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 dot\n"
-"    dbox3(x+.1*c.xyy-.1*c.yyx, vec3(.02,.3,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 1 bar\n"
-"    dbox3(x+.04*c.yyx, vec3(.3,.02,.08), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 1 dot\n"
-"    dbox3(x-.1*c.yyx, vec3(.3,.02,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 0 big stripes\n"
-"    vec3 y = vec3(x.x, abs(x.y), x.z);\n"
-"    dbox3(y-.05*c.yxy, vec3(.1,.03,.3), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"\n"
-"	// 0 small stripes\n"
-"    dbox3(y-.1*c.yxy-.06*c.xyy, vec3(.08,.021,.3), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"\n"
-"    // 0 upper/lower stripes\n"
-"    vec3 z = vec3(abs(x.x), x.yz);\n"
-"	dbox3(z-.119*c.xyy, vec3(.021,.08,.3), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    sdf.x *= size;\n"
-"}\n"
+"void dbox210(in vec3 x, in float size, out vec2 sdf);\n"
 "\n"
 "mat3 R;\n"
 "void scene(in vec3 x, out vec2 sdf)\n"
@@ -1162,19 +1170,7 @@ const char *logo210_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline
 "    add(sdf, sda*c.zx, sdf);\n"
 "}\n"
 "\n"
-"void normal(in vec3 x, out vec3 n, in float dx)\n"
-"{\n"
-"    vec2 s, na;\n"
-"    \n"
-"    scene(x,s);\n"
-"    scene(x+dx*c.xyy, na);\n"
-"    n.x = na.x;\n"
-"    scene(x+dx*c.yxy, na);\n"
-"    n.y = na.x;\n"
-"    scene(x+dx*c.yyx, na);\n"
-"    n.z = na.x;\n"
-"    n = normalize(n-s.x);\n"
-"}\n"
+"void normal(in vec3 x, out vec3 n, in float dx);\n"
 "\n"
 "void mainImage( out vec4 fragColor, in vec2 fragCoord )\n"
 "{\n"
@@ -3014,6 +3010,19 @@ void Loadrot3()
 #endif
     progress += .2/(float)nsymbols;
 }
+void Loaddbox210()
+{
+    int dbox210_size = strlen(dbox210_source);
+    dbox210_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dbox210_handle, 1, (GLchar **)&dbox210_source, &dbox210_size);
+    glCompileShader(dbox210_handle);
+#ifdef DEBUG
+    printf("---> dbox210 Shader:\n");
+    debug(dbox210_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
 void Loaddspline2()
 {
     int dspline2_size = strlen(dspline2_source);
@@ -3244,6 +3253,8 @@ void LoadSymbols()
     updateBar();
     Loadrot3();
     updateBar();
+    Loaddbox210();
+    updateBar();
     Loaddspline2();
     updateBar();
     Loadzextrude();
@@ -3340,6 +3351,8 @@ void Loadlogo210()
     glAttachShader(logo210_program,rot3_handle);
     glAttachShader(logo210_program,stroke_handle);
     glAttachShader(logo210_program,add_handle);
+    glAttachShader(logo210_program,dbox210_handle);
+    glAttachShader(logo210_program,normal_handle);
     glLinkProgram(logo210_program);
 #ifdef DEBUG
     printf("---> logo210 Program:\n");

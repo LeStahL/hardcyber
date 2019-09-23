@@ -17,164 +17,29 @@
 
 #version 130
 
-uniform float iTime;
+out vec4 gl_FragColor;
+
 uniform vec2 iResolution;
 uniform float iProgress;
 
 const float pi = acos(-1.);
 const vec3 c = vec3(1.,0.,-1.);
 
-void rand(in vec2 x, out float n)
+float sm(in float d)
 {
-    x += 400.;
-    n = fract(sin(dot(sign(x)*abs(x) ,vec2(12.9898,78.233)))*43758.5453);
+    return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);
 }
 
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash11(in float p, out float d)
-{
-    p = fract(p * .1031);
-    p *= p + 33.33;
-    p *= p + p;
-    d = fract(p);
-}
-
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash12(in vec2 p, out float d)
-{
-	vec3 p3  = fract(vec3(p.xyx) * .1031);
-    p3 += dot(p3, p3.yzx + 33.33);
-    d = fract((p3.x + p3.y) * p3.z);
-}
-
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash21(in float p, out vec2 d)
-{
-	vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
-	p3 += dot(p3, p3.yzx + 33.33);
-    d = fract((p3.xx+p3.yz)*p3.zy);
-}
-
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash22(in vec2 p, out vec2 d)
-{
-	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yzx+33.33);
-    d = fract((p3.xx+p3.yz)*p3.zy);
-}
-
-// Adapted from iq, https://www.shadertoy.com/view/XsXSz4
-void dtriangle(in vec2 p, in vec2 p0, in vec2 p1, in vec2 p2, out float dst)
-{
-	vec2 e0 = p1 - p0;
-	vec2 e1 = p2 - p1;
-	vec2 e2 = p0 - p2;
-
-	vec2 v0 = p - p0;
-	vec2 v1 = p - p1;
-	vec2 v2 = p - p2;
-
-	vec2 pq0 = v0 - e0*clamp( dot(v0,e0)/dot(e0,e0), 0.0, 1.0 );
-	vec2 pq1 = v1 - e1*clamp( dot(v1,e1)/dot(e1,e1), 0.0, 1.0 );
-	vec2 pq2 = v2 - e2*clamp( dot(v2,e2)/dot(e2,e2), 0.0, 1.0 );
-    
-    float s = sign( e0.x*e2.y - e0.y*e2.x );
-    vec2 d = min( min( vec2( dot( pq0, pq0 ), s*(v0.x*e0.y-v0.y*e0.x) ),
-                       vec2( dot( pq1, pq1 ), s*(v1.x*e1.y-v1.y*e1.x) )),
-                       vec2( dot( pq2, pq2 ), s*(v2.x*e2.y-v2.y*e2.x) ));
-
-	dst = -sqrt(d.x)*sign(d.y);
-}
-
-void stroke(in float d0, in float s, out float d)
-{
-    d = abs(d0)-s;
-}
-
-void dist(in vec2 a, in vec2 b, out float d)
-{
-    d = length(b-a);
-}
-
-void lfnoise(in vec2 t, out float n)
-{
-    vec2 i = floor(t);
-    t = fract(t);
-    t = smoothstep(c.yy, c.xx, t);
-    vec2 v1, v2;
-    rand(i, v1.x);
-    rand(i+c.xy, v1.y);
-    rand(i+c.yx, v2.x);
-    rand(i+c.xx, v2.y);
-    v1 = c.zz+2.*mix(v1, v2, t.y);
-    n = mix(v1.x, v1.y, t.x);
-}
-
-void nearest_controlpoint(in vec2 x, out vec2 p)
-{
-    float dmin = 1.e5, 
-        d;
-    vec2 dp,
-        y = floor(x);
-    
-    float i = 0.;
-    for(float i = -1.; i <= 1.; i += 1.)
-        for(float j = -1.; j <= 1.; j += 1.)
-        {
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            dist(x, dp, d);
-            if(d<dmin)
-            {
-                dmin = d;
-                p = dp;
-            }
-        }
-}
-
-void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)
-{
-    d = 1.e4;
-    vec2 y,
-        dp;
-    
-    nearest_controlpoint(x, p);
-    y = floor(p);
-    
-    control_distance = 1.e4;
-    
-    for(float i = -2.; i <= 2.; i += 1.)
-        for(float j = -2.; j <= 2.; j += 1.)
-        {
-            if(i==0. && j==0.) continue;
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            vec2 o = p - dp;
-            float l = length(o);
-            d = min(d,abs(.5*l-dot(x-dp,o)/l));
-            control_distance = min(control_distance,.5*l);
-        }
-}
-
-void dbox(in vec2 x, in vec2 b, out float d)
-{
-    vec2 da = abs(x)-b;
-    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);
-}
-
-void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d)
-{
-    vec2 da = p2-p1;
-    d = length(x-mix(p1, p2, clamp(dot(x-p1, da)/dot(da,da),0.,1.)));
-}
+void rand(in vec2 x, out float d);
+void hash11(in float p, out float d);
+void hash12(in vec2 p, out float d);
+void hash21(in float p, out vec2 d);
+void hash22(in vec2 p, out vec2 d);
+void stroke(in float d0, in float s, out float d);
+void lfnoise(in vec2 t, out float n);
+void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
+void dbox(in vec2 x, in vec2 b, out float d);
+void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);
 
 const vec3 orange =vec3(0.20,0.60,0.86),
     redorange = vec3(0.27,0.70,0.62);
@@ -205,17 +70,7 @@ void modgradient(in vec2 x, in float decs, inout vec3 col)
     col = mix(orange, redorange, 2.*abs(y)/decs);
 }
 
-float sm(in float d)
-{
-    return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);
-}
-
-void smoothmin(in float a, in float b, in float k, out float dst)
-{
-    float h = max( k-abs(a-b), 0.0 )/k;
-    dst = min( a, b ) - h*h*h*k*(1.0/6.0);
-}
-
+void smoothmin(in float a, in float b, in float k, out float dst);
 void dloading(in vec2 uv, out float d)
 {
     d = 1.;
@@ -334,6 +189,9 @@ void dloading(in vec2 uv, out float d)
     smoothmin(d,dc,.1,d);
 }
 
+void addwindow(in vec2 uv, inout vec3 col, in vec2 dimensions);
+void addprogressbar(in vec2 uv, inout vec3 col, in vec2 dimensions, in float progress);
+
 void main()
 {
     float d;
@@ -358,42 +216,8 @@ void main()
     
     col = mix(col, c.yyy, .2);
     
-    // Background loading bar window
-    dbox(uv, vec2(.3,.2), d);
-    vec3 gcol = length(col)/sqrt(3.)*c.xxx;
-    vec3 window_raw = vec3(0.08,0.07,0.16);
-    vec3 window_background = mix(mix(col,window_raw,.2), mix(gcol,window_raw,.8), clamp((.5-uv.y/.4),0.,1.));
-    col = mix(col, window_background, sm(d));
-    
-    // White border on loading bar window
-    d = abs(d-.002)-.002;
-    d = mix(d, 1., step(abs(uv.y),.19));
-    col = mix(col, c.xxx, sm(d));
-    
-    // Progress bar outline
-    dbox(uv, vec2(.28,.02), d);
-    d = abs(d-.001)-.001;
-    d = mix(d, 1., step(abs(uv.y),.015));
-    col = mix(col, c.xxx, sm(d));
-    
-    // Progress bar value
-    float w = .275;
-    dbox(uv+mix(w,0.,iProgress)*c.xy, vec2(mix(0.,w,iProgress),.01), d);
-    col = mix(col, c.xxx, sm(d));
-    
-    // X box
-    dbox(uv-vec2(.26,.16), .015*c.xx, d);
-    col = mix(col, c.xxx, sm(d+.005));
-    stroke(d, .001, d);
-    col = mix(col, c.xxx, sm(d));
-    
-    // Actual x
-    dlinesegment(uv,vec2(.25,.15),vec2(.27,.17),d);
-    float da;
-    dlinesegment(uv,vec2(.25,.17),vec2(.27,.15),da);
-    d = min(d,da);
-    stroke(d,.002, d);
-    col = mix(col, c.yyy, sm(d));
+    addwindow(uv, col, vec2(.3,.2));
+    addprogressbar(uv, col, vec2(.28,.02), iProgress);
     
     // Loading... text
     dloading(60.*(uv-vec2(-.26,.05)),d);

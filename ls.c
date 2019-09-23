@@ -383,10 +383,21 @@ void load_sound_block(int music_block)
     progress += .5/nblocks1;
 }
 
+#include "engine/shader.h"
+#include "shaders.gen.h"
 void load_demo()
 {
     printf("++++ Creating Loading bar.\n");
+    shader_program_gfx_load.linkStatus = GL_TRUE;
     lInitializeLoader();
+#if 0 // FIXME Debug code
+#else
+    if (shader_program_gfx_load.linkStatus != GL_TRUE)
+    {
+        printf("    Linker Error. Log:\n%s\n\n", shader_program_gfx_load.linkerError);
+    }
+#endif
+
     printf("++++ Loading bar created.\n");
 
     create_render_framebuffers();
@@ -399,8 +410,19 @@ void load_demo()
     updateBar();
 
     lLoadAllSymbols();
-    lLoadAllPrograms();
+#if 0 // FIXME Debug code
+#else
+    for(unsigned int symbolIndex = 0; symbolIndex < lNumberOfSymbols; ++symbolIndex)
+    {
+        if ((shader_symbols + symbolIndex)->compileStatus != GL_TRUE)
+        {
+            printf("    Compiler Error. Log:\n%s\n\n", (shader_symbols + symbolIndex)->compilerError);
+        }
+    }
+#endif
 
+    lLoadAllPrograms();
+    
     LoadSymbols();
     LoadPrograms();
 

@@ -132,7 +132,7 @@ for i in range(len(scene_names)):
     header_source += "static unsigned short shader_" + scene_names[i] + "_symbols[] = { "
     header_source += str(len(symbol_names) + i) + ","
     for symbol in scene_symbol_lists[i]:
-        header_source += str(symbol_names.index(scene_symbol_lists[i][j])) + ","
+        header_source += str(symbol_names.index(symbol)) + ","
     header_source += " };\n"
     header_source += "static struct Uniform shader_" + scene_names[i] + "_uniforms[] = {\n"
     for j in range(len(scene_uniform_lists[i])):
