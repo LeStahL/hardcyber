@@ -3,14 +3,14 @@
         {
             "name": "Team210 Logo",
             "prefix": "logo210",
-            "t_end": 11,
+            "t_end": 12,
             "t_start": 0
         },
         {
             "name": "Hardcyber Graffiti",
             "prefix": "graffiti",
             "t_end": 22,
-            "t_start": 11
+            "t_start": 12
         },
         {
             "name": "Stars, Sky & Street",

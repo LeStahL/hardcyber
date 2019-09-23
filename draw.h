@@ -6,10 +6,10 @@ if(scene_override)
     else t = t_now + start_times[override_index - 2];
 }
 
-if(t < 11)
+if(t < 12)
 {
     glUseProgram(logo210_program);
-    glUniform1f(logo210_iTime_location, t);
+    glUniform1f(logo210_iTime_location, t-0);
     glUniform2f(logo210_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(logo210_iFader0_location, fader0);
@@ -30,7 +30,7 @@ if(t < 11)
 else if(t < 22)
 {
     glUseProgram(graffiti_program);
-    glUniform1f(graffiti_iTime_location, t);
+    glUniform1f(graffiti_iTime_location, t-12);
     glUniform2f(graffiti_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(graffiti_iFader0_location, fader0);
@@ -51,7 +51,7 @@ else if(t < 22)
 else if(t < 33)
 {
     glUseProgram(starsky_program);
-    glUniform1f(starsky_iTime_location, t);
+    glUniform1f(starsky_iTime_location, t-22);
     glUniform2f(starsky_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(starsky_iFader0_location, fader0);
@@ -72,7 +72,7 @@ else if(t < 33)
 else if(t < 44)
 {
     glUseProgram(ocean_program);
-    glUniform1f(ocean_iTime_location, t);
+    glUniform1f(ocean_iTime_location, t-33);
     glUniform2f(ocean_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(ocean_iFader0_location, fader0);

@@ -154,10 +154,10 @@ void zextrude(in float z, in float d2d, in float h, out float d);
 void scene(in vec3 x, out vec2 sdf)
 {    
     dhardcyber(x.xy, sdf.x);
-    zextrude(x.z, -sdf.x, .1, sdf.x);
-    smoothmin(sdf.x, x.z,.1, sdf.x);
+    zextrude(x.z, -sdf.x, mix(.0,.1,clamp((iTime-3.5)/.5,0.,1.)), sdf.x);
+    smoothmin(sdf.x, x.z, mix(.001,.1,clamp((iTime-3.5)/.5,0.,1.)), sdf.x);
     sdf.y = 1.;
-    stroke(sdf.x, .01, sdf.x);
+    stroke(sdf.x, mix(0.,.01,clamp((iTime-3.5)/.5,0.,1.)), sdf.x);
 //     sdf.x = abs(sdf.x);
 //     sdf.x /= 4.;
 }
@@ -178,6 +178,7 @@ void colorize(in vec2 uv, inout vec3 col)
     col = (.5+.5*r)*c.xxx;
     
     dhardcyber(uv, d);
+    d = mix(1.,d,clamp((iTime-3.)/.5,0.,1.));
     col = mix(col, .7*c.xxx, sm(d-.04));
     col = mix(col, c1, sm(d));
     col = mix(col, c.yyy, sm(abs(d-.01)-.01));
@@ -201,13 +202,15 @@ void main()
         dir,
         n, 
         x;
-    int N = 650,
+    int N = 150,
         i;
     t = uv.x * r + uv.y * u;
     dir = normalize(t-o);
 
     vec3 c1;
-    float d = -(o.z-.1)/dir.z;
+    float d = -o.z/dir.z;
+    
+    d = -(o.z-.1)/dir.z;
     
     for(i = 0; i<N; ++i)
     {
@@ -232,9 +235,11 @@ void main()
         col = .1*col 
             + .1*col*dot(l, n)
             + .6*col*pow(abs(dot(reflect(-l,n),dir)),2.);
+        col = mix(c.xxx, col, clamp(iTime/(1.+length(x.xy)),0.,1.));
     }
     
     col = 2.*col*col;
+    col = mix(col, c.yyy, clamp(iTime-9.,0.,1.));
     
     gl_FragColor = vec4(clamp(col,0.,1.), 1.);
 }

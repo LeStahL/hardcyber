@@ -147,7 +147,8 @@ void scene2(in vec3 x, out vec2 sdf)
     lfnoise(12.*vec2(n,1.)*yi-(.8+.2*n)*c.xy, n);
     n *= iScale;
     //sdf = vec2(length(y-.05*n*c.yyx)-.5*size, 1.);
-    sdf = vec2(length(y-.05*n*c.yyx)-mix(.05,1.,length(texture(iChannel0, yi/vec2(a,1.)).rgb)/sqrt(3.))*size, 1.);
+//     sdf = vec2(length(y-.05*n*c.yyx)-mix(.05,1.,length(texture(iChannel0, yi/vec2(a,1.)).rgb)/sqrt(3.))*size, 1.);
+    sdf = vec2(length(y-.05*n*c.yyx)-size*vn*mix(1.,4.,length(texture(iChannel0, yi/vec2(a,1.)).rgb)/sqrt(3.)), 1.);
 }
 
 void normal2(in vec3 x, out vec3 n, in float dx)
@@ -347,7 +348,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord_ )
         iScale = nbeats-30./29.;
         iScale = smoothstep(-5./29., 0., iScale)*(1.-smoothstep(0./29., 35./29., iScale));
 //         lscale = iScale;
-        lscale = smoothstep(0.,.5,clamp((iTime-10.),0.,1.))*(1.-smoothstep(0.,.5,clamp((iTime-18.),0.,1.)));
+        lscale = smoothstep(0.,.5,clamp((iTime-6.),0.,1.))*(1.-smoothstep(0.,.5,clamp((iTime-13.),0.,1.)));
 //         lscale += smoothstep(0.,.5,clamp((iTime-10.),0.,1.))*(1.-smoothstep(0.,.5,clamp((iTime-18.),0.,1.)));
         rscale = smoothstep(167.,167.5,iTime)-smoothstep(172.,172.5,iTime);
         

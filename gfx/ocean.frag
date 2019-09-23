@@ -224,7 +224,7 @@ void main()
     col = 3.*col*col;
     
     //col = mix(col, c.yyy, tanh(2.e-1*d));
-    
+   
     
     gl_FragColor = vec4(clamp(col,0.,1.),1.);
 }

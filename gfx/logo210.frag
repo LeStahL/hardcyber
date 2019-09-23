@@ -79,19 +79,17 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec2 s;
     vec3 o, t, dir, x, n;
     
-    mat3 Ra;
+    mat3 Ra, Rb;
     rot3(mix(c.yyy,vec3(-5.7884463,2.4242211,0.3463173),clamp((iTime-6.)/1.5,0.,1.)), Ra);
-    //vec3 a = vec3(uv,-1.);
-	
-    //rot3(mix(c.yyy,vec3(-3.*pi/4.,3.*pi/4.,-7.*pi/4.),clamp((iTime-6.)/1.5,0.,1.)), Ra);
-    //Ra *= mix(1.,-1.,clamp((iTime-6.)/1.5,0.,1.));
-       
+    rot3(mix(c.yyy,vec3(-2.*pi+5.7884463,-2.4242211,-0.3463173)+pi*c.xyy,clamp((iTime-10.),0.,1.)), Rb);
+    
     
     o = Ra * mix(mix(mix(c.yyy-.1*c.yxy,c.yyx,clamp(iTime/2.,0.,1.)),10.*c.yyx,clamp((iTime-2.)/2.,0.,1.)), 100.*c.yyx, clamp((iTime-4.)/2.,0.,1.));
 	t = c.yyy;
     int N = 650,
         i;
-    dir = Ra *normalize(vec3(uv,-1.));//normalize(t-o);
+    dir = Rb * Ra *normalize(vec3(uv,-1.));//normalize(t-o);
+//     dir = mix(dir, normalize(vec3(uv,1.)), clamp(iTime-10.,0.,1.));
     
     for(i = 0; i<N; ++i)
     {
@@ -165,7 +163,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         }
         
     }
-    col = mix(col,vec3(0.14,0.01,0.2),smoothstep(0.,1.,iTime-10.));
+    col = mix(col,c.xxx,smoothstep(0.,1.,iTime-11.));
     
     fragColor = vec4(clamp(col,0.,1.),1.0);
 }

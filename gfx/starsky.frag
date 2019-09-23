@@ -86,6 +86,8 @@ void colorize(in vec2 x, inout vec3 col)
 void dbox(in vec2 x, in vec2 b, out float d);
 void street(in vec2 x, out vec3 col)
 {
+    x.y += .3*iTime;
+    
     float dx;
     lfnoise(x.y*c.xx, dx);
     x.x += .1*dx;
@@ -113,10 +115,12 @@ void dbox3(in vec3 x, in vec3 b, out float d);
 void add(in vec2 sda, in vec2 sdb, out vec2 sdf);
 void scene(in vec3 x, out vec2 sdf)
 {
+    x.y += .3*iTime;
+    
     float dx;
-    lfnoise(x.y*c.xx, dx);
+    lfnoise((x.y)*c.xx, dx);
     x.x += .1*dx;
-
+    
     sdf = c.xx;
     float n;
     mfnoise(x.xy, mix(8.,1.,smoothstep(.4,1.6,abs(x.x))),2000., mix(.35,.45,smoothstep(.4,1.6,abs(x.x))),n);
@@ -170,6 +174,7 @@ void main()
     int N = 250,
         i;
     t = uv.x * r + uv.y * u;
+    
     dir = normalize(t-o);
 
     vec3 c1;
@@ -230,6 +235,8 @@ void main()
     vec3 c2;
     colorize(4.*uv, c2);
     col = mix(col, 2.*c2, smoothstep(.3,.5, uv.y));
+    
+    col = mix(c.yyy, col, clamp(iTime,0.,1.));
     
     gl_FragColor = vec4(clamp(col,0.,1.), 1.);
 }
