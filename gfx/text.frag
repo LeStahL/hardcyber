@@ -76,7 +76,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     new = old;
     
-    if(uv.y > .38)
+    if(uv.y > .38) // Ui overlay with time counter and credits
     {
         addwindow(uv-.45*vec2(-.45*a,1.-2.*.008*c.yx), new.gba, vec2(.4,.04));
         addwindow((uv-.45*vec2(.97*a,1.-2.*.008*c.yx))*c.zx, new.gba, vec2(.1,.04));
@@ -116,12 +116,17 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
         float sc = smoothstep(0.,1.,clamp(iTime+3.,0.,1.))*(1.-smoothstep(0.,1.,clamp(iTime+1.,0.,1.)));
         
+        vec3 c1 = new.gba;
+        addwindow(uv-vec2(0.,-.3), c1, vec2(.15,.1));
+        
         dstring((uv-vec2(-.085,-.3)), 3., .02, d); // Team210
         float da;
         dstring((uv-vec2(-.08,-.35)), 26., .02, da); // present
         d = min(d,da);
 
-        new.gba = mix(new.gba, mix(new.gba,c.yyy,sc), sm(d));
+        c1 = mix(c1,c.xxx, sm(d));
+        
+        new.gba = mix(new.gba, c1, sc);
     }
     else if(iTime < 6.)
     {
