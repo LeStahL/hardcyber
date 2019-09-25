@@ -1,16 +1,16 @@
 {
     "scenes": [
         {
-            "name": "Team210 Logo",
-            "prefix": "logo210",
-            "t_end": 12,
+            "name": "Deadline Logo",
+            "prefix": "deadline",
+            "t_end": 20,
             "t_start": 0
         },
         {
-            "name": "Hardcyber Graffiti",
-            "prefix": "graffiti",
-            "t_end": 22,
-            "t_start": 12
+            "name": "Team210 Logo",
+            "prefix": "logo210",
+            "t_end": 32,
+            "t_start": 20
         },
         {
             "name": "Stars, Sky & Street",
@@ -19,10 +19,16 @@
             "t_start": 22
         },
         {
+            "name": "Hardcyber Graffiti",
+            "prefix": "graffiti",
+            "t_end": 42,
+            "t_start": 33
+        },
+        {
             "name": "Ocean Scene",
             "prefix": "ocean",
-            "t_end": 44,
-            "t_start": 33
+            "t_end": 53,
+            "t_start": 42
         }
     ]
 }
