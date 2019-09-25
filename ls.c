@@ -359,7 +359,7 @@ void load_sound_block(int music_block)
     glUniform1f(sfx_volumelocation, 1.);
     glUniform1f(sfx_samplerate_location, (float)sample_rate);
     glUniform1f(sfx_blockoffset_location, (float)tstart);
-    glUniform1i(sfx_texs_location, texs);
+    glUniform1f(sfx_texs_location, (float)texs);
     glUniform1i(sfx_sequence_texture_location, 0);
     glUniform1f(sfx_sequence_width_location, sequence_texture_size);
 
