@@ -1,6 +1,12 @@
 {
     "scenes": [
         {
+            "name": "Spacepigs Greetings",
+            "prefix": "hydrant",
+            "t_end": 10,
+            "t_start": 0
+        },
+        {
             "name": "Deadline Logo",
             "prefix": "deadline",
             "t_end": 20,

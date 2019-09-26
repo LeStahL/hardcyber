@@ -6,7 +6,28 @@ if(scene_override)
     else t = t_now + start_times[override_index - 2];
 }
 
-if(t < 20)
+if(t < 10)
+{
+    glUseProgram(hydrant_program);
+    glUniform1f(hydrant_iTime_location, t-0);
+    glUniform2f(hydrant_iResolution_location, w, h);
+#ifdef MIDI
+    glUniform1f(hydrant_iFader0_location, fader0);
+    glUniform1f(hydrant_iFader1_location, fader1);
+    glUniform1f(hydrant_iFader2_location, fader2);
+    glUniform1f(hydrant_iFader3_location, fader3);
+    glUniform1f(hydrant_iFader4_location, fader4);
+    glUniform1f(hydrant_iFader5_location, fader5);
+    glUniform1f(hydrant_iFader6_location, fader6);
+    glUniform1f(hydrant_iFader7_location, fader7);
+    if(override_index == 0)
+    {
+        select_button(override_index);
+        override_index = 0;
+    }
+#endif
+}
+else if(t < 20)
 {
     glUseProgram(deadline_program);
     glUniform1f(deadline_iTime_location, t-0);
@@ -20,7 +41,7 @@ if(t < 20)
     glUniform1f(deadline_iFader5_location, fader5);
     glUniform1f(deadline_iFader6_location, fader6);
     glUniform1f(deadline_iFader7_location, fader7);
-    if(override_index == 0)
+    if(override_index == 1)
     {
         select_button(override_index);
         override_index = 0;
@@ -41,7 +62,7 @@ else if(t < 32)
     glUniform1f(logo210_iFader5_location, fader5);
     glUniform1f(logo210_iFader6_location, fader6);
     glUniform1f(logo210_iFader7_location, fader7);
-    if(override_index == 1)
+    if(override_index == 2)
     {
         select_button(override_index);
         override_index = 0;
@@ -62,7 +83,7 @@ else if(t < 33)
     glUniform1f(starsky_iFader5_location, fader5);
     glUniform1f(starsky_iFader6_location, fader6);
     glUniform1f(starsky_iFader7_location, fader7);
-    if(override_index == 2)
+    if(override_index == 3)
     {
         select_button(override_index);
         override_index = 0;
@@ -83,7 +104,7 @@ else if(t < 42)
     glUniform1f(graffiti_iFader5_location, fader5);
     glUniform1f(graffiti_iFader6_location, fader6);
     glUniform1f(graffiti_iFader7_location, fader7);
-    if(override_index == 3)
+    if(override_index == 4)
     {
         select_button(override_index);
         override_index = 0;
@@ -104,7 +125,7 @@ else if(t < 53)
     glUniform1f(ocean_iFader5_location, fader5);
     glUniform1f(ocean_iFader6_location, fader6);
     glUniform1f(ocean_iFader7_location, fader7);
-    if(override_index == 4)
+    if(override_index == 5)
     {
         select_button(override_index);
         override_index = 0;
