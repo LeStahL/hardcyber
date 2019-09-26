@@ -472,7 +472,6 @@ void main()
     vec3 c0, c1;
     colorize(uv,c0);
     
-//     d = 0.;//-(o.z-mix(0.,.2,step(.2,iTime)))/dir.z;
     analytical_box(o-.25*c.yyx, dir, vec3(.2,.2,.5),d);
     if(d > 4.)
     d = -o.z/dir.z;
@@ -482,14 +481,15 @@ void main()
      	x = o + d * dir;
         scene(x,s);
         if(s.x < 1.e-5)break;
-//         if(x.z<0.)
-//         {
-//             i = N;
-//             break;
-//         }
+        if(x.y>.5)
+        {
+            d = -(o.z+.4)/dir.z;
+            x = o + d * dir;
+            scene(x,s);
+            break;
+        }
         d += s.x;
-//         d += min(s.x,1.e-1);
-        //d += s.x;
+
     }
     
     if(i < N)
