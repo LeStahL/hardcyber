@@ -15,11 +15,11 @@ float linmix(float x, float a, float b, float y0, float y1) { return mix(y0,y1,c
 
 #define pat4(a,b,c,d,x) mod(x,1.)<.25 ? a : mod(x,1.)<.5 ? b : mod(x,1.) < .75 ? c : d
 
-#define NTIME 12
-const float pos_B[12] = float[12](0.,2.,10.,18.,25.,26.,27.,102.,110.,118.,126.,144.);
-const float pos_t[12] = float[12](0.,3.4286,16.9497,30.283,41.7899,43.3899,44.9483,157.4483,169.6002,181.9079,194.3754,222.7965);
-const float pos_BPS[11] = float[11](.5833,.5917,.6,.6083,.625,.6417,.6667,.6583,.65,.6417,.6333);
-const float pos_SPB[11] = float[11](1.7144,1.69,1.6667,1.6439,1.6,1.5584,1.4999,1.5191,1.5385,1.5584,1.579);
+#define NTIME 6
+const float pos_B[6] = float[6](0.,18.,26.,34.,42.,110.);
+const float pos_t[6] = float[6](0.,27.,39.1519,51.4596,63.9271,171.2955);
+const float pos_BPS[5] = float[5](.6667,.6583,.65,.6417,.6333);
+const float pos_SPB[5] = float[5](1.4999,1.5191,1.5385,1.5584,1.579);
 float BPS, SPB, BT;
 
 float Tsample;
@@ -208,10 +208,10 @@ float rfloat(int off)
     return mix(1., -1., sign) * (1. + significand * 9.765625e-4) * pow(2.,exponent-15.);
 }
 
-#define NTRK 15
-#define NMOD 290
-#define NPTN 290
-#define NNOT 9711
+#define NTRK 13
+#define NMOD 66
+#define NPTN 66
+#define NNOT 1935
 #define NDRM 48
 
 int trk_sep(int index)      {return int(rfloat(index));}
@@ -241,7 +241,8 @@ vec2 mainSynth(float time)
     float dL = 0.;
     float dR = 0.;
 
-    time = mod(time, 229.1123);
+    time = mod(time, 47.36840000000001);
+    time += 130.2429;
     
     int _it;
     for(_it = 0; _it < NTIME - 2 && pos_t[_it + 1] < time; _it++);
@@ -408,11 +409,6 @@ env = theta(Bprog)*pow(1.-smoothstep(Boff-rel, Boff, B),.5);
       +s_atan(1.*(2.*fract(.2497*f*(_t2-6.0e-03*(1.+1.*_sin(.9*_t2)))+.02)-1.)+MADD((_t2-6.0e-03*(1.+1.*_sin(.9*_t2))),.5009*f,0.,16,1,-1.,10.*f,1.,10.,1.,.015,1.,0)+.8*MADD((_t2-6.0e-03*(1.+1.*_sin(.9*_t2))),.25*f,0.,32,1,-.6,1000.,100.,0.,1.,.02,.3,0)))
       +.9*vel*(.8*(2.*fract(.2497*f*_t2+.02)-1.)+MADD(_t2,.5009*f,0.,16,1,-1.,10.*f,1.,10.,1.,.015,1.,0)+.8*MADD(_t2,.25*f,0.,32,1,-.6,1000.,100.,0.,1.,.02,.3,0))
       +.5*vel*s_atan(1.*(2.*fract(.2497*f*_t2+.02)-1.)+MADD(_t2,.5009*f,0.,16,1,-1.,10.*f,1.,10.,1.,.015,1.,0)+.8*MADD(_t2,.25*f,0.,32,1,-.6,1000.,100.,0.,1.,.02,.3,0));
-                    }
-                    else if(syn == 121){
-                        time2 = time-5e-3; _t2 = _t-5e-3;
-                        amaysynL = .6*exp(-3.2*Bprog)*clip(2.*(.6+(.4*_sin(.256*BT)))*MADD(_t,f,.3*lpnoise(_t + 0.,8330.)*env_AHDSR(Bprog,L,.08,0.,.2,.4,1.)+.3*lpnoise(_t + 0.,510.)*env_AHDSR(Bprog,L,.02,.1,.3,.2,1.),64,1,(.6+(.4*_sin(.256*BT))),10000.,100.,0.,0.,.001,.5+.1*(.6+(.4*_sin(.256*BT))),0));
-                        amaysynR = .6*exp(-3.2*Bprog)*clip(2.*(.6+(.4*_sin(.256*BT)))*MADD(_t2,f,.3*lpnoise(_t2 + 0.,8330.)*env_AHDSR(Bprog,L,.08,0.,.2,.4,1.)+.3*lpnoise(_t2 + 0.,510.)*env_AHDSR(Bprog,L,.02,.1,.3,.2,1.),64,1,(.6+(.4*_sin(.256*BT))),10000.,100.,0.,0.,.001,.5+.1*(.6+(.4*_sin(.256*BT))),0));
                     }
                     else if(syn == 122){
                         time2 = time-5e-2; _t2 = _t-5e-2;
