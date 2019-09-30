@@ -189,7 +189,7 @@ float rshort(float off)
 {
     float hilo = mod(off, 2.);
     off *= .5;
-    vec2 ind = (vec2(mod(off, iSequenceWidth), floor(off/iSequenceWidth))+.05)/iSequenceWidth;
+    vec2 ind = (vec2(mod(off, iSequenceWidth), floor(off/iSequenceWidth)))/iSequenceWidth+1.e-5;
     vec4 block = texture(iSequence, ind);
     vec2 data = mix(block.rg, block.ba, hilo);
     return round(dot(vec2(255., 65280.), data));
@@ -236,6 +236,9 @@ float drum_rel(int index)   {return     rfloat(index+2+6*NTRK+4*NMOD+NPTN+7*NNOT
 
 vec2 mainSynth(float time)
 {
+    if(rfloat(3) == 41.)
+        return vec2(sin(5000.*time));
+    
     float sL = 0.;
     float sR = 0.;
     float dL = 0.;
