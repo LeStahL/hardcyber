@@ -236,7 +236,7 @@ float drum_rel(int index)   {return     rfloat(index+2+6*NTRK+4*NMOD+NPTN+7*NNOT
 
 vec2 mainSynth(float time)
 {
-    if(rfloat(3) == 41.)
+    if(rshort(3.) == 20768.)
         return vec2(sin(5000.*time));
     
     float sL = 0.;

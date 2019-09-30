@@ -36,6 +36,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+double t_now = 0.,
+    t_start = 0.;
+
+PFNGLCREATESHADERPROC glCreateShader;
+PFNGLCREATEPROGRAMPROC glCreateProgram;
+PFNGLSHADERSOURCEPROC glShaderSource;
+PFNGLCOMPILESHADERPROC glCompileShader;
+PFNGLATTACHSHADERPROC glAttachShader;
+PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLUSEPROGRAMPROC glUseProgram;
+PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+    
 // TODO: remove below
 void debug(int shader_handle)
 {
@@ -85,6 +101,17 @@ HGLRC glrc;
 int w = 1920,
     h = 1080;
 
+void quad()
+{
+    glBegin(GL_QUADS);
+    glVertex3f(-1,-1,0);
+    glVertex3f(-1,1,0);
+    glVertex3f(1,1,0);
+    glVertex3f(1,-1,0);
+    glEnd();
+    glFlush();
+}
+    
 int flip_buffers()
 {
 	SwapBuffers(hdc);
@@ -102,14 +129,36 @@ int flip_buffers()
 	return TRUE;
 }
 
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch(uMsg)
+	{
+		case WM_KEYDOWN:
+			switch(wParam)
+			{
+				case VK_ESCAPE:
+					ExitProcess(0);
+					break;
+			}
+			break;
+		case WM_RBUTTONDOWN:
+			ExitProcess(0);
+			break;
+
+		default:
+			break;
+	}
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
 // Pure opengl drawing code, essentially cross-platform
 void draw()
 {
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, font_texture_handle);
+//     glActiveTexture(GL_TEXTURE1);
+//     glBindTexture(GL_TEXTURE_2D, font_texture_handle);
     
     quad();
-    glBindTexture(GL_TEXTURE_2D, 0);
+//     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
@@ -198,7 +247,18 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
 	glrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, glrc);
 
-    rInitializeRenderer();
+    glCreateShader = (PFNGLCREATESHADERPROC) wglGetProcAddress("glCreateShader");
+	glCreateProgram = (PFNGLCREATEPROGRAMPROC) wglGetProcAddress("glCreateProgram");
+	glShaderSource = (PFNGLSHADERSOURCEPROC) wglGetProcAddress("glShaderSource");
+	glCompileShader = (PFNGLCOMPILESHADERPROC) wglGetProcAddress("glCompileShader");
+	glAttachShader = (PFNGLATTACHSHADERPROC) wglGetProcAddress("glAttachShader");
+	glLinkProgram = (PFNGLLINKPROGRAMPROC) wglGetProcAddress("glLinkProgram");
+	glUseProgram = (PFNGLUSEPROGRAMPROC) wglGetProcAddress("glUseProgram");
+    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) wglGetProcAddress("glGetUniformLocation");
+    glUniform1f = (PFNGLUNIFORM1FPROC) wglGetProcAddress("glUniform1f");
+    glUniform1i = (PFNGLUNIFORM1IPROC) wglGetProcAddress("glUniform1i");
+    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC) wglGetProcAddress("glGenFramebuffers");
+    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC) wglGetProcAddress("glBindFramebuffer");
 
     ShowCursor(FALSE);
     
@@ -206,10 +266,7 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
 	t_start = 0.;
 	while(flip_buffers())
 	{
-		static MMTIME MMTime = { TIME_SAMPLES, 0};
-		waveOutGetPosition(hWaveOut, &MMTime, sizeof(MMTIME));
-		t_now = ((double)MMTime.u.sample)/( 44100.0);
-
 		draw();
 	}
+	return 0;
 }

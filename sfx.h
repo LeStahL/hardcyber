@@ -240,7 +240,7 @@ const char * sfx_frag =
 "\n"
 "vec2 mainSynth(float time)\n"
 "{\n"
-"    if(rfloat(3) == 41.)\n"
+"    if(rshort(3.) == 20768.)\n"
 "        return vec2(sin(5000.*time));\n"
 "    \n"
 "    float sL = 0.;\n"

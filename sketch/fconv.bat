@@ -15,7 +15,6 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-python ..\symbolize.py ..\gfx.frag -o ..\gfx.h
-python ..\symbolize.py ..\sfx.frag -o ..\sfx.h
+cl fconv.c /out:fconv.obj /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt" /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.13.26128\include" /I".." /DWIN32 /c /Gy /O1 /fp:fast /GR- /GS- /MT
 
-"C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x86/cl.exe" ..\nswv.c /out:nswv.obj /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\ucrt" /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include" /I".." /DWIN32 /c /Gy /O1 /fp:fast /GR- /GS- /MT
+crinkler.exe fconv.obj /out:fconv.exe /ENTRY:demo /SUBSYSTEM:Windows /LARGEADDRESSAWARE /PROGRESSGUI /COMPMODE:FAST /PRIORITY:NORMAL User32.lib Winmm.lib opengl32.lib Kernel32.lib ucrt.lib Gdi32.lib /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x86" /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x86"
