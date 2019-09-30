@@ -128,7 +128,7 @@ print("Finished packing texture.")
 # Fill last 4-byte-block with zero
 length = int(len(texture)) # in bytes
 while ((length % 4) != 0):
-    texture += bytes(10)
+    texture += bytes(1)
     length += 1
 print("Packed font and text database is "+str(length)+" bytes.")
 
