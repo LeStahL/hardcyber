@@ -301,14 +301,13 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
 #define data_width 10
 
     int idata_texture_handle;
-    unsigned short odata[data_width*data_width],
-             idata[data_width*data_width];
+    float idata[data_width*data_width];
+    float odata[data_width*data_width];
 
     for(int i=0; i<data_width*data_width; ++i)
     {
-        idata[i] = i % 2;
-        odata[i] = 0;
-        printf("%hu", idata[i]);
+        idata[i] = 655044672134.;
+        printf("%e", idata[i]);
     }
     printf("\n");
 
@@ -318,7 +317,10 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, data_width, data_width, 0, GL_RED, GL_UNSIGNED_SHORT, idata);
+    
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, data_width, data_width, 0, GL_RED, GL_FLOAT, idata);
 
     // Setup output
     int output_framebuffer;
@@ -332,7 +334,7 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, data_width, data_width, 0, GL_RED, GL_UNSIGNED_SHORT, odata);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, data_width, data_width, 0, GL_RED, GL_FLOAT, odata);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, odata_texture_handle, 0);
 
     // Main loop
@@ -341,19 +343,17 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     glUniform1i(iDataLocation, 0);
     glUniform1i(iDataWidthLocation, data_width);
 
-    glBindTexture(GL_TEXTURE_2D, idata_texture_handle);
     glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, idata_texture_handle);
 
     draw();
     
-    glBindTexture(GL_TEXTURE_2D, odata_texture_handle);
-    
-    glReadPixels(0,0,data_width, data_width, GL_RED, GL_UNSIGNED_SHORT, odata);
+    glReadPixels(0,0,data_width, data_width, GL_RED, GL_FLOAT, odata);
     glFlush();
     
     for(int i=0; i<data_width*data_width; ++i)
     {
-        printf("%d: %hu -> %hu\n", i, idata[i], odata[i]);
+        printf("%d: %.12e -> %.12e\n", i, idata[i], odata[i]);
     }
     
     return 0;

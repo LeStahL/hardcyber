@@ -1,11 +1,13 @@
-#version 430
+#version 440
 
-uniform usampler2D iData;
+precision highp float;
+
+uniform sampler2D iData;
 uniform int iDataWidth;
 
-out uint oData;
+out vec4 oData;
 
 void main()
 {
-    oData = 1;
+    oData.r = texture(iData, gl_FragCoord.xy/float(iDataWidth)).r;
 }
