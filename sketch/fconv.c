@@ -302,11 +302,11 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
 
     int idata_texture_handle;
     float idata[data_width*data_width];
-    float odata[data_width*data_width];
 
-    for(int i=0; i<data_width*data_width; ++i)
+    for(int i=0; i<data_width*data_width/2; ++i)
     {
-        idata[i] = 655044672134.;
+        idata[2*i] = (float)i;
+        idata[2*i+1] = (float)i;
         printf("%e", idata[i]);
     }
     printf("\n");
@@ -317,12 +317,12 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, data_width, data_width, 0, GL_RED, GL_FLOAT, idata);
 
     // Setup output
+    float odata[data_width*data_width];
+    
     int output_framebuffer;
     glGenFramebuffers(1, &output_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, output_framebuffer);
@@ -334,6 +334,7 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, data_width, data_width, 0, GL_RED, GL_FLOAT, odata);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, odata_texture_handle, 0);
 
@@ -353,7 +354,7 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     
     for(int i=0; i<data_width*data_width; ++i)
     {
-        printf("%d: %.12e -> %.12e\n", i, idata[i], odata[i]);
+        printf("%d: %.12f -> %.12f\n", i, idata[i], odata[i]);
     }
     
     return 0;
