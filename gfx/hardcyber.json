@@ -35,6 +35,18 @@
             "prefix": "starsky",
             "t_end": 73,
             "t_start": 63
+        },
+        {
+            "name": "Voronoi Cubes",
+            "prefix": "watercubes",
+            "t_end": 93,
+            "t_start": 73
+        },
+        {
+            "name": "Glitch City",
+            "prefix": "glitchcity",
+            "t_end": 103,
+            "t_start": 93
         }
     ]
 }

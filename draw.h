@@ -132,4 +132,46 @@ else if(t < 73)
     }
 #endif
 }
+else if(t < 93)
+{
+    glUseProgram(watercubes_program);
+    glUniform1f(watercubes_iTime_location, t-73);
+    glUniform2f(watercubes_iResolution_location, w, h);
+#ifdef MIDI
+    glUniform1f(watercubes_iFader0_location, fader0);
+    glUniform1f(watercubes_iFader1_location, fader1);
+    glUniform1f(watercubes_iFader2_location, fader2);
+    glUniform1f(watercubes_iFader3_location, fader3);
+    glUniform1f(watercubes_iFader4_location, fader4);
+    glUniform1f(watercubes_iFader5_location, fader5);
+    glUniform1f(watercubes_iFader6_location, fader6);
+    glUniform1f(watercubes_iFader7_location, fader7);
+    if(override_index == 6)
+    {
+        select_button(override_index);
+        override_index = 0;
+    }
+#endif
+}
+else if(t < 103)
+{
+    glUseProgram(glitchcity_program);
+    glUniform1f(glitchcity_iTime_location, t-93);
+    glUniform2f(glitchcity_iResolution_location, w, h);
+#ifdef MIDI
+    glUniform1f(glitchcity_iFader0_location, fader0);
+    glUniform1f(glitchcity_iFader1_location, fader1);
+    glUniform1f(glitchcity_iFader2_location, fader2);
+    glUniform1f(glitchcity_iFader3_location, fader3);
+    glUniform1f(glitchcity_iFader4_location, fader4);
+    glUniform1f(glitchcity_iFader5_location, fader5);
+    glUniform1f(glitchcity_iFader6_location, fader6);
+    glUniform1f(glitchcity_iFader7_location, fader7);
+    if(override_index == 7)
+    {
+        select_button(override_index);
+        override_index = 0;
+    }
+#endif
+}
 #endif

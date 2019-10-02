@@ -15,7 +15,6 @@ uniform float iFader6;
 uniform float iFader7;
 
 
-// Global constants
 const float pi = acos(-1.);
 const vec3 c = vec3(1.0, 0.0, -1.0);
 float a = 1.0;
@@ -23,9 +22,6 @@ float a = 1.0;
 vec3 color1 =vec3(0.02,0.08,0.18),
     color2 = 2.*vec3(0.08,0.08,0.24);
 
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
 void hash22(in vec2 p, out vec2 d)
 {
 	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
@@ -33,9 +29,6 @@ void hash22(in vec2 p, out vec2 d)
     d = fract((p3.xx+p3.yz)*p3.zy);
 }
 
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
 void hash12(in vec2 p, out float d)
 {
 	vec3 p3  = fract(vec3(p.xyx) * .1031);
@@ -306,11 +299,11 @@ void main()
     else colorize(uv,col);
     
     d = d0;
-    
+    float ha = mod(abs(x.y)-mix(-1.,1.,h)*iTime+12.*h,.15);
     palette2(fract(h), c1);
-    col = mix(col,1.15*c1, smoothstep(-.2,1.,smoothstep(.1,1.3,(1.-8.*abs(x.y))))); 
+    col = mix(col,1.15*c1, smoothstep(-.2,1.,smoothstep(.1,1.3,(1.-8.*ha)))); 
     palette2(fract(h+13.37e-3), c1);
-    col = mix(col,1.65*c1*c1, smoothstep(-.2,1.,smoothstep(.1,1.3,(1.-26.*abs(x.y))))); 
+    col = mix(col,1.65*c1*c1, smoothstep(-.2,1.,smoothstep(.1,1.3,(1.-26.*ha)))); 
     
     col = 2.*col*col;
     col = mix(col,c.yyy, smoothstep(0.,2.,d));
