@@ -26,11 +26,94 @@ float a = 1.0;
 
 float nbeats, iScale;
 
-void dbox3(in vec3 x, in vec3 b, out float d);
-void rot3(in vec3 p, out mat3 rot);
-void stroke(in float d0, in float s, out float d);
-void add(in vec2 sda, in vec2 sdb, out vec2 sdf);
-void dbox210(in vec3 x, in float size, out vec2 sdf);
+void dbox3(in vec3 x, in vec3 b, out float d)
+{
+  vec3 da = abs(x) - b;
+  d = length(max(da,0.0))
+         + min(max(da.x,max(da.y,da.z)),0.0);
+}
+void rot3(in vec3 p, out mat3 rot)
+{
+    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))
+        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))
+        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);
+}
+// Stroke
+void stroke(in float d0, in float s, out float d)
+{
+    d = abs(d0)-s;
+}
+
+void add(in vec2 sda, in vec2 sdb, out vec2 sdf)
+{
+    sdf = (sda.x<sdb.x)?sda:sdb;
+}
+void dbox210(in vec3 x, in float size, out vec2 sdf)
+{
+    x /= size;
+    
+    float d = 1.;
+    
+    // Big red box    
+    dbox3(x, .2*c.xxx, sdf.x);
+    sdf.y = 1.;
+    
+    // Holes
+    
+    // 2 upper bar
+    dbox3(x-.1*c.xyy, vec3(.02,.3,.12), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 2 right bar
+    dbox3(x-.05*c.xyy-.1*c.yyx, vec3(.07,.3,.02), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 2 mid bar
+    dbox3(x, vec3(.02,.3,.1), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 2 left bar
+    dbox3(x+.05*c.xyy+.1*c.yyx, vec3(.07,.3,.02), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 2 dot
+    dbox3(x+.1*c.xyy-.1*c.yyx, vec3(.02,.3,.02), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 1 bar
+    dbox3(x+.04*c.yyx, vec3(.3,.02,.08), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 1 dot
+    dbox3(x-.1*c.yyx, vec3(.3,.02,.02), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    // 0 big stripes
+    vec3 y = vec3(x.x, abs(x.y), x.z);
+    dbox3(y-.05*c.yxy, vec3(.1,.03,.3), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+
+	// 0 small stripes
+    dbox3(y-.1*c.yxy-.06*c.xyy, vec3(.08,.021,.3), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+
+    // 0 upper/lower stripes
+    vec3 z = vec3(abs(x.x), x.yz);
+	dbox3(z-.119*c.xyy, vec3(.021,.08,.3), d);
+    sdf.x = max(-d, sdf.x);
+    sdf.y = mix(sdf.y, 2., step(d, sdf.x));
+    
+    sdf.x *= size;
+}
 
 mat3 R;
 void scene(in vec3 x, out vec2 sdf)
@@ -66,7 +149,19 @@ void scene(in vec3 x, out vec2 sdf)
     add(sdf, sda*c.zx, sdf);
 }
 
-void normal(in vec3 x, out vec3 n, in float dx);
+void normal(in vec3 x, out vec3 n, in float dx)
+{
+    vec2 s, na;
+    
+    scene(x,s);
+    scene(x+dx*c.xyy, na);
+    n.x = na.x;
+    scene(x+dx*c.yxy, na);
+    n.y = na.x;
+    scene(x+dx*c.yyx, na);
+    n.z = na.x;
+    n = normalize(n-s.x);
+}
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -84,7 +179,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     rot3(mix(c.yyy,vec3(-2.*pi+5.7884463,-2.4242211,-0.3463173)+pi*c.xyy,clamp((iTime-10.),0.,1.)), Rb);
     
     
-    o = Ra * mix(mix(mix(c.yyy-.1*c.yxy,c.yyx,clamp(iTime/2.,0.,1.)),10.*c.yyx,clamp((iTime-2.)/2.,0.,1.)), 100.*c.yyx, clamp((iTime-4.)/2.,0.,1.));
+    o = Ra * mix(mix(mix(c.yyy-.005*c.yyx,c.yyx,clamp(iTime/2.,0.,1.)),10.*c.yyx,clamp((iTime-2.)/2.,0.,1.)), 100.*c.yyx, clamp((iTime-4.)/2.,0.,1.));
 	t = c.yyy;
     int N = 650,
         i;
@@ -164,6 +259,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
     }
     col = mix(col,c.xxx,smoothstep(0.,1.,iTime-11.));
+    
+    col = mix(vec3(0.18,0.24,0.31), col, clamp(iTime,0.,1.));
     
     fragColor = vec4(clamp(col,0.,1.),1.0);
 }

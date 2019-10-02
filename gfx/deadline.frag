@@ -246,6 +246,7 @@ void ddecorations(in vec2 x, in float decs, out float d)
     pdec = yi/decs;
 }
 
+float m;
 void scene(in vec3 x, out vec2 sdf)
 {
     if(iTime < 8.)
@@ -258,22 +259,21 @@ void scene(in vec3 x, out vec2 sdf)
     }
     else
     {
-        float d;
+//         float d;
         sdf.x = x.z;
-        for(float decs = .05; decs <= 1.; decs += .3)
-//         float decs = .05;
-        {
-            ddecorations(x.xy-1337.-12.*decs*c.yx, decs, d);
-            
-            float m;
-            lfnoise(pdec-iTime*vec2(1.3,.9), m);
-//             hash12(1.e3*pdec, m);
-            
-//             stroke(d, .001, d);
-//             d += .001;
-            zextrude(x.z,-d,mix(0.,.1-.1*m, clamp(iTime-8.,0.,1.)),d);
-            sdf.x = min(sdf.x,d);
-        }
+//         for(float decs = .05; decs <= 1.; decs += .3)
+// //         float decs = .05;
+//         {
+// //             ddecorations(x.xy-1337.-12.*decs*c.yx, decs, d);
+//             
+// //             lfnoise(pdec-iTime*vec2(1.3,.9), m);
+// //             hash12(1.e3*pdec, m);
+//             
+// //             stroke(d, .001, d);
+// //             d += .001;
+// //             zextrude(x.z,-d,mix(0.,.01-.01*m, clamp(iTime-8.,0.,1.)),d);
+// //             sdf.x = min(sdf.x,d);
+//         }
         sdf.y = 1.;
 //         sdf.x = abs(sdf.x);
     }
@@ -321,25 +321,25 @@ void colorize(in vec2 uv, out vec3 col)
         
         ddecorations(uv-1337.-12.*decs*c.yx, decs, d);
         
-        float m;
-        lfnoise((1.+5.*decs)*uv-1337.-12.*decs*c.yx, m);
-        
-        col = mix(col, mix(col,c1,mix(.6,.1,.8+.2*m)* mix(1., 0., clamp(length(uv),0.,1.))), sm(d));
+        float ma;
+        lfnoise((1.+5.*decs)*uv-1337.-12.*decs*c.yx-clamp(iTime/3.,0.,1.)*iTime*c.yx, ma);
+        col = mix(col, mix(col,c1,mix(.6,.1,.8+.2*ma)* mix(1., 0., clamp(length(uv),0.,1.))), sm(d));
         stroke(d, .001, d);
+        col = mix(col, 1.4*col, mix(0.,sm(d-.01),mix(0.,.5+.5*ma,clamp(iTime-10.,0.,1.))));
         col = mix(col, mix(orange,c.xxx,decs), sm(d));
     }
 //     col *= mix(1.,2.1, clamp(iTime-8.,0.,1.));
     
     col = mix(col, c.yyy, .2);
-    
+
     if(iTime < 8.)
     {
         ddeadline(uv, d);
         ddl = d;
         
-        c1 = mix(col,mix(3.5,5.5,.5+.5*sin(6.*iTime))*vec3(0.27,0.36,0.48), sm(ddl/150.));
+        c1 = mix(col,mix(col,mix(3.5,5.5,.5+.5*sin(6.*iTime))*vec3(0.27,0.36,0.48),.5), sm(ddl/150.));
         
-        c1 = mix(c1, 1.3*vec3(0.27,0.36,0.48), sm(d+.002));
+        c1 = mix(c1, mix(col,1.3*vec3(0.27,0.36,0.48),.8), sm(d+.002));
         stroke(d,.002, d);
         c1 = mix(c1, 2.5*vec3(0.27,0.36,0.48), sm(d));
         
@@ -429,6 +429,8 @@ void main()
     
     col = 2.*col*col;
     col = mix(c0, col, clamp(iTime,0.,1.));
+    
+    col = mix(col, vec3(0.18,0.24,0.31), clamp(iTime-19.,0.,1.));
 //     col = mix(col, c.yyy, clamp(iTime-9.,0.,1.));
     gl_FragColor = vec4(clamp(col,0.,1.),1.);
 }
