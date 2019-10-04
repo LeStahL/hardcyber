@@ -27,7 +27,7 @@
         {
             "name": "Stars, Sky & Street",
             "prefix": "starsky",
-            "t_end": 83,
+            "t_end": 73,
             "t_start": 53
         },
         {
@@ -57,7 +57,7 @@
         {
             "name": "Fractal Scene",
             "prefix": "fractal",
-            "t_end": 153,
+            "t_end": 173,
             "t_start": 143
         }
     ]

@@ -90,7 +90,7 @@ else if(t < 53)
     }
 #endif
 }
-else if(t < 83)
+else if(t < 73)
 {
     glUseProgram(starsky_program);
     glUniform1f(starsky_iTime_location, t-53);
@@ -195,7 +195,7 @@ else if(t < 143)
     }
 #endif
 }
-else if(t < 153)
+else if(t < 173)
 {
     glUseProgram(fractal_program);
     glUniform1f(fractal_iTime_location, t-143);
