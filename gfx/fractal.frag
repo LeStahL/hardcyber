@@ -17,142 +17,18 @@ const float pi = acos(-1.);
 const vec3 c = vec3(1.0, 0.0, -1.0);
 float a = 1.0;
 
-void rand(in vec2 x, out float n)
-{
-    x += 400.;
-    n = fract(sin(dot(sign(x)*abs(x) ,vec2(12.9898,78.233)))*43758.5453);
-}
-
-void lfnoise(in vec2 t, out float n)
-{
-    vec2 i = floor(t);
-    t = fract(t);
-    t = smoothstep(c.yy, c.xx, t);
-    vec2 v1, v2;
-    rand(i, v1.x);
-    rand(i+c.xy, v1.y);
-    rand(i+c.yx, v2.x);
-    rand(i+c.xx, v2.y);
-    v1 = c.zz+2.*mix(v1, v2, t.y);
-    n = mix(v1.x, v1.y, t.x);
-}
-
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash22(in vec2 p, out vec2 d)
-{
-	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yzx+33.33);
-    d = fract((p3.xx+p3.yz)*p3.zy);
-}
-
-void dist(in vec2 a, in vec2 b, out float d)
-{
-    d = length(b-a);
-}
-
-void nearest_controlpoint(in vec2 x, out vec2 p)
-{
-    float dmin = 1.e5, 
-        d;
-    vec2 dp,
-        y = floor(x);
-    
-    float i = 0.;
-    for(float i = -1.; i <= 1.; i += 1.)
-        for(float j = -1.; j <= 1.; j += 1.)
-        {
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            dist(x, dp, d);
-            if(d<dmin)
-            {
-                dmin = d;
-                p = dp;
-            }
-        }
-}
-
-void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)
-{
-    d = 1.e4;
-    vec2 y,
-        dp;
-    
-    nearest_controlpoint(x, p);
-    y = floor(p);
-    
-    control_distance = 1.e4;
-    
-    for(float i = -2.; i <= 2.; i += 1.)
-        for(float j = -2.; j <= 2.; j += 1.)
-        {
-            if(i==0. && j==0.) continue;
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            vec2 o = p - dp;
-            float l = length(o);
-            d = min(d,abs(.5*l-dot(x-dp,o)/l));
-            control_distance = min(control_distance,.5*l);
-        }
-}
-
-void add(in vec2 sda, in vec2 sdb, out vec2 sdf)
-{
-    sdf = (sda.x<sdb.x)?sda:sdb;
-}
-
-void sub(in vec2 sda, in vec2 sdb, out vec2 sdf)
-{
-    sdf = (sda.x>sdb.x)?abs(sda):abs(sdb)*c.zx;
-}
-
-void zextrude(in float z, in float d2d, in float h, out float d)
-{
-    vec2 w = vec2(-d2d, abs(z)-0.5*h);
-    d = length(max(w,0.0));
-}
-
-void dbox3(in vec3 x, in vec3 b, out float d)
-{
-  vec3 da = abs(x) - b;
-  d = length(max(da,0.0))
-         + min(max(da.x,max(da.y,da.z)),0.0);
-}
-
-void rot3(in vec3 p, out mat3 rot)
-{
-    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))
-        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))
-        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);
-}
-
-void dbox(in vec2 x, in vec2 b, out float d)
-{
-    vec2 da = abs(x)-b;
-    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);
-}
-
-void dstar(in vec2 x, in float N, in vec2 R, out float dst)
-{
-    float d = pi/N,
-        p0 = acos(x.x/length(x)),
-        p = mod(p0, d),
-        i = mod(round((p-p0)/d),2.);
-    x = length(x)*vec2(cos(p),sin(p));
-    vec2 a = mix(R,R.yx,i),
-    	p1 = a.x*c.xy,
-        ff = a.y*vec2(cos(d),sin(d))-p1;
-   	ff = ff.yx*c.zx;
-    dst = dot(x-p1,ff)/length(ff);
-}
-
-void doctahedron(in vec3 x, in float h, in float w, out float d){
-    x.xz = abs(x.xz);
-    x.y = abs(x.y)-h;
-    d = max(x.z,x.x)+(x.y*w);    
-}
+void rand(in vec2 x, out float n);
+void lfnoise(in vec2 t, out float n);
+void hash22(in vec2 p, out vec2 d);
+void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
+void add(in vec2 sda, in vec2 sdb, out vec2 sdf);
+void sub(in vec2 sda, in vec2 sdb, out vec2 sdf);
+void zextrude(in float z, in float d2d, in float h, out float d);
+void dbox3(in vec3 x, in vec3 b, out float d);
+void rot3(in vec3 p, out mat3 rot);
+void dbox(in vec2 x, in vec2 b, out float d);
+void dstar(in vec2 x, in float N, in vec2 R, out float dst);
+void doctahedron(in vec3 x, in float h, in float w, out float d);
 
 mat3 gR;
 vec2 ind = c.yy;
@@ -207,19 +83,7 @@ void texture_scene(in vec3 x, out vec2 sdf)
     add(sdf, vec2(db,1.), sdf);
 }
 
-void normal(in vec3 x, out vec3 n, in float dx)
-{
-    vec2 s, na;
-    
-    scene(x,s);
-    scene(x+dx*c.xyy, na);
-    n.x = na.x;
-    scene(x+dx*c.yxy, na);
-    n.y = na.x;
-    scene(x+dx*c.yyx, na);
-    n.z = na.x;
-    n = normalize(n-s.x);
-}
+void normal(in vec3 x, out vec3 n, in float dx);
 
 void texture_normal(in vec3 x, out vec3 n, in float dx)
 {

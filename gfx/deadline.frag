@@ -19,14 +19,11 @@ void rand(in vec2 x, out float n);
 void lfnoise(in vec2 t, out float n);
 void hash11(in float p, out float d);
 void hash12(in vec2 p, out float d);
-void hash21(in float p, out vec2 d);
 void hash22(in vec2 p, out vec2 d);
-void hash31(in float p, out vec3 d);
+void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);
 void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
 void stroke(in float d0, in float s, out float d);
 void dbox(in vec2 x, in vec2 b, out float d);
-void drhomboid(in vec2 x, in vec2 b, in float tilt, out float dst);
-void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);
 void ddeadline(in vec2 x, out float ret);
 void zextrude(in float z, in float d2d, in float h, out float d);
 
