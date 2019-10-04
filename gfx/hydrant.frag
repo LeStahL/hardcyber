@@ -104,7 +104,6 @@ void dcircle(in vec2 x, out float d)
     d = length(x)-1.;
 }
 
-void dear(in vec2 x, out float d);
 void dpolygon(in vec2 x, in float N, out float d);
 void dspacepigs(in vec2 x, out float d);
 

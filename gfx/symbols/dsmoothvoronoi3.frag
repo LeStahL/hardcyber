@@ -5,12 +5,12 @@ const vec3 c = vec3(1.,0.,-1.);
 void hash33(in vec3 p3, out vec3 d);
 void smoothmin(in float a, in float b, in float k, out float dst);
 
-void dist3(in vec3 a, in vec3 b, out float d)
+void dist3_s(in vec3 a, in vec3 b, out float d)
 {
     d = length(b-a);
 }
 
-void nearest_controlpoint3(in vec3 x, out vec3 p)
+void nearest_controlpoint3_s(in vec3 x, out vec3 p)
 {
     float dmin = 1.e5, 
         d;
@@ -24,7 +24,7 @@ void nearest_controlpoint3(in vec3 x, out vec3 p)
             {
                 hash33(y+vec3(i,j,k), dp);
                 dp += y+vec3(i,j,k);
-                dist3(x, dp, d);
+                dist3_s(x, dp, d);
                 if(d<dmin)
                 {
                     dmin = d;
@@ -40,7 +40,7 @@ void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_dista
     vec3 y,
         dp;
     
-    nearest_controlpoint3(x, p);
+    nearest_controlpoint3_s(x, p);
     y = floor(p);
     
     control_distance = 1.e4;

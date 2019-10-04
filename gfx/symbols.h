@@ -2,8 +2,8 @@
 #ifndef SYMBOLIZE_H
 #define SYMBOLIZE_H
 
-extern float progress;int rand_handle, hash11_handle, hash12_handle, hash21_handle, hash22_handle, hash31_handle, stroke_handle, lfnoise_handle, dvoronoi_handle, dbox_handle, dlinesegment_handle, smoothmin_handle, add_handle, normal_handle, dspline2_handle, zextrude_handle, mfnoise_handle, dbox3_handle, rshort_handle, rfloat_handle, dcircle_handle, drhomboid_handle, dcirclesegment_handle, dglyph_handle, dstring_handle, dfloat_handle, dint_handle, dtime_handle, addwindow_handle, rot3_handle, ddeadline_handle, sub_handle, dstar_handle, doctahedron_handle;
-const int nsymbols = 34;
+extern float progress;int rand_handle, hash11_handle, hash12_handle, hash21_handle, hash22_handle, hash31_handle, stroke_handle, lfnoise_handle, dvoronoi_handle, dbox_handle, dlinesegment_handle, smoothmin_handle, add_handle, normal_handle, dbox3_handle, rot3_handle, dbox210_handle, dspline2_handle, zextrude_handle, mfnoise_handle, rshort_handle, rfloat_handle, dcircle_handle, drhomboid_handle, dcirclesegment_handle, dglyph_handle, dstring_handle, dfloat_handle, dint_handle, dtime_handle, addwindow_handle, ddeadline_handle, dpolygon_handle, dspacepigs_handle, analytical_box_handle, hash33_handle, dvoronoi3_handle, dsmoothvoronoi3_handle, dstar_handle, smoothmax_handle, dstar3_handle, dhexagonpattern_handle, dmercury_handle, dtriangle_handle, rot_handle, dschnappsgirls_handle, dhaujobb_handle, dkewlers_handle, dfarbrausch_handle, d5711_handle, sub_handle, doctahedron_handle;
+const int nsymbols = 52;
 const char *rand_source = "#version 130\n\n"
 "void rand(in vec2 x, out float n)\n"
 "{\n"
@@ -184,6 +184,95 @@ const char *normal_source = "const vec3 c = vec3(1.0, 0.0, -1.0);\n"
 "    n = normalize(n-s.x);\n"
 "}\n"
 "\0";
+const char *dbox3_source = "#version 130\n\n"
+"void dbox3(in vec3 x, in vec3 b, out float d)\n"
+"{\n"
+"  vec3 da = abs(x) - b;\n"
+"  d = length(max(da,0.0))\n"
+"         + min(max(da.x,max(da.y,da.z)),0.0);\n"
+"}\n"
+"\0";
+const char *rot3_source = "const vec3 c = vec3(1.,0.,-1.);\n"
+"void rot3(in vec3 p, out mat3 rot)\n"
+"{\n"
+"    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))\n"
+"        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))\n"
+"        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);\n"
+"}\n"
+"\0";
+const char *dbox210_source = "#version 130\n\n"
+"\n"
+"const vec3 c = vec3(1.,0.,-1.);\n"
+"\n"
+"void dbox3(in vec3 x, in vec3 b, out float d);\n"
+"\n"
+"void dbox210(in vec3 x, in float size, out vec2 sdf)\n"
+"{\n"
+"    x /= size;\n"
+"    \n"
+"    float d = 1.;\n"
+"    \n"
+"    // Big red box    \n"
+"    dbox3(x, .2*c.xxx, sdf.x);\n"
+"    sdf.y = 1.;\n"
+"    \n"
+"    // Holes\n"
+"    \n"
+"    // 2 upper bar\n"
+"    dbox3(x-.1*c.xyy, vec3(.02,.3,.12), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 right bar\n"
+"    dbox3(x-.05*c.xyy-.1*c.yyx, vec3(.07,.3,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 mid bar\n"
+"    dbox3(x, vec3(.02,.3,.1), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 left bar\n"
+"    dbox3(x+.05*c.xyy+.1*c.yyx, vec3(.07,.3,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 2 dot\n"
+"    dbox3(x+.1*c.xyy-.1*c.yyx, vec3(.02,.3,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 1 bar\n"
+"    dbox3(x+.04*c.yyx, vec3(.3,.02,.08), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 1 dot\n"
+"    dbox3(x-.1*c.yyx, vec3(.3,.02,.02), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    // 0 big stripes\n"
+"    vec3 y = vec3(x.x, abs(x.y), x.z);\n"
+"    dbox3(y-.05*c.yxy, vec3(.1,.03,.3), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"\n"
+"	// 0 small stripes\n"
+"    dbox3(y-.1*c.yxy-.06*c.xyy, vec3(.08,.021,.3), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"\n"
+"    // 0 upper/lower stripes\n"
+"    vec3 z = vec3(abs(x.x), x.yz);\n"
+"	dbox3(z-.119*c.xyy, vec3(.021,.08,.3), d);\n"
+"    sdf.x = max(-d, sdf.x);\n"
+"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
+"    \n"
+"    sdf.x *= size;\n"
+"}\n"
+"\0";
 const char *dspline2_source = "#version 130\n\n"
 "const vec3 c = vec3(1.,0.,-1.);\n"
 "const float pi = acos(-1.);\n"
@@ -247,14 +336,6 @@ const char *mfnoise_source = "#version 130\n\n"
 "        nf += 1.;\n"
 "    }\n"
 "    n *= (1.-e)/(1.-pow(e, nf));\n"
-"}\n"
-"\0";
-const char *dbox3_source = "#version 130\n\n"
-"void dbox3(in vec3 x, in vec3 b, out float d)\n"
-"{\n"
-"  vec3 da = abs(x) - b;\n"
-"  d = length(max(da,0.0))\n"
-"         + min(max(da.x,max(da.y,da.z)),0.0);\n"
 "}\n"
 "\0";
 const char *rshort_source = "#version 130\n\n"
@@ -734,14 +815,6 @@ const char *addwindow_source = "#version 130\n\n"
 "    col = mix(col, c.yyy, sm(d));\n"
 "}\n"
 "\0";
-const char *rot3_source = "const vec3 c = vec3(1.,0.,-1.);\n"
-"void rot3(in vec3 p, out mat3 rot)\n"
-"{\n"
-"    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))\n"
-"        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))\n"
-"        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);\n"
-"}\n"
-"\0";
 const char *ddeadline_source = "#version 130\n\n"
 "\n"
 "void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);\n"
@@ -773,13 +846,216 @@ const char *ddeadline_source = "#version 130\n\n"
 "    ret = mix(ret, -ret, mod(n, 2.));\n"
 "}\n"
 "\0";
-const char *sub_source = "#version 130\n\n"
+const char *dpolygon_source = "#version 130\n\n"
+"// compute distance to regular polygon\n"
+"const float pi = acos(-1.);\n"
+"void dpolygon(in vec2 x, in float N, out float d)\n"
+"{\n"
+"    d = 2.0*pi/N;\n"
+"    float t = mod(acos(x.x/length(x)), d)-0.5*d;\n"
+"    d = -0.5+length(x)*cos(t)/cos(0.5*d);\n"
+"}\n"
+"\0";
+const char *dspacepigs_source = "#version 130\n\n"
+"\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"void dcircle(in vec2 x, out float d);\n"
+"\n"
+"void dear(in vec2 x, out float d)\n"
+"{\n"
+"    d = abs(2.*x.y)\n"
+"        -.95+smoothstep(0.,.5,clamp(abs(x.x),0.,1.))\n"
+"        -.5*min(-abs(x.x),.01);\n"
+"}\n"
+"\n"
+"void dspacepigs(in vec2 x, out float d)\n"
+"{\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    float da, d0;\n"
+"    \n"
+"    // Head\n"
+"    dcircle(2.5*x,d0);\n"
+"    d0 /= 2.5;\n"
+"    \n"
+"    // Ears\n"
+"    dear(vec2(2.,5.)*x-vec2(.8,1.3), da);\n"
+"    d0 = min(d0,da/10.);\n"
+"    dear(vec2(2.,5.)*x+vec2(.8,-1.3), da);\n"
+"    d0 = min(d0,da/10.);\n"
+"    \n"
+"    // Nose\n"
+"    dcircle(6.*x-vec2(0.,-.5),da);\n"
+"    d0 = max(d0,-da/6.);\n"
+"    dcircle(24.*x-vec2(-1.5,-2.),da);\n"
+"    d0 = min(d0,da/24.);\n"
+"    dcircle(24.*x-vec2(1.5,-2.),da);\n"
+"    d0 = min(d0,da/24.);\n"
+"    \n"
+"    // Eyes\n"
+"    dcircle(16.*x-vec2(-3.5,2.5),da);\n"
+"    d0 = max(d0,-da/16.);\n"
+"    dcircle(16.*x-vec2(3.5,2.5),da);\n"
+"    d0 = max(d0,-da/16.);\n"
+"    dcircle(24.*x-vec2(-5.,3.5),da);\n"
+"    d0 = min(d0,da/24.);\n"
+"    dcircle(24.*x-vec2(5.,3.5),da);\n"
+"    d0 = min(d0,da/24.);\n"
+"    \n"
+"    d = max(d, -d0);\n"
+"}\n"
+"\0";
+const char *analytical_box_source = "#version 130\n\n"
+"const vec3 c = vec3(1.,0.,-1.);\n"
+"void analytical_box(in vec3 o, in vec3 dir, in vec3 size, out float d)\n"
+"{\n"
+"    vec3 tlo = min((size-o)/dir,(-size-o)/dir); // Select 3 visible planes\n"
+"    vec2 abxlo = abs(o.yz + tlo.x*dir.yz),\n"
+"        abylo = abs(o.xz + tlo.y*dir.xz),\n"
+"        abzlo = abs(o.xy + tlo.z*dir.xy);\n"
+"    vec4 dn = 100.*c.xyyy;\n"
+"    \n"
+"    dn = mix(dn, vec4(tlo.x,c.xyy), float(all(lessThan(abxlo,size.yz)))*step(tlo.x,dn.x));\n"
+"    dn = mix(dn, vec4(tlo.y,c.yxy), float(all(lessThan(abylo,size.xz)))*step(tlo.y,dn.x));\n"
+"    dn = mix(dn, vec4(tlo.z,c.yyx), float(all(lessThan(abzlo,size.xy)))*step(tlo.z,dn.x));\n"
+"\n"
+"    d = dn.r;\n"
+"}\n"
+"\0";
+const char *hash33_source = "// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
+"// Created by David Hoskins.\n"
+"// See https://www.shadertoy.com/view/4djSRW\n"
+"void hash33(in vec3 p3, out vec3 d)\n"
+"{\n"
+"	p3 = fract(p3 * vec3(.1031, .1030, .0973));\n"
+"    p3 += dot(p3, p3.yxz+33.33);\n"
+"    d = fract((p3.xxy + p3.yxx)*p3.zyx);\n"
+"}\n"
+"\0";
+const char *dvoronoi3_source = "#version 130\n\n"
 "\n"
 "const vec3 c = vec3(1.,0.,-1.);\n"
 "\n"
-"void sub(in vec2 sda, in vec2 sdb, out vec2 sdf)\n"
+"void hash33(in vec3 p3, out vec3 d);\n"
+"\n"
+"void dist3(in vec3 a, in vec3 b, out float d)\n"
 "{\n"
-"    sdf = (sda.x>sdb.x)?abs(sda):abs(sdb)*c.zx;\n"
+"    d = length(b-a);\n"
+"}\n"
+"\n"
+"void nearest_controlpoint3(in vec3 x, out vec3 p)\n"
+"{\n"
+"    float dmin = 1.e5, \n"
+"        d;\n"
+"    vec3 dp,\n"
+"        y = floor(x);\n"
+"    \n"
+"    for(float i = -1.; i <= 1.; i += 1.)\n"
+"        for(float j = -1.; j <= 1.; j += 1.)\n"
+"        {\n"
+"            for(float k = -1.; k <= 1.; k += 1.)\n"
+"            {\n"
+"                hash33(y+vec3(i,j,k), dp);\n"
+"                dp += y+vec3(i,j,k);\n"
+"                dist3(x, dp, d);\n"
+"                if(d<dmin)\n"
+"                {\n"
+"                    dmin = d;\n"
+"                    p = dp;\n"
+"                }\n"
+"            }\n"
+"        }\n"
+"}\n"
+"\n"
+"void dvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)\n"
+"{\n"
+"    d = 1.e4;\n"
+"    vec3 y,\n"
+"        dp;\n"
+"    \n"
+"    nearest_controlpoint3(x, p);\n"
+"    y = floor(p);\n"
+"    \n"
+"    control_distance = 1.e4;\n"
+"    \n"
+"    for(float i = -2.; i <= 2.; i += 1.)\n"
+"        for(float j = -2.; j <= 2.; j += 1.)\n"
+"        {\n"
+"            for(float k = -1.; k <= 1.; k += 1.)\n"
+"            {\n"
+"                if(i==0. && j==0. && k == 0.) continue;\n"
+"                hash33(y+vec3(i,j,k), dp);\n"
+"                dp += y+vec3(i,j,k);\n"
+"                vec3 o = p - dp;\n"
+"                float l = length(o);\n"
+"                d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
+"                control_distance = min(control_distance,.5*l);\n"
+"            }\n"
+"        }\n"
+"}\n"
+"\0";
+const char *dsmoothvoronoi3_source = "#version 130\n\n"
+"\n"
+"const vec3 c = vec3(1.,0.,-1.);\n"
+"\n"
+"void hash33(in vec3 p3, out vec3 d);\n"
+"void smoothmin(in float a, in float b, in float k, out float dst);\n"
+"\n"
+"void dist3_s(in vec3 a, in vec3 b, out float d)\n"
+"{\n"
+"    d = length(b-a);\n"
+"}\n"
+"\n"
+"void nearest_controlpoint3_s(in vec3 x, out vec3 p)\n"
+"{\n"
+"    float dmin = 1.e5, \n"
+"        d;\n"
+"    vec3 dp,\n"
+"        y = floor(x);\n"
+"    \n"
+"    for(float i = -1.; i <= 1.; i += 1.)\n"
+"        for(float j = -1.; j <= 1.; j += 1.)\n"
+"        {\n"
+"            for(float k = -1.; k <= 1.; k += 1.)\n"
+"            {\n"
+"                hash33(y+vec3(i,j,k), dp);\n"
+"                dp += y+vec3(i,j,k);\n"
+"                dist3_s(x, dp, d);\n"
+"                if(d<dmin)\n"
+"                {\n"
+"                    dmin = d;\n"
+"                    p = dp;\n"
+"                }\n"
+"            }\n"
+"        }\n"
+"}\n"
+"\n"
+"void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)\n"
+"{\n"
+"    d = 1.e4;\n"
+"    vec3 y,\n"
+"        dp;\n"
+"    \n"
+"    nearest_controlpoint3_s(x, p);\n"
+"    y = floor(p);\n"
+"    \n"
+"    control_distance = 1.e4;\n"
+"    \n"
+"    for(float i = -2.; i <= 2.; i += 1.)\n"
+"        for(float j = -2.; j <= 2.; j += 1.)\n"
+"        {\n"
+"            for(float k = -1.; k <= 1.; k += 1.)\n"
+"            {\n"
+"                if(i==0. && j==0. && k == 0.) continue;\n"
+"                hash33(y+vec3(i,j,k), dp);\n"
+"                dp += y+vec3(i,j,k);\n"
+"                vec3 o = p - dp;\n"
+"                float l = length(o);\n"
+"//                 d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
+"                smoothmin(d,abs(.5*l-dot(x-dp,o)/l), .15, d);\n"
+"//                 control_distance = min(control_distance,.5*l);\n"
+"                smoothmin(control_distance, .5*l, .15, control_distance);\n"
+"            }\n"
+"        }\n"
 "}\n"
 "\0";
 const char *dstar_source = "#version 130\n\n"
@@ -797,6 +1073,372 @@ const char *dstar_source = "#version 130\n\n"
 "        ff = a.y*vec2(cos(d),sin(d))-p1;\n"
 "   	ff = ff.yx*c.zx;\n"
 "    dst = dot(x-p1,ff)/length(ff);\n"
+"}\n"
+"\0";
+const char *smoothmax_source = "#version 130\n\n"
+"\n"
+"void smoothmin(in float a, in float b, in float k, out float dst);\n"
+"\n"
+"void smoothmax(in float a, in float b, in float k, out float res)\n"
+"{\n"
+"    smoothmin(a,b,k,res);\n"
+"    res = a + b - res;\n"
+"}\n"
+"\0";
+const char *dstar3_source = "#version 130\n\n"
+"\n"
+"void dstar(in vec2 x, in float N, in vec2 R, out float dst);\n"
+"void smoothmax(in float a, in float b, in float k, out float res);\n"
+"\n"
+"void dstar3(in vec3 x, in float N, in vec2 R, out float dst)\n"
+"{\n"
+"    float d;\n"
+"    \n"
+"    dstar(x.xy, N, R, dst);\n"
+"    dstar(x.yz, N, R, d);\n"
+"    smoothmax(-d,-dst,.15,dst);\n"
+"    dstar(x.zx, N, R, d);\n"
+"    smoothmax(-d,dst,.15,dst);\n"
+"}\n"
+"\0";
+const char *dhexagonpattern_source = "// Distance to hexagon pattern\n"
+"void dhexagonpattern(in vec2 p, out float d, out vec2 ind) \n"
+"{\n"
+"    vec2 q = vec2( p.x*1.2, p.y + p.x*0.6 );\n"
+"    \n"
+"    vec2 pi = floor(q);\n"
+"    vec2 pf = fract(q);\n"
+"\n"
+"    float v = mod(pi.x + pi.y, 3.0);\n"
+"\n"
+"    float ca = step(1.,v);\n"
+"    float cb = step(2.,v);\n"
+"    vec2  ma = step(pf.xy,pf.yx);\n"
+"    \n"
+"    d = dot( ma, 1.0-pf.yx + ca*(pf.x+pf.y-1.0) + cb*(pf.yx-2.0*pf.xy) );\n"
+"    ind = pi + ca - cb*ma;\n"
+"    ind = vec2(ind.x/1.2, ind.y);\n"
+"    ind = vec2(ind.x, ind.y-ind.x*.6);\n"
+"}\n"
+"\0";
+const char *dmercury_source = "#version 130\n\n"
+"\n"
+"const vec3 c = vec3(1.,0.,-1.);\n"
+"\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"\n"
+"void dmercury(in vec2 x, out float d)\n"
+"{\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    float da;\n"
+"\n"
+"    x += .1*c.yx;\n"
+"\n"
+"    // Upper part\n"
+"    dbox(x-.35*c.yx,vec2(.4,.35), da);\n"
+"    d = max(d, -da);\n"
+"    dbox(x-.7*c.yx, vec2(.2,.2), da);\n"
+"    d = min(d,da);\n"
+"    dbox(x-.25*c.yx,vec2(.2,.05),da);\n"
+"    d = min(d,da);\n"
+"    \n"
+"    // Lower part\n"
+"    dbox(x+.2*c.yx,vec2(.1,.4),da);\n"
+"    d = max(d, -da);\n"
+"    dbox(x+.2*c.yx, vec2(.4,.1),da);\n"
+"    d = max(d, -da);\n"
+"}\n"
+"\0";
+const char *dtriangle_source = "// Adapted from iq, https://www.shadertoy.com/view/XsXSz4\n"
+"void dtriangle(in vec2 p, in vec2 p0, in vec2 p1, in vec2 p2, out float dst)\n"
+"{\n"
+"	vec2 e0 = p1 - p0;\n"
+"	vec2 e1 = p2 - p1;\n"
+"	vec2 e2 = p0 - p2;\n"
+"\n"
+"	vec2 v0 = p - p0;\n"
+"	vec2 v1 = p - p1;\n"
+"	vec2 v2 = p - p2;\n"
+"\n"
+"	vec2 pq0 = v0 - e0*clamp( dot(v0,e0)/dot(e0,e0), 0.0, 1.0 );\n"
+"	vec2 pq1 = v1 - e1*clamp( dot(v1,e1)/dot(e1,e1), 0.0, 1.0 );\n"
+"	vec2 pq2 = v2 - e2*clamp( dot(v2,e2)/dot(e2,e2), 0.0, 1.0 );\n"
+"    \n"
+"    float s = sign( e0.x*e2.y - e0.y*e2.x );\n"
+"    vec2 d = min( min( vec2( dot( pq0, pq0 ), s*(v0.x*e0.y-v0.y*e0.x) ),\n"
+"                       vec2( dot( pq1, pq1 ), s*(v1.x*e1.y-v1.y*e1.x) )),\n"
+"                       vec2( dot( pq2, pq2 ), s*(v2.x*e2.y-v2.y*e2.x) ));\n"
+"\n"
+"	dst = -sqrt(d.x)*sign(d.y);\n"
+"}\n"
+"\0";
+const char *rot_source = "#version 130\n\n"
+"void rot(in float phi, out mat2 m)\n"
+"{\n"
+"    vec2 cs = vec2(cos(phi), sin(phi));\n"
+"    m = mat2(cs.x, -cs.y, cs.y, cs.x);\n"
+"}\n"
+"\0";
+const char *dschnappsgirls_source = "#version 130\n\n"
+"\n"
+"void dtriangle(in vec2 x, in vec2 p0, in vec2 p1, in vec2 p2, out float d);\n"
+"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);\n"
+"void stroke(in float d0, in float s, out float d);\n"
+"void dcircle(in vec2 x, out float d);\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"\n"
+"void dschnappsgirls(in vec2 x, out float d)\n"
+"{\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    float da, d0;\n"
+"    \n"
+"    // Dress\n"
+"    dtriangle(x, vec2(-.1,-.3), vec2(.5,-.3), vec2(.2, .6), d0);\n"
+"    dlinesegment(x, vec2(-.1,.325), vec2(.5,.325), da);\n"
+"    stroke(da,.06,da);\n"
+"    d0 = max(d0,-da);\n"
+"    \n"
+"    // Head\n"
+"    dcircle(7.*(x-vec2(.2,.5)), da);\n"
+"    d0 = max(d0, -da+.5);\n"
+"    d0 = min(d0, da/7.);\n"
+"    \n"
+"    // Legs\n"
+"    dlinesegment(x, vec2(.125,-.3), vec2(.125,-.6), da);\n"
+"    stroke(da, .06, da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x, vec2(.275,-.3), vec2(.275,-.6), da);\n"
+"    stroke(da, .06, da);\n"
+"    d0 = min(d0, da);\n"
+"    \n"
+"    // Shoulders\n"
+"    dlinesegment(x, vec2(0.05,.25), vec2(.35,.25), da);\n"
+"    stroke(da, .085, da);\n"
+"    d0 = min(d0, da);\n"
+"    \n"
+"    // Arms\n"
+"    dlinesegment(x, vec2(.385,.25), vec2(.5, -.1), da);\n"
+"    stroke(da, .055, da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x, vec2(.017,.25), vec2(-.1, -.1), da);\n"
+"    stroke(da, .055, da);\n"
+"    d0 = min(d0, da);\n"
+"    \n"
+"    // Glass\n"
+"    dtriangle(x, vec2(-.6,.3), vec2(-.4,.1), vec2(-.2,.3), da);\n"
+"    stroke(da, .0125, da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x, vec2(-.4,.15), vec2(-.4,-.1), da);\n"
+"    stroke(da, .0125, da);\n"
+"    d0 = min(d0, da);\n"
+"    dtriangle(x, vec2(-.5,-.15), vec2(-.3,-.15), vec2(-.4,-.1), da);\n"
+"    d0 = min(d0, da);\n"
+"    \n"
+"    // Liquid\n"
+"    dtriangle(x, vec2(-.55,.25), vec2(-.4,.1), vec2(-.25,.25), da);\n"
+"    d0 = min(d0, da);\n"
+"    \n"
+"    // Salad\n"
+"    dlinesegment(x, vec2(-.4,.1), vec2(-.2,.5), da);\n"
+"    stroke(da, .01, da);\n"
+"    d0 = min(d0, da);\n"
+"    dcircle(24.*(x-vec2(-.3,.3)), da);\n"
+"    d0 = min(d0, da/24.);\n"
+"    dcircle(24.*(x-vec2(-.25,.4)), da);\n"
+"    d0 = min(d0, da/24.);\n"
+"    \n"
+"    d = max(d, -d0);\n"
+"}\n"
+"\0";
+const char *dhaujobb_source = "#version 130\n\n"
+"\n"
+"const vec3 c = vec3(1.0, 0.0, -1.0);\n"
+"const float pi = acos(-1.);\n"
+"\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"void rot(in float phi, out mat2 m);\n"
+"void dcircle(in vec2 x, out float d);\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
+"\n"
+"void dhaujobb(in vec2 x, out float d)\n"
+"{\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    float da, d0;\n"
+"    mat2 m;\n"
+"	rot(.3,m);\n"
+"    x = 1.1*x*m;\n"
+"    x.x *= 1.1;\n"
+"        \n"
+"    x += vec2(-.05,.2);\n"
+"    \n"
+"    // Left leg\n"
+"    dbox(x+.35*c.xx,vec2(.1,.05),d0);\n"
+"    dbox(x+vec2(.3,.25),vec2(.05,.15),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(x+vec2(.2,.15),vec2(.1,.05),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(x+vec2(.15,.05),vec2(.05,.15),da);\n"
+"    d0 = min(d0,da);\n"
+"    \n"
+"    // Right leg\n"
+"    dbox(x-vec2(.65,.35),vec2(.05,.15),da);\n"
+"    d0 = min(d0,da);\n"
+"\n"
+"    // Torso\n"
+"    rot(.2, m);\n"
+"    dbox(m*(x-vec2(.25,.15)),vec2(.45,.05),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(m*(x-vec2(-.15,.35)),vec2(.45,.05),da);\n"
+"    d0 = min(d0,da);\n"
+"    rot(pi/8.,m);\n"
+"    dbox(m*(x-vec2(.0,.25)),vec2(.1,.15),da);\n"
+"    d0 = min(d0,da);\n"
+"    \n"
+"    // Penis\n"
+"    dbox(m*(x-vec2(.1,-.0)),vec2(.025,.1),da);\n"
+"    d0 = min(d0,da);\n"
+"    \n"
+"    // Left hand\n"
+"    rot(.3,m);\n"
+"    dbox(m*(x-vec2(.235,.535)),vec2(.035,.15),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(m*(x-vec2(.225,.7)),vec2(.075,.025),da);\n"
+"    d0 = min(d0,da);\n"
+"    \n"
+"    // Right hand\n"
+"    rot(-.2,m);\n"
+"    dbox(m*(x+vec2(.585,-.2)),vec2(.0375,.1),da);\n"
+"    d0 = min(d0,da);\n"
+"    \n"
+"    // Head\n"
+"    dcircle(6.*(x-vec2(-.15,.58)),da);\n"
+"    d0 = min(d0,da/6.);\n"
+"    \n"
+"    d0 -= .05*(abs(x.x)+abs(x.y)-.2);\n"
+"    d = max(d,-d0);\n"
+"}\n"
+"\0";
+const char *dkewlers_source = "#version 130\n\n"
+"\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"\n"
+"void dkewlers(in vec2 x, out float d)\n"
+"{\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    float da, d0;\n"
+"    \n"
+"    x *= 1.2;\n"
+"    \n"
+"    dbox(x-vec2(0.,-.3),vec2(.6,.1),d0);\n"
+"    dbox(x-vec2(-.5,-.0),vec2(.1,.25),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(x-vec2(-.5+1./3.,.25),vec2(.1,.5),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(x-vec2(-.5+2./3.,-.0),vec2(.1,.25),da);\n"
+"    d0 = min(d0,da);\n"
+"    dbox(x-vec2(.5,-.0),vec2(.1,.25),da);\n"
+"    d0 = min(d0,da);\n"
+"    \n"
+"    d = max(d, -d0);\n"
+"}\n"
+"\0";
+const char *dfarbrausch_source = "#version 130\n\n"
+"\n"
+"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"void stroke(in float d0, in float s, out float d);\n"
+"\n"
+"void dfarbrausch(in vec2 x, out float d)\n"
+"{\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    float da, d0;\n"
+"    \n"
+"    x += vec2(.1,0.);\n"
+"    x *= 1.2;\n"
+"    \n"
+"    dlinesegment(x,vec2(-.65,.05),vec2(-.5,.05),d0);\n"
+"    dlinesegment(x,vec2(-.5,.05),vec2(-.2,-.49),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(-.2,-.49),vec2(-.0,-.49),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(-.0,-.49),vec2(-.27,.0),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(-.07,0.),vec2(-.27,.0),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.2,-.49),vec2(-.07,.0),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.4,-.49),vec2(.13,.0),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.4,-.49),vec2(.2,-.49),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.33,0.),vec2(.13,.0),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.33,0.),vec2(.51,-.33),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.6,-.15),vec2(.51,-.33),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.53,0.),vec2(.6,-.15),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.7,0.),vec2(.53,.0),da);\n"
+"    d0 = min(d0, da);\n"
+"    dlinesegment(x,vec2(.7,0.),vec2(.68,-.04),da);\n"
+"    d0 = min(d0, da);\n"
+"    dpolygon(5.*(x+vec2(.3,.65)),6.,da);\n"
+"    d0 = min(d0, da/5.);\n"
+"    dpolygon(5.*(x+vec2(-.5,.65)),6.,da);\n"
+"    d0 = min(d0, da/5.);\n"
+"    \n"
+"    stroke(d0,.035, d0);\n"
+"    d = max(d, -d0);\n"
+"}\n"
+"\0";
+const char *d5711_source = "#version 130\n\n"
+"\n"
+"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"\n"
+"const int npts = 208;\n"
+"const float path[npts] = float[npts](-0.500,0.145,-0.500,-0.029,-0.500,-0.029,-0.353,-0.029,-0.353,-0.029,-0.353,-0.087,-0.353,-0.087,-0.500,-0.087,-0.500,-0.087,-0.500,-0.145,-0.500,-0.145,-0.280,-0.145,-0.280,-0.145,-0.280,0.029,-0.280,0.029,-0.427,0.029,-0.427,0.029,-0.427,0.087,-0.427,0.087,-0.280,0.087,-0.280,0.087,-0.280,0.145,-0.280,0.145,-0.500,0.145,-0.500,0.145,-0.500,0.145,-0.240,0.145,-0.240,0.087,-0.240,0.087,-0.093,0.087,-0.093,0.087,-0.093,0.029,-0.093,0.029,-0.020,0.029,-0.020,0.029,-0.020,0.145,-0.020,0.145,-0.240,0.145,-0.093,0.029,-0.167,0.029,-0.167,0.029,-0.167,-0.087,-0.167,-0.087,-0.093,-0.087,-0.093,-0.087,-0.093,0.029,-0.093,0.029,-0.093,0.029,-0.167,-0.087,-0.240,-0.087,-0.240,-0.087,-0.240,-0.145,-0.240,-0.145,-0.167,-0.145,-0.167,-0.145,-0.167,-0.087,0.093,0.145,0.093,0.087,0.093,0.087,0.020,0.087,0.020,0.087,0.020,0.029,0.020,0.029,0.093,0.029,0.093,0.029,0.093,-0.087,0.093,-0.087,0.020,-0.087,0.020,-0.087,0.020,-0.145,0.020,-0.145,0.240,-0.145,0.240,-0.145,0.240,-0.087,0.240,-0.087,0.167,-0.087,0.167,-0.087,0.167,0.145,0.167,0.145,0.093,0.145,0.353,0.145,0.353,0.087,0.353,0.087,0.280,0.087,0.280,0.087,0.280,0.029,0.280,0.029,0.353,0.029,0.353,0.029,0.353,-0.087,0.353,-0.087,0.280,-0.087,0.280,-0.087,0.280,-0.145,0.280,-0.145,0.500,-0.145,0.500,-0.145,0.500,-0.087,0.500,-0.087,0.427,-0.087,0.427,-0.087,0.427,0.145,0.427,0.145,0.353,0.145);\n"
+"void d5711(in vec2 x, out float ret)\n"
+"{\n"
+"    float d;\n"
+"    dpolygon(.5*x,6.0,d);\n"
+"    \n"
+"    x *= .7;\n"
+"    ret = 1.;\n"
+"    float da;\n"
+"\n"
+"    float n = 0.;\n"
+"    for(int i=0; i<npts/4; ++i)\n"
+"    {\n"
+"        vec2 ptsi = vec2(path[4*i], path[4*i+1]),\n"
+"            ptsip1 = vec2(path[4*i+2], path[4*i+3]),\n"
+"            k = x-ptsi, \n"
+"            d = ptsip1-ptsi;\n"
+"        \n"
+"        float beta = k.x/d.x,\n"
+"            alpha = d.y*k.x/d.x-k.y;\n"
+"        \n"
+"        n += step(.0, beta)*step(beta, 1.)*step(0., alpha);\n"
+"        dlinesegment(x, ptsi, ptsip1, da);\n"
+"        ret = min(ret, da);\n"
+"    }\n"
+"    \n"
+"    ret = mix(ret, -ret, mod(n, 2.));\n"
+"    \n"
+"    ret = max(d,-ret);\n"
+"    ret /= .7;\n"
+"}\n"
+"\0";
+const char *sub_source = "#version 130\n\n"
+"\n"
+"const vec3 c = vec3(1.,0.,-1.);\n"
+"\n"
+"void sub(in vec2 sda, in vec2 sdb, out vec2 sdf)\n"
+"{\n"
+"    sdf = (sda.x>sdb.x)?abs(sda):abs(sdb)*c.zx;\n"
 "}\n"
 "\0";
 const char *doctahedron_source = "#version 130\n\n"
@@ -1086,94 +1728,11 @@ const char *logo210_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline
 "\n"
 "float nbeats, iScale;\n"
 "\n"
-"void dbox3(in vec3 x, in vec3 b, out float d)\n"
-"{\n"
-"  vec3 da = abs(x) - b;\n"
-"  d = length(max(da,0.0))\n"
-"         + min(max(da.x,max(da.y,da.z)),0.0);\n"
-"}\n"
-"void rot3(in vec3 p, out mat3 rot)\n"
-"{\n"
-"    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))\n"
-"        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))\n"
-"        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);\n"
-"}\n"
-"// Stroke\n"
-"void stroke(in float d0, in float s, out float d)\n"
-"{\n"
-"    d = abs(d0)-s;\n"
-"}\n"
-"\n"
-"void add(in vec2 sda, in vec2 sdb, out vec2 sdf)\n"
-"{\n"
-"    sdf = (sda.x<sdb.x)?sda:sdb;\n"
-"}\n"
-"void dbox210(in vec3 x, in float size, out vec2 sdf)\n"
-"{\n"
-"    x /= size;\n"
-"    \n"
-"    float d = 1.;\n"
-"    \n"
-"    // Big red box    \n"
-"    dbox3(x, .2*c.xxx, sdf.x);\n"
-"    sdf.y = 1.;\n"
-"    \n"
-"    // Holes\n"
-"    \n"
-"    // 2 upper bar\n"
-"    dbox3(x-.1*c.xyy, vec3(.02,.3,.12), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 right bar\n"
-"    dbox3(x-.05*c.xyy-.1*c.yyx, vec3(.07,.3,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 mid bar\n"
-"    dbox3(x, vec3(.02,.3,.1), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 left bar\n"
-"    dbox3(x+.05*c.xyy+.1*c.yyx, vec3(.07,.3,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 2 dot\n"
-"    dbox3(x+.1*c.xyy-.1*c.yyx, vec3(.02,.3,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 1 bar\n"
-"    dbox3(x+.04*c.yyx, vec3(.3,.02,.08), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 1 dot\n"
-"    dbox3(x-.1*c.yyx, vec3(.3,.02,.02), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    // 0 big stripes\n"
-"    vec3 y = vec3(x.x, abs(x.y), x.z);\n"
-"    dbox3(y-.05*c.yxy, vec3(.1,.03,.3), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"\n"
-"	// 0 small stripes\n"
-"    dbox3(y-.1*c.yxy-.06*c.xyy, vec3(.08,.021,.3), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"\n"
-"    // 0 upper/lower stripes\n"
-"    vec3 z = vec3(abs(x.x), x.yz);\n"
-"	dbox3(z-.119*c.xyy, vec3(.021,.08,.3), d);\n"
-"    sdf.x = max(-d, sdf.x);\n"
-"    sdf.y = mix(sdf.y, 2., step(d, sdf.x));\n"
-"    \n"
-"    sdf.x *= size;\n"
-"}\n"
+"void dbox3(in vec3 x, in vec3 b, out float d);\n"
+"void rot3(in vec3 p, out mat3 rot);\n"
+"void stroke(in float d0, in float s, out float d);\n"
+"void add(in vec2 sda, in vec2 sdb, out vec2 sdf);\n"
+"void dbox210(in vec3 x, in float size, out vec2 sdf);\n"
 "\n"
 "mat3 R;\n"
 "void scene(in vec3 x, out vec2 sdf)\n"
@@ -1209,19 +1768,7 @@ const char *logo210_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline
 "    add(sdf, sda*c.zx, sdf);\n"
 "}\n"
 "\n"
-"void normal(in vec3 x, out vec3 n, in float dx)\n"
-"{\n"
-"    vec2 s, na;\n"
-"    \n"
-"    scene(x,s);\n"
-"    scene(x+dx*c.xyy, na);\n"
-"    n.x = na.x;\n"
-"    scene(x+dx*c.yxy, na);\n"
-"    n.y = na.x;\n"
-"    scene(x+dx*c.yyx, na);\n"
-"    n.z = na.x;\n"
-"    n = normalize(n-s.x);\n"
-"}\n"
+"void normal(in vec3 x, out vec3 n, in float dx);\n"
 "\n"
 "void mainImage( out vec4 fragColor, in vec2 fragCoord )\n"
 "{\n"
@@ -1626,16 +2173,18 @@ const char *starsky_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline
 "void lfnoise(in vec2 t, out float n);\n"
 "void mfnoise(in vec2 x, in float d, in float b, in float e, out float n);\n"
 "void dvoronoi(in vec2 x, out float d, out vec2 z, out float dv);\n"
+"float dspiral(vec2 x, float a, float d);\n"
+"float sm(float d)\n"
+"{\n"
+"    return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);\n"
+"}\n"
+"\n"
 "float dspiral(vec2 x, float a, float d)\n"
 "{\n"
 "    float p = atan(x.y, x.x),\n"
 "        n = floor((abs(length(x)-a*p)+d*p)/(2.*pi*a));\n"
 "    p += (n*2.+1.)*pi;\n"
 "    return -abs(length(x)-a*p)+d*p;\n"
-"}\n"
-"float sm(float d)\n"
-"{\n"
-"    return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);\n"
 "}\n"
 "\n"
 "void stroke(in float d0, in float s, out float d);\n"
@@ -2865,236 +3414,20 @@ const char *hydrant_source = "#version 130\n\n"
 "const float pi = acos(-1.);\n"
 "const vec3 c = vec3(1.,0.,-1.);\n"
 "\n"
-"void rand(in vec2 x, out float n)\n"
-"{\n"
-"    x += 400.;\n"
-"    n = fract(sin(dot(sign(x)*abs(x) ,vec2(12.9898,78.233)))*43758.5453);\n"
-"}\n"
-"\n"
-"\n"
-"void lfnoise(in vec2 t, out float n)\n"
-"{\n"
-"    vec2 i = floor(t);\n"
-"    t = fract(t);\n"
-"    t = smoothstep(c.yy, c.xx, t);\n"
-"    vec2 v1, v2;\n"
-"    rand(i, v1.x);\n"
-"    rand(i+c.xy, v1.y);\n"
-"    rand(i+c.yx, v2.x);\n"
-"    rand(i+c.xx, v2.y);\n"
-"    v1 = c.zz+2.*mix(v1, v2, t.y);\n"
-"    n = mix(v1.x, v1.y, t.x);\n"
-"}\n"
-"\n"
-"void mfnoise(in vec2 x, in float d, in float b, in float e, out float n)\n"
-"{\n"
-"    n = 0.;\n"
-"    float a = 1., nf = 0., buf;\n"
-"    for(float f = d; f<b; f *= 2.)\n"
-"    {\n"
-"        lfnoise(f*x, buf);\n"
-"        n += a*buf;\n"
-"        a *= e;\n"
-"        nf += 1.;\n"
-"    }\n"
-"    n *= (1.-e)/(1.-pow(e, nf));\n"
-"}\n"
-"\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash11(in float p, out float d)\n"
-"{\n"
-"    p = fract(p * .1031);\n"
-"    p *= p + 33.33;\n"
-"    p *= p + p;\n"
-"    d = fract(p);\n"
-"}\n"
-"\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash12(in vec2 p, out float d)\n"
-"{\n"
-"	vec3 p3  = fract(vec3(p.xyx) * .1031);\n"
-"    p3 += dot(p3, p3.yzx + 33.33);\n"
-"    d = fract((p3.x + p3.y) * p3.z);\n"
-"}\n"
-"\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash21(in float p, out vec2 d)\n"
-"{\n"
-"	vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));\n"
-"	p3 += dot(p3, p3.yzx + 33.33);\n"
-"    d = fract((p3.xx+p3.yz)*p3.zy);\n"
-"}\n"
-"\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash22(in vec2 p, out vec2 d)\n"
-"{\n"
-"	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));\n"
-"    p3 += dot(p3, p3.yzx+33.33);\n"
-"    d = fract((p3.xx+p3.yz)*p3.zy);\n"
-"}\n"
-"\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash31(in float p, out vec3 d)\n"
-"{\n"
-"   vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));\n"
-"   p3 += dot(p3, p3.yzx+33.33);\n"
-"   d = fract((p3.xxy+p3.yzz)*p3.zyx); \n"
-"}\n"
-"\n"
-"void dist(in vec2 a, in vec2 b, out float d)\n"
-"{\n"
-"    d = length(b-a);\n"
-"}\n"
-"\n"
-"void nearest_controlpoint(in vec2 x, out vec2 p)\n"
-"{\n"
-"    float dmin = 1.e5, \n"
-"        d;\n"
-"    vec2 dp,\n"
-"        y = floor(x);\n"
-"    \n"
-"    float i = 0.;\n"
-"    for(float i = -1.; i <= 1.; i += 1.)\n"
-"        for(float j = -1.; j <= 1.; j += 1.)\n"
-"        {\n"
-"            hash22(y+vec2(i,j), dp);\n"
-"            dp += y+vec2(i,j);\n"
-"            dist(x, dp, d);\n"
-"            if(d<dmin)\n"
-"            {\n"
-"                dmin = d;\n"
-"                p = dp;\n"
-"            }\n"
-"        }\n"
-"}\n"
-"\n"
-"void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)\n"
-"{\n"
-"    d = 1.e4;\n"
-"    vec2 y,\n"
-"        dp;\n"
-"    \n"
-"    nearest_controlpoint(x, p);\n"
-"    y = floor(p);\n"
-"    \n"
-"    control_distance = 1.e4;\n"
-"    \n"
-"    for(float i = -2.; i <= 2.; i += 1.)\n"
-"        for(float j = -2.; j <= 2.; j += 1.)\n"
-"        {\n"
-"            if(i==0. && j==0.) continue;\n"
-"            hash22(y+vec2(i,j), dp);\n"
-"            dp += y+vec2(i,j);\n"
-"            vec2 o = p - dp;\n"
-"            float l = length(o);\n"
-"            d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
-"            control_distance = min(control_distance,.5*l);\n"
-"        }\n"
-"}\n"
-"\n"
-"// void worley(in vec2 x, out float n)\n"
-"// {\n"
-"//     vec2 p, dp, y;\n"
-"//     nearest_controlpoint(x, p);\n"
-"//     y = floor(p);\n"
-"//     \n"
-"//     float control_distance = 1.e4;\n"
-"//     \n"
-"//     for(float i = -2.; i <= 2.; i += 1.)\n"
-"//         for(float j = -2.; j <= 2.; j += 1.)\n"
-"//         {\n"
-"//             if(i==0. && j==0.) continue;\n"
-"//             hash22(y+vec2(i,j), dp);\n"
-"//             dp += y+vec2(i,j);\n"
-"//             vec2 o = p - dp;\n"
-"//             float l = length(o);\n"
-"//             control_distance = min(control_distance,.5*l);\n"
-"//         }\n"
-"//     n = 1.-length(x-p)*1.5;\n"
-"// }\n"
-"// \n"
-"// void mfworley(in vec2 x, in float d, in float b, in float e, out float n)\n"
-"// {\n"
-"//     n = 0.;\n"
-"//     float a = 1., nf = 0., buf;\n"
-"//     for(float f = d; f<b; f *= 2.)\n"
-"//     {\n"
-"//         worley(f*x-f, buf);\n"
-"//         n += a*buf;\n"
-"//         a *= e;\n"
-"//         nf += 1.;\n"
-"//     }\n"
-"//     n *= (1.-e)/(1.-pow(e, nf));\n"
-"// }\n"
-"\n"
-"// Stroke\n"
-"void stroke(in float d0, in float s, out float d)\n"
-"{\n"
-"    d = abs(d0)-s;\n"
-"}\n"
-"\n"
-"\n"
-"void dbox(in vec2 x, in vec2 b, out float d)\n"
-"{\n"
-"    vec2 da = abs(x)-b;\n"
-"    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);\n"
-"}\n"
-"\n"
-"\n"
-"void drhomboid(in vec2 x, in vec2 b, in float tilt, out float dst)\n"
-"{\n"
-"    x.x -= tilt/2./b.y*x.y;\n"
-"    dbox(x,b,dst);\n"
-"}\n"
-"\n"
-"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d)\n"
-"{\n"
-"    vec2 da = p2-p1;\n"
-"    d = length(x-mix(p1, p2, clamp(dot(x-p1, da)/dot(da,da),0.,1.)));\n"
-"}\n"
-"\n"
-"void ddeadline(in vec2 x, out float ret)\n"
-"{\n"
-"    ret = 1.;\n"
-"    float da;\n"
-"    const int npts = 368;\n"
-"const float path[npts] = float[npts](0.114,-0.123,0.102,-0.137,0.102,-0.137,0.040,-0.137,0.040,-0.137,-0.013,-0.078,-0.013,-0.078,-0.064,-0.137,-0.064,-0.137,-0.153,-0.137,-0.153,-0.137,-0.165,-0.123,-0.165,-0.123,-0.176,-0.137,-0.176,-0.137,-0.380,-0.137,-0.380,-0.137,-0.500,0.002,-0.500,0.002,-0.412,0.104,-0.412,0.104,-0.393,0.104,-0.393,0.104,-0.480,0.002,-0.480,0.002,-0.467,0.002,-0.467,0.002,-0.380,0.104,-0.380,0.104,-0.297,0.104,-0.297,0.104,-0.253,0.054,-0.253,0.054,-0.238,0.073,-0.238,0.073,-0.259,0.073,-0.259,0.073,-0.288,0.104,-0.288,0.104,0.030,0.104,0.030,0.104,-0.039,0.023,-0.039,0.023,-0.196,0.023,-0.196,0.023,-0.205,0.033,-0.205,0.033,-0.228,0.002,-0.228,0.002,-0.044,0.002,-0.044,0.002,0.042,0.104,0.042,0.104,0.067,0.104,0.067,0.104,-0.020,0.002,-0.020,0.002,-0.011,0.002,-0.011,0.002,0.077,0.104,0.077,0.104,0.090,0.104,0.090,0.104,0.057,0.145,0.057,0.145,0.123,0.145,0.123,0.145,0.156,0.104,0.156,0.104,0.357,0.105,0.357,0.105,0.332,0.072,0.332,0.072,0.260,0.072,0.260,0.072,0.301,0.023,0.301,0.023,0.404,0.145,0.404,0.145,0.470,0.145,0.470,0.145,0.349,0.001,0.349,0.001,0.255,0.001,0.255,0.001,0.195,0.072,0.195,0.072,0.185,0.072,0.185,0.072,0.251,-0.009,0.251,-0.009,0.352,-0.009,0.352,-0.009,0.481,0.145,0.481,0.145,0.500,0.145,0.500,0.145,0.376,-0.009,0.376,-0.009,0.442,-0.086,0.442,-0.086,0.143,-0.086,0.143,-0.086,0.127,-0.107,0.127,-0.107,0.396,-0.107,0.396,-0.107,0.428,-0.145,0.428,-0.145,0.133,-0.145,0.133,-0.145,0.114,-0.123,-0.155,-0.050,-0.131,-0.050,-0.131,-0.050,-0.094,-0.093,-0.094,-0.093,-0.047,-0.039,-0.047,-0.039,-0.144,-0.038,-0.144,-0.038,-0.240,-0.037,-0.240,-0.037,-0.252,-0.025,-0.252,-0.025,-0.263,-0.037,-0.263,-0.037,-0.398,-0.039,-0.398,-0.039,-0.340,-0.107,-0.340,-0.107,-0.180,-0.107,-0.180,-0.107,-0.231,-0.050,-0.231,-0.050,-0.164,-0.050,-0.164,-0.050,-0.112,-0.116,-0.112,-0.116,-0.107,-0.109,-0.107,-0.109,-0.155,-0.050,0.125,-0.038,0.032,-0.036,0.032,-0.036,0.065,0.003,0.065,0.003,0.175,0.003,0.175,0.003,0.115,0.072,0.115,0.072,0.022,-0.037,0.022,-0.037,0.073,-0.098,0.073,-0.098,0.125,-0.038,0.350,-0.056,0.336,-0.037,0.336,-0.037,0.210,-0.037,0.210,-0.037,0.200,-0.024,0.200,-0.024,0.172,-0.056,0.172,-0.056,0.350,-0.056,-0.281,0.023,-0.299,0.023,-0.299,0.023,-0.341,0.071,-0.341,0.071,-0.401,0.002,-0.401,0.002,-0.297,0.002,-0.297,0.002,-0.281,0.023,-0.063,0.073,-0.172,0.073,-0.172,0.073,-0.186,0.055,-0.186,0.055,-0.076,0.055,-0.076,0.055,-0.063,0.073);\n"
-"\n"
-"    float n = 0.;\n"
-"    for(int i=0; i<npts/4; ++i)\n"
-"    {\n"
-"        vec2 ptsi = vec2(path[4*i], path[4*i+1]),\n"
-"            ptsip1 = vec2(path[4*i+2], path[4*i+3]),\n"
-"            k = x-ptsi, \n"
-"            d = ptsip1-ptsi;\n"
-"        \n"
-"        float beta = k.x/d.x,\n"
-"            alpha = d.y*k.x/d.x-k.y;\n"
-"        \n"
-"        n += step(.0, beta)*step(beta, 1.)*step(0., alpha);\n"
-"        dlinesegment(x, ptsi, ptsip1, da);\n"
-"        ret = min(ret, da);\n"
-"    }\n"
-"    \n"
-"    ret = mix(ret, -ret, mod(n, 2.));\n"
-"}\n"
-"\n"
-"// Extrusion\n"
-"void zextrude(in float z, in float d2d, in float h, out float d)\n"
-"{\n"
-"    vec2 w = vec2(-d2d, abs(z)-0.5*h);\n"
-"    d = length(max(w,0.0));\n"
-"}\n"
+"void rand(in vec2 x, out float n);\n"
+"void lfnoise(in vec2 t, out float n);\n"
+"void mfnoise(in vec2 x, in float d, in float b, in float e, out float n);\n"
+"void hash11(in float p, out float d);\n"
+"void hash12(in vec2 p, out float d);\n"
+"void hash21(in float p, out vec2 d);\n"
+"void hash22(in vec2 p, out vec2 d);\n"
+"void hash31(in float p, out vec3 d);\n"
+"void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);\n"
+"void stroke(in float d0, in float s, out float d);\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
+"void drhomboid(in vec2 x, in vec2 b, in float tilt, out float dst);\n"
+"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);\n"
+"void zextrude(in float z, in float d2d, in float h, out float d);\n"
 "\n"
 "void dhydrantradius(in float lxy, in float z, in float phi, out float r)\n"
 "{\n"
@@ -3128,10 +3461,7 @@ const char *hydrant_source = "#version 130\n\n"
 "    r = lxy - r;\n"
 "}\n"
 "\n"
-"void add(in vec2 sda, in vec2 sdb, out vec2 sdf)\n"
-"{\n"
-"    sdf = (sda.x<sdb.x)?sda:sdb;\n"
-"}\n"
+"void add(in vec2 sda, in vec2 sdb, out vec2 sdf);\n"
 "\n"
 "void scene(in vec3 x, out vec2 sdf)\n"
 "{    \n"
@@ -3159,24 +3489,9 @@ const char *hydrant_source = "#version 130\n\n"
 "    sdf.y = 0.;\n"
 "    \n"
 "    add(sdf, vec2(x.z+.4,1.), sdf);\n"
-"//     stroke(sdf.x, mix(0.,.01,clamp((iTime-3.5)/.5,0.,1.)), sdf.x);\n"
-"//     sdf.x = abs(sdf.x);\n"
-"//     sdf.x /= 4.;\n"
 "}\n"
 "\n"
-"void normal(in vec3 x, out vec3 n, in float dx)\n"
-"{\n"
-"    vec2 s, na;\n"
-"    \n"
-"    scene(x,s);\n"
-"    scene(x+dx*c.xyy, na);\n"
-"    n.x = na.x;\n"
-"    scene(x+dx*c.yxy, na);\n"
-"    n.y = na.x;\n"
-"    scene(x+dx*c.yyx, na);\n"
-"    n.z = na.x;\n"
-"    n = normalize(n-s.x);\n"
-"}\n"
+"void normal(in vec3 x, out vec3 n, in float dx);\n"
 "\n"
 "float sm(in float d)\n"
 "{\n"
@@ -3188,56 +3503,8 @@ const char *hydrant_source = "#version 130\n\n"
 "    d = length(x)-1.;\n"
 "}\n"
 "\n"
-"void dear(in vec2 x, out float d)\n"
-"{\n"
-"    d = abs(2.*x.y)\n"
-"        -.95+smoothstep(0.,.5,clamp(abs(x.x),0.,1.))\n"
-"        -.5*min(-abs(x.x),.01);\n"
-"}\n"
-"\n"
-"void dpolygon(in vec2 x, in float N, out float d)\n"
-"{\n"
-"    d = 2.0*pi/N;\n"
-"    float t = mod(acos(x.x/length(x)), d)-0.5*d;\n"
-"    d = -0.5+length(x)*cos(t)/cos(0.5*d);\n"
-"}\n"
-"\n"
-"void dspacepigs(in vec2 x, out float d)\n"
-"{\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"//     d = 1.;\n"
-"    float da, d0;\n"
-"    \n"
-"    // Head\n"
-"    dcircle(2.5*x,d0);\n"
-"    d0 /= 2.5;\n"
-"    \n"
-"    // Ears\n"
-"    dear(vec2(2.,5.)*x-vec2(.8,1.3), da);\n"
-"    d0 = min(d0,da/10.);\n"
-"    dear(vec2(2.,5.)*x+vec2(.8,-1.3), da);\n"
-"    d0 = min(d0,da/10.);\n"
-"    \n"
-"    // Nose\n"
-"    dcircle(6.*x-vec2(0.,-.5),da);\n"
-"    d0 = max(d0,-da/6.);\n"
-"    dcircle(24.*x-vec2(-1.5,-2.),da);\n"
-"    d0 = min(d0,da/24.);\n"
-"    dcircle(24.*x-vec2(1.5,-2.),da);\n"
-"    d0 = min(d0,da/24.);\n"
-"    \n"
-"    // Eyes\n"
-"    dcircle(16.*x-vec2(-3.5,2.5),da);\n"
-"    d0 = max(d0,-da/16.);\n"
-"    dcircle(16.*x-vec2(3.5,2.5),da);\n"
-"    d0 = max(d0,-da/16.);\n"
-"    dcircle(24.*x-vec2(-5.,3.5),da);\n"
-"    d0 = min(d0,da/24.);\n"
-"    dcircle(24.*x-vec2(5.,3.5),da);\n"
-"    d0 = min(d0,da/24.);\n"
-"    \n"
-"    d = max(d, -d0);\n"
-"}\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"void dspacepigs(in vec2 x, out float d);\n"
 "\n"
 "const vec3 orange = 2.*vec3(0.99,0.34,0.39),\n"
 "    redorange = vec3(0.97,0.60,0.33);\n"
@@ -3294,21 +3561,7 @@ const char *hydrant_source = "#version 130\n\n"
 "    col = mix(col, c.yyy, .2);\n"
 "}\n"
 "\n"
-"void analytical_box(in vec3 o, in vec3 dir, in vec3 size, out float d)\n"
-"{\n"
-"    vec3 tlo = min((size-o)/dir,(-size-o)/dir); // Select 3 visible planes\n"
-"    vec2 abxlo = abs(o.yz + tlo.x*dir.yz),\n"
-"        abylo = abs(o.xz + tlo.y*dir.xz),\n"
-"        abzlo = abs(o.xy + tlo.z*dir.xy);\n"
-"    vec4 dn = 100.*c.xyyy;\n"
-"    \n"
-"    dn = mix(dn, vec4(tlo.x,c.xyy), float(all(lessThan(abxlo,size.yz)))*step(tlo.x,dn.x));\n"
-"    dn = mix(dn, vec4(tlo.y,c.yxy), float(all(lessThan(abylo,size.xz)))*step(tlo.y,dn.x));\n"
-"    dn = mix(dn, vec4(tlo.z,c.yyx), float(all(lessThan(abzlo,size.xy)))*step(tlo.z,dn.x));\n"
-"\n"
-"    d = dn.r;\n"
-"}\n"
-"\n"
+"void analytical_box(in vec3 o, in vec3 dir, in vec3 size, out float d);\n"
 "void main()\n"
 "{\n"
 "    vec2 uv = (gl_FragCoord.xy-.5*iResolution.xy)/iResolution.y,\n"
@@ -3408,219 +3661,20 @@ const char *watercubes_source = "uniform float iTime;\n"
 "\n"
 "vec3 color1, color2;\n"
 "\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash22(in vec2 p, out vec2 d)\n"
-"{\n"
-"	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));\n"
-"    p3 += dot(p3, p3.yzx+33.33);\n"
-"    d = fract((p3.xx+p3.yz)*p3.zy);\n"
-"}\n"
-"\n"
-"void dist(in vec2 a, in vec2 b, out float d)\n"
-"{\n"
-"    d = length(b-a);\n"
-"}\n"
-"\n"
-"void nearest_controlpoint(in vec2 x, out vec2 p)\n"
-"{\n"
-"    float dmin = 1.e5, \n"
-"        d;\n"
-"    vec2 dp,\n"
-"        y = floor(x);\n"
-"    \n"
-"    float i = 0.;\n"
-"    for(float i = -1.; i <= 1.; i += 1.)\n"
-"        for(float j = -1.; j <= 1.; j += 1.)\n"
-"        {\n"
-"            hash22(y+vec2(i,j), dp);\n"
-"            dp += y+vec2(i,j);\n"
-"            dist(x, dp, d);\n"
-"            if(d<dmin)\n"
-"            {\n"
-"                dmin = d;\n"
-"                p = dp;\n"
-"            }\n"
-"        }\n"
-"}\n"
-"\n"
-"void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)\n"
-"{\n"
-"    d = 1.e4;\n"
-"    vec2 y,\n"
-"        dp;\n"
-"    \n"
-"    nearest_controlpoint(x, p);\n"
-"    y = floor(p);\n"
-"    \n"
-"    control_distance = 1.e4;\n"
-"    \n"
-"    for(float i = -2.; i <= 2.; i += 1.)\n"
-"        for(float j = -2.; j <= 2.; j += 1.)\n"
-"        {\n"
-"            if(i==0. && j==0.) continue;\n"
-"            hash22(y+vec2(i,j), dp);\n"
-"            dp += y+vec2(i,j);\n"
-"            vec2 o = p - dp;\n"
-"            float l = length(o);\n"
-"            d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
-"            control_distance = min(control_distance,.5*l);\n"
-"        }\n"
-"}\n"
-"\n"
-"// Creative Commons Attribution-ShareAlike 4.0 International Public License\n"
-"// Created by David Hoskins.\n"
-"// See https://www.shadertoy.com/view/4djSRW\n"
-"void hash33(in vec3 p3, out vec3 d)\n"
-"{\n"
-"	p3 = fract(p3 * vec3(.1031, .1030, .0973));\n"
-"    p3 += dot(p3, p3.yxz+33.33);\n"
-"    d = fract((p3.xxy + p3.yxx)*p3.zyx);\n"
-"}\n"
-"\n"
-"void dist3(in vec3 a, in vec3 b, out float d)\n"
-"{\n"
-"    d = length(b-a);\n"
-"}\n"
-"\n"
-"void nearest_controlpoint3(in vec3 x, out vec3 p)\n"
-"{\n"
-"    float dmin = 1.e5, \n"
-"        d;\n"
-"    vec3 dp,\n"
-"        y = floor(x);\n"
-"    \n"
-"    for(float i = -1.; i <= 1.; i += 1.)\n"
-"        for(float j = -1.; j <= 1.; j += 1.)\n"
-"        {\n"
-"            for(float k = -1.; k <= 1.; k += 1.)\n"
-"            {\n"
-"                hash33(y+vec3(i,j,k), dp);\n"
-"                dp += y+vec3(i,j,k);\n"
-"                dist3(x, dp, d);\n"
-"                if(d<dmin)\n"
-"                {\n"
-"                    dmin = d;\n"
-"                    p = dp;\n"
-"                }\n"
-"            }\n"
-"        }\n"
-"}\n"
-"\n"
-"void dvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)\n"
-"{\n"
-"    d = 1.e4;\n"
-"    vec3 y,\n"
-"        dp;\n"
-"    \n"
-"    nearest_controlpoint3(x, p);\n"
-"    y = floor(p);\n"
-"    \n"
-"    control_distance = 1.e4;\n"
-"    \n"
-"    for(float i = -2.; i <= 2.; i += 1.)\n"
-"        for(float j = -2.; j <= 2.; j += 1.)\n"
-"        {\n"
-"            for(float k = -1.; k <= 1.; k += 1.)\n"
-"            {\n"
-"                if(i==0. && j==0. && k == 0.) continue;\n"
-"                hash33(y+vec3(i,j,k), dp);\n"
-"                dp += y+vec3(i,j,k);\n"
-"                vec3 o = p - dp;\n"
-"                float l = length(o);\n"
-"                d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
-"                control_distance = min(control_distance,.5*l);\n"
-"            }\n"
-"        }\n"
-"}\n"
-"\n"
-"// iq's smooth minimum\n"
-"void smoothmin(in float a, in float b, in float k, out float dst)\n"
-"{\n"
-"    float h = max( k-abs(a-b), 0.0 )/k;\n"
-"    dst = min( a, b ) - h*h*h*k*(1.0/6.0);\n"
-"}\n"
-"\n"
-"void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)\n"
-"{\n"
-"    d = 1.e4;\n"
-"    vec3 y,\n"
-"        dp;\n"
-"    \n"
-"    nearest_controlpoint3(x, p);\n"
-"    y = floor(p);\n"
-"    \n"
-"    control_distance = 1.e4;\n"
-"    \n"
-"    for(float i = -2.; i <= 2.; i += 1.)\n"
-"        for(float j = -2.; j <= 2.; j += 1.)\n"
-"        {\n"
-"            for(float k = -1.; k <= 1.; k += 1.)\n"
-"            {\n"
-"                if(i==0. && j==0. && k == 0.) continue;\n"
-"                hash33(y+vec3(i,j,k), dp);\n"
-"                dp += y+vec3(i,j,k);\n"
-"                vec3 o = p - dp;\n"
-"                float l = length(o);\n"
-"//                 d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
-"                smoothmin(d,abs(.5*l-dot(x-dp,o)/l), .15, d);\n"
-"//                 control_distance = min(control_distance,.5*l);\n"
-"                smoothmin(control_distance, .5*l, .15, control_distance);\n"
-"            }\n"
-"        }\n"
-"}\n"
+"void hash22(in vec2 p, out vec2 d);\n"
+"void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);\n"
+"void hash33(in vec3 p3, out vec3 d);\n"
+"void dvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance);\n"
+"void smoothmin(in float a, in float b, in float k, out float dst);\n"
+"void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance);\n"
 "\n"
 "mat3 gR;\n"
-"void rot3(in vec3 p, out mat3 rot)\n"
-"{\n"
-"    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))\n"
-"        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))\n"
-"        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);\n"
-"}\n"
-"\n"
-"void add(in vec2 sda, in vec2 sdb, out vec2 sdf)\n"
-"{\n"
-"    sdf = (sda.x<sdb.x)?sda:sdb;\n"
-"}\n"
-"\n"
-"void dbox3(in vec3 x, in vec3 b, out float d)\n"
-"{\n"
-"  vec3 da = abs(x) - b;\n"
-"  d = length(max(da,0.0))\n"
-"         + min(max(da.x,max(da.y,da.z)),0.0);\n"
-"}\n"
-"\n"
-"void dstar(in vec2 x, in float N, in vec2 R, out float dst)\n"
-"{\n"
-"    float d = pi/N,\n"
-"        p0 = acos(x.x/length(x)),\n"
-"        p = mod(p0, d),\n"
-"        i = mod(round((p-p0)/d),2.);\n"
-"    x = length(x)*vec2(cos(p),sin(p));\n"
-"    vec2 a = mix(R,R.yx,i),\n"
-"    	p1 = a.x*c.xy,\n"
-"        ff = a.y*vec2(cos(d),sin(d))-p1;\n"
-"   	ff = ff.yx*c.zx;\n"
-"    dst = dot(x-p1,ff)/length(ff);\n"
-"}\n"
-"\n"
-"void smoothmax(in float a, in float b, in float k, out float res)\n"
-"{\n"
-"    smoothmin(a,b,k,res);\n"
-"    res = a + b - res;\n"
-"}\n"
-"\n"
-"void dstar3(in vec3 x, in float N, in vec2 R, out float dst)\n"
-"{\n"
-"    float d;\n"
-"    \n"
-"    dstar(x.xy, N, R, dst);\n"
-"    dstar(x.yz, N, R, d);\n"
-"    smoothmax(-d,-dst,.15,dst);\n"
-"    dstar(x.zx, N, R, d);\n"
-"    smoothmax(-d,dst,.15,dst);\n"
-"}\n"
+"void rot3(in vec3 p, out mat3 rot);\n"
+"void add(in vec2 sda, in vec2 sdb, out vec2 sdf);\n"
+"void dbox3(in vec3 x, in vec3 b, out float d);\n"
+"void dstar(in vec2 x, in float N, in vec2 R, out float dst);\n"
+"void smoothmax(in float a, in float b, in float k, out float res);\n"
+"void dstar3(in vec3 x, in float N, in vec2 R, out float dst);\n"
 "\n"
 "void scene(in vec3 x, out vec2 sdf)\n"
 "{\n"
@@ -3643,26 +3697,8 @@ const char *watercubes_source = "uniform float iTime;\n"
 "    add(sdf, vec2(abs(db+.0002)-.0001, 1.), sdf);\n"
 "}\n"
 "\n"
-"void normal(in vec3 x, out vec3 n, in float dx)\n"
-"{\n"
-"    vec2 s, na;\n"
-"    \n"
-"    scene(x,s);\n"
-"    scene(x+dx*c.xyy, na);\n"
-"    n.x = na.x;\n"
-"    scene(x+dx*c.yxy, na);\n"
-"    n.y = na.x;\n"
-"    scene(x+dx*c.yyx, na);\n"
-"    n.z = na.x;\n"
-"    n = normalize(n-s.x);\n"
-"}\n"
-"\n"
-"void dbox(in vec2 x, in vec2 b, out float d)\n"
-"{\n"
-"    vec2 da = abs(x)-b;\n"
-"    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);\n"
-"}\n"
-"\n"
+"void normal(in vec3 x, out vec3 n, in float dx);\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
 "float sm(in float d)\n"
 "{\n"
 "    return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);\n"
@@ -3838,82 +3874,11 @@ const char *glitchcity_source = "#version 130\n\n"
 "vec3 color1 =vec3(0.02,0.08,0.18),\n"
 "    color2 = 2.*vec3(0.08,0.08,0.24);\n"
 "\n"
-"void hash22(in vec2 p, out vec2 d)\n"
-"{\n"
-"	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));\n"
-"    p3 += dot(p3, p3.yzx+33.33);\n"
-"    d = fract((p3.xx+p3.yz)*p3.zy);\n"
-"}\n"
-"\n"
-"void hash12(in vec2 p, out float d)\n"
-"{\n"
-"	vec3 p3  = fract(vec3(p.xyx) * .1031);\n"
-"    p3 += dot(p3, p3.yzx + 33.33);\n"
-"    d = fract((p3.x + p3.y) * p3.z);\n"
-"}\n"
-"\n"
-"void dist(in vec2 a, in vec2 b, out float d)\n"
-"{\n"
-"    d = length(b-a);\n"
-"}\n"
-"\n"
-"void nearest_controlpoint(in vec2 x, out vec2 p)\n"
-"{\n"
-"    float dmin = 1.e5, \n"
-"        d;\n"
-"    vec2 dp,\n"
-"        y = floor(x);\n"
-"    \n"
-"    float i = 0.;\n"
-"    for(float i = -1.; i <= 1.; i += 1.)\n"
-"        for(float j = -1.; j <= 1.; j += 1.)\n"
-"        {\n"
-"            hash22(y+vec2(i,j), dp);\n"
-"            dp += y+vec2(i,j);\n"
-"            dist(x, dp, d);\n"
-"            if(d<dmin)\n"
-"            {\n"
-"                dmin = d;\n"
-"                p = dp;\n"
-"            }\n"
-"        }\n"
-"}\n"
-"\n"
-"void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)\n"
-"{\n"
-"    d = 1.e4;\n"
-"    vec2 y,\n"
-"        dp;\n"
-"    \n"
-"    nearest_controlpoint(x, p);\n"
-"    y = floor(p);\n"
-"    \n"
-"    control_distance = 1.e4;\n"
-"    \n"
-"    for(float i = -2.; i <= 2.; i += 1.)\n"
-"        for(float j = -2.; j <= 2.; j += 1.)\n"
-"        {\n"
-"            if(i==0. && j==0.) continue;\n"
-"            hash22(y+vec2(i,j), dp);\n"
-"            dp += y+vec2(i,j);\n"
-"            vec2 o = p - dp;\n"
-"            float l = length(o);\n"
-"            d = min(d,abs(.5*l-dot(x-dp,o)/l));\n"
-"            control_distance = min(control_distance,.5*l);\n"
-"        }\n"
-"}\n"
-"\n"
-"void add(in vec2 sda, in vec2 sdb, out vec2 sdf)\n"
-"{\n"
-"    sdf = (sda.x<sdb.x)?sda:sdb;\n"
-"}\n"
-"\n"
-"void dbox3(in vec3 x, in vec3 b, out float d)\n"
-"{\n"
-"  vec3 da = abs(x) - b;\n"
-"  d = length(max(da,0.0))\n"
-"         + min(max(da.x,max(da.y,da.z)),0.0);\n"
-"}\n"
+"void hash22(in vec2 p, out vec2 d);\n"
+"void hash12(in vec2 p, out float d);\n"
+"void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);\n"
+"void add(in vec2 sda, in vec2 sdb, out vec2 sdf);\n"
+"void dbox3(in vec3 x, in vec3 b, out float d);\n"
 "\n"
 "float h;\n"
 "void scene(in vec3 x, out vec2 sdf)\n"
@@ -3942,19 +3907,7 @@ const char *glitchcity_source = "#version 130\n\n"
 "    sdf.x -= .003;\n"
 "}\n"
 "\n"
-"void normal(in vec3 x, out vec3 n, in float dx)\n"
-"{\n"
-"    vec2 s, na;\n"
-"    \n"
-"    scene(x,s);\n"
-"    scene(x+dx*c.xyy, na);\n"
-"    n.x = na.x;\n"
-"    scene(x+dx*c.yxy, na);\n"
-"    n.y = na.x;\n"
-"    scene(x+dx*c.yyx, na);\n"
-"    n.z = na.x;\n"
-"    n = normalize(n-s.x);\n"
-"}\n"
+"void normal(in vec3 x, out vec3 n, in float dx);\n"
 "\n"
 "float sm(in float d)\n"
 "{\n"
@@ -4148,383 +4101,29 @@ const char *greetings_source = "uniform float iTime;\n"
 "const vec3 c = vec3(1.0, 0.0, -1.0);\n"
 "float a = 1.0;\n"
 "\n"
-"void rand(in vec2 x, out float n)\n"
-"{\n"
-"    x += 400.;\n"
-"    n = fract(sin(dot(sign(x)*abs(x) ,vec2(12.9898,78.233)))*43758.5453);\n"
-"}\n"
-"\n"
-"void lfnoise(in vec2 t, out float n)\n"
-"{\n"
-"    vec2 i = floor(t);\n"
-"    t = fract(t);\n"
-"    t = smoothstep(c.yy, c.xx, t);\n"
-"    vec2 v1, v2;\n"
-"    rand(i, v1.x);\n"
-"    rand(i+c.xy, v1.y);\n"
-"    rand(i+c.yx, v2.x);\n"
-"    rand(i+c.xx, v2.y);\n"
-"    v1 = c.zz+2.*mix(v1, v2, t.y);\n"
-"    n = mix(v1.x, v1.y, t.x);\n"
-"}\n"
-"\n"
-"// Distance to hexagon pattern\n"
-"void dhexagonpattern(in vec2 p, out float d, out vec2 ind) \n"
-"{\n"
-"    vec2 q = vec2( p.x*1.2, p.y + p.x*0.6 );\n"
-"    \n"
-"    vec2 pi = floor(q);\n"
-"    vec2 pf = fract(q);\n"
-"\n"
-"    float v = mod(pi.x + pi.y, 3.0);\n"
-"\n"
-"    float ca = step(1.,v);\n"
-"    float cb = step(2.,v);\n"
-"    vec2  ma = step(pf.xy,pf.yx);\n"
-"    \n"
-"    d = dot( ma, 1.0-pf.yx + ca*(pf.x+pf.y-1.0) + cb*(pf.yx-2.0*pf.xy) );\n"
-"    ind = pi + ca - cb*ma;\n"
-"    ind = vec2(ind.x/1.2, ind.y);\n"
-"    ind = vec2(ind.x, ind.y-ind.x*.6);\n"
-"}\n"
+"void rand(in vec2 x, out float n);\n"
+"void lfnoise(in vec2 t, out float n);\n"
+"void dhexagonpattern(in vec2 p, out float d, out vec2 ind);\n"
 "\n"
 "float sm(in float d)\n"
 "{\n"
 "    return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);\n"
 "}\n"
 "\n"
-"void dbox(in vec2 x, in vec2 b, out float d)\n"
-"{\n"
-"    vec2 da = abs(x)-b;\n"
-"    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);\n"
-"}\n"
-"\n"
-"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d)\n"
-"{\n"
-"    vec2 da = p2-p1;\n"
-"    d = length(x-mix(p1, p2, clamp(dot(x-p1, da)/dot(da,da),0.,1.)));\n"
-"}\n"
-"\n"
-"void stroke(in float d0, in float s, out float d)\n"
-"{\n"
-"    d = abs(d0)-s;\n"
-"}\n"
-"\n"
-"void addwindow(in vec2 uv, inout vec3 col, in vec2 dimensions)\n"
-"{\n"
-"    float d = 1.;\n"
-"    \n"
-"    // Background loading bar window\n"
-"    dbox(uv, dimensions, d);\n"
-"    vec3 gcol = length(col)/sqrt(3.)*c.xxx;\n"
-"    const vec3 window_raw = vec3(0.08,0.07,0.16);\n"
-"    vec3 window_background = mix(mix(col,window_raw,.2), mix(gcol,window_raw,.8), clamp((.5-uv.y/dimensions.y*.5),0.,1.));\n"
-"    \n"
-"    // Shadow\n"
-"    col = mix(col, .1*gcol, sm(d/8.));\n"
-"    // Window\n"
-"    col = mix(col, window_background, sm(d));\n"
-"    \n"
-"    // White border on loading bar window\n"
-"    d = abs(d-.002)-.002;\n"
-"    d = mix(d, 1., step(abs(uv.y),dimensions.y-.01));\n"
-"    col = mix(col, c.xxx, sm(d));\n"
-"    \n"
-"    // X box\n"
-"    dbox(uv-(dimensions-.04*c.xx), .015*c.xx, d);\n"
-"    col = mix(col, c.xxx, sm(d+.005));\n"
-"    stroke(d, .001, d);\n"
-"    col = mix(col, c.xxx, sm(d));\n"
-"    \n"
-"    // Actual x\n"
-"    dlinesegment(uv,dimensions-.05*c.xx,dimensions-.03*c.xx,d);\n"
-"    float da;\n"
-"    dlinesegment(uv,dimensions-vec2(.05,.03),dimensions-vec2(.03,.05),da);\n"
-"    d = min(d,da);\n"
-"    stroke(d,.002, d);\n"
-"    col = mix(col, c.yyy, sm(d));\n"
-"}\n"
-"\n"
-"void dpolygon(in vec2 x, in float N, out float d)\n"
-"{\n"
-"    d = 2.0*pi/N;\n"
-"    float t = mod(acos(x.x/length(x)), d)-0.5*d;\n"
-"    d = -0.5+length(x)*cos(t)/cos(0.5*d);\n"
-"}\n"
-"\n"
-"void dmercury(in vec2 x, out float d)\n"
-"{\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"    float da;\n"
-"\n"
-"    x += .1*c.yx;\n"
-"\n"
-"    // Upper part\n"
-"    dbox(x-.35*c.yx,vec2(.4,.35), da);\n"
-"    d = max(d, -da);\n"
-"    dbox(x-.7*c.yx, vec2(.2,.2), da);\n"
-"    d = min(d,da);\n"
-"    dbox(x-.25*c.yx,vec2(.2,.05),da);\n"
-"    d = min(d,da);\n"
-"    \n"
-"    // Lower part\n"
-"    dbox(x+.2*c.yx,vec2(.1,.4),da);\n"
-"    d = max(d, -da);\n"
-"    dbox(x+.2*c.yx, vec2(.4,.1),da);\n"
-"    d = max(d, -da);\n"
-"}\n"
-"\n"
-"void dcircle(in vec2 x, out float d)\n"
-"{\n"
-"    d = length(x)-1.0;\n"
-"}\n"
-"\n"
-"// Adapted from iq, https://www.shadertoy.com/view/XsXSz4\n"
-"void dtriangle(in vec2 p, in vec2 p0, in vec2 p1, in vec2 p2, out float dst)\n"
-"{\n"
-"	vec2 e0 = p1 - p0;\n"
-"	vec2 e1 = p2 - p1;\n"
-"	vec2 e2 = p0 - p2;\n"
-"\n"
-"	vec2 v0 = p - p0;\n"
-"	vec2 v1 = p - p1;\n"
-"	vec2 v2 = p - p2;\n"
-"\n"
-"	vec2 pq0 = v0 - e0*clamp( dot(v0,e0)/dot(e0,e0), 0.0, 1.0 );\n"
-"	vec2 pq1 = v1 - e1*clamp( dot(v1,e1)/dot(e1,e1), 0.0, 1.0 );\n"
-"	vec2 pq2 = v2 - e2*clamp( dot(v2,e2)/dot(e2,e2), 0.0, 1.0 );\n"
-"    \n"
-"    float s = sign( e0.x*e2.y - e0.y*e2.x );\n"
-"    vec2 d = min( min( vec2( dot( pq0, pq0 ), s*(v0.x*e0.y-v0.y*e0.x) ),\n"
-"                       vec2( dot( pq1, pq1 ), s*(v1.x*e1.y-v1.y*e1.x) )),\n"
-"                       vec2( dot( pq2, pq2 ), s*(v2.x*e2.y-v2.y*e2.x) ));\n"
-"\n"
-"	dst = -sqrt(d.x)*sign(d.y);\n"
-"}\n"
-"\n"
-"void rot(in float phi, out mat2 m)\n"
-"{\n"
-"    vec2 cs = vec2(cos(phi), sin(phi));\n"
-"    m = mat2(cs.x, -cs.y, cs.y, cs.x);\n"
-"}\n"
-"\n"
-"void dschnappsgirls(in vec2 x, out float d)\n"
-"{\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"    float da, d0;\n"
-"    \n"
-"    // Dress\n"
-"    dtriangle(x, vec2(-.1,-.3), vec2(.5,-.3), vec2(.2, .6), d0);\n"
-"    dlinesegment(x, vec2(-.1,.325), vec2(.5,.325), da);\n"
-"    stroke(da,.06,da);\n"
-"    d0 = max(d0,-da);\n"
-"    \n"
-"    // Head\n"
-"    dcircle(7.*(x-vec2(.2,.5)), da);\n"
-"    d0 = max(d0, -da+.5);\n"
-"    d0 = min(d0, da/7.);\n"
-"    \n"
-"    // Legs\n"
-"    dlinesegment(x, vec2(.125,-.3), vec2(.125,-.6), da);\n"
-"    stroke(da, .06, da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x, vec2(.275,-.3), vec2(.275,-.6), da);\n"
-"    stroke(da, .06, da);\n"
-"    d0 = min(d0, da);\n"
-"    \n"
-"    // Shoulders\n"
-"    dlinesegment(x, vec2(0.05,.25), vec2(.35,.25), da);\n"
-"    stroke(da, .085, da);\n"
-"    d0 = min(d0, da);\n"
-"    \n"
-"    // Arms\n"
-"    dlinesegment(x, vec2(.385,.25), vec2(.5, -.1), da);\n"
-"    stroke(da, .055, da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x, vec2(.017,.25), vec2(-.1, -.1), da);\n"
-"    stroke(da, .055, da);\n"
-"    d0 = min(d0, da);\n"
-"    \n"
-"    // Glass\n"
-"    dtriangle(x, vec2(-.6,.3), vec2(-.4,.1), vec2(-.2,.3), da);\n"
-"    stroke(da, .0125, da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x, vec2(-.4,.15), vec2(-.4,-.1), da);\n"
-"    stroke(da, .0125, da);\n"
-"    d0 = min(d0, da);\n"
-"    dtriangle(x, vec2(-.5,-.15), vec2(-.3,-.15), vec2(-.4,-.1), da);\n"
-"    d0 = min(d0, da);\n"
-"    \n"
-"    // Liquid\n"
-"    dtriangle(x, vec2(-.55,.25), vec2(-.4,.1), vec2(-.25,.25), da);\n"
-"    d0 = min(d0, da);\n"
-"    \n"
-"    // Salad\n"
-"    dlinesegment(x, vec2(-.4,.1), vec2(-.2,.5), da);\n"
-"    stroke(da, .01, da);\n"
-"    d0 = min(d0, da);\n"
-"    dcircle(24.*(x-vec2(-.3,.3)), da);\n"
-"    d0 = min(d0, da/24.);\n"
-"    dcircle(24.*(x-vec2(-.25,.4)), da);\n"
-"    d0 = min(d0, da/24.);\n"
-"    \n"
-"    d = max(d, -d0);\n"
-"}\n"
-"\n"
-"void dhaujobb(in vec2 x, out float d)\n"
-"{\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"    float da, d0;\n"
-"    mat2 m;\n"
-"	rot(.3,m);\n"
-"    x = 1.1*x*m;\n"
-"    x.x *= 1.1;\n"
-"        \n"
-"    x += vec2(-.05,.2);\n"
-"    \n"
-"    // Left leg\n"
-"    dbox(x+.35*c.xx,vec2(.1,.05),d0);\n"
-"    dbox(x+vec2(.3,.25),vec2(.05,.15),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(x+vec2(.2,.15),vec2(.1,.05),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(x+vec2(.15,.05),vec2(.05,.15),da);\n"
-"    d0 = min(d0,da);\n"
-"    \n"
-"    // Right leg\n"
-"    dbox(x-vec2(.65,.35),vec2(.05,.15),da);\n"
-"    d0 = min(d0,da);\n"
-"\n"
-"    // Torso\n"
-"    rot(.2, m);\n"
-"    dbox(m*(x-vec2(.25,.15)),vec2(.45,.05),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(m*(x-vec2(-.15,.35)),vec2(.45,.05),da);\n"
-"    d0 = min(d0,da);\n"
-"    rot(pi/8.,m);\n"
-"    dbox(m*(x-vec2(.0,.25)),vec2(.1,.15),da);\n"
-"    d0 = min(d0,da);\n"
-"    \n"
-"    // Penis\n"
-"    dbox(m*(x-vec2(.1,-.0)),vec2(.025,.1),da);\n"
-"    d0 = min(d0,da);\n"
-"    \n"
-"    // Left hand\n"
-"    rot(.3,m);\n"
-"    dbox(m*(x-vec2(.235,.535)),vec2(.035,.15),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(m*(x-vec2(.225,.7)),vec2(.075,.025),da);\n"
-"    d0 = min(d0,da);\n"
-"    \n"
-"    // Right hand\n"
-"    rot(-.2,m);\n"
-"    dbox(m*(x+vec2(.585,-.2)),vec2(.0375,.1),da);\n"
-"    d0 = min(d0,da);\n"
-"    \n"
-"    // Head\n"
-"    dcircle(6.*(x-vec2(-.15,.58)),da);\n"
-"    d0 = min(d0,da/6.);\n"
-"    \n"
-"    d0 -= .05*(abs(x.x)+abs(x.y)-.2);\n"
-"    d = max(d,-d0);\n"
-"}\n"
-"\n"
-"void dkewlers(in vec2 x, out float d)\n"
-"{\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"    float da, d0;\n"
-"    \n"
-"    x *= 1.2;\n"
-"    \n"
-"    dbox(x-vec2(0.,-.3),vec2(.6,.1),d0);\n"
-"    dbox(x-vec2(-.5,-.0),vec2(.1,.25),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(x-vec2(-.5+1./3.,.25),vec2(.1,.5),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(x-vec2(-.5+2./3.,-.0),vec2(.1,.25),da);\n"
-"    d0 = min(d0,da);\n"
-"    dbox(x-vec2(.5,-.0),vec2(.1,.25),da);\n"
-"    d0 = min(d0,da);\n"
-"    \n"
-"    d = max(d, -d0);\n"
-"}\n"
-"\n"
-"void dfarbrausch(in vec2 x, out float d)\n"
-"{\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"    float da, d0;\n"
-"    \n"
-"    x += vec2(.1,0.);\n"
-"    x *= 1.2;\n"
-"    \n"
-"    dlinesegment(x,vec2(-.65,.05),vec2(-.5,.05),d0);\n"
-"    dlinesegment(x,vec2(-.5,.05),vec2(-.2,-.49),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(-.2,-.49),vec2(-.0,-.49),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(-.0,-.49),vec2(-.27,.0),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(-.07,0.),vec2(-.27,.0),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.2,-.49),vec2(-.07,.0),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.4,-.49),vec2(.13,.0),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.4,-.49),vec2(.2,-.49),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.33,0.),vec2(.13,.0),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.33,0.),vec2(.51,-.33),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.6,-.15),vec2(.51,-.33),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.53,0.),vec2(.6,-.15),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.7,0.),vec2(.53,.0),da);\n"
-"    d0 = min(d0, da);\n"
-"    dlinesegment(x,vec2(.7,0.),vec2(.68,-.04),da);\n"
-"    d0 = min(d0, da);\n"
-"    dpolygon(5.*(x+vec2(.3,.65)),6.,da);\n"
-"    d0 = min(d0, da/5.);\n"
-"    dpolygon(5.*(x+vec2(-.5,.65)),6.,da);\n"
-"    d0 = min(d0, da/5.);\n"
-"    \n"
-"    stroke(d0,.035, d0);\n"
-"    d = max(d, -d0);\n"
-"}\n"
-"\n"
-"const int npts = 208;\n"
-"const float path[npts] = float[npts](-0.500,0.145,-0.500,-0.029,-0.500,-0.029,-0.353,-0.029,-0.353,-0.029,-0.353,-0.087,-0.353,-0.087,-0.500,-0.087,-0.500,-0.087,-0.500,-0.145,-0.500,-0.145,-0.280,-0.145,-0.280,-0.145,-0.280,0.029,-0.280,0.029,-0.427,0.029,-0.427,0.029,-0.427,0.087,-0.427,0.087,-0.280,0.087,-0.280,0.087,-0.280,0.145,-0.280,0.145,-0.500,0.145,-0.500,0.145,-0.500,0.145,-0.240,0.145,-0.240,0.087,-0.240,0.087,-0.093,0.087,-0.093,0.087,-0.093,0.029,-0.093,0.029,-0.020,0.029,-0.020,0.029,-0.020,0.145,-0.020,0.145,-0.240,0.145,-0.093,0.029,-0.167,0.029,-0.167,0.029,-0.167,-0.087,-0.167,-0.087,-0.093,-0.087,-0.093,-0.087,-0.093,0.029,-0.093,0.029,-0.093,0.029,-0.167,-0.087,-0.240,-0.087,-0.240,-0.087,-0.240,-0.145,-0.240,-0.145,-0.167,-0.145,-0.167,-0.145,-0.167,-0.087,0.093,0.145,0.093,0.087,0.093,0.087,0.020,0.087,0.020,0.087,0.020,0.029,0.020,0.029,0.093,0.029,0.093,0.029,0.093,-0.087,0.093,-0.087,0.020,-0.087,0.020,-0.087,0.020,-0.145,0.020,-0.145,0.240,-0.145,0.240,-0.145,0.240,-0.087,0.240,-0.087,0.167,-0.087,0.167,-0.087,0.167,0.145,0.167,0.145,0.093,0.145,0.353,0.145,0.353,0.087,0.353,0.087,0.280,0.087,0.280,0.087,0.280,0.029,0.280,0.029,0.353,0.029,0.353,0.029,0.353,-0.087,0.353,-0.087,0.280,-0.087,0.280,-0.087,0.280,-0.145,0.280,-0.145,0.500,-0.145,0.500,-0.145,0.500,-0.087,0.500,-0.087,0.427,-0.087,0.427,-0.087,0.427,0.145,0.427,0.145,0.353,0.145);\n"
-"void d5711(in vec2 x, out float ret)\n"
-"{\n"
-"    float d;\n"
-"    dpolygon(.5*x,6.0,d);\n"
-"    \n"
-"    x *= .7;\n"
-"    ret = 1.;\n"
-"    float da;\n"
-"\n"
-"    float n = 0.;\n"
-"    for(int i=0; i<npts/4; ++i)\n"
-"    {\n"
-"        vec2 ptsi = vec2(path[4*i], path[4*i+1]),\n"
-"            ptsip1 = vec2(path[4*i+2], path[4*i+3]),\n"
-"            k = x-ptsi, \n"
-"            d = ptsip1-ptsi;\n"
-"        \n"
-"        float beta = k.x/d.x,\n"
-"            alpha = d.y*k.x/d.x-k.y;\n"
-"        \n"
-"        n += step(.0, beta)*step(beta, 1.)*step(0., alpha);\n"
-"        dlinesegment(x, ptsi, ptsip1, da);\n"
-"        ret = min(ret, da);\n"
-"    }\n"
-"    \n"
-"    ret = mix(ret, -ret, mod(n, 2.));\n"
-"    \n"
-"    ret = max(d,-ret);\n"
-"    ret /= .7;\n"
-"}\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
+"void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);\n"
+"void stroke(in float d0, in float s, out float d);\n"
+"void addwindow(in vec2 uv, inout vec3 col, in vec2 dimensions);\n"
+"void dpolygon(in vec2 x, in float N, out float d);\n"
+"void dmercury(in vec2 x, out float d);\n"
+"void dcircle(in vec2 x, out float d);\n"
+"void dtriangle(in vec2 p, in vec2 p0, in vec2 p1, in vec2 p2, out float dst);\n"
+"void rot(in float phi, out mat2 m);\n"
+"void dschnappsgirls(in vec2 x, out float d);\n"
+"void dhaujobb(in vec2 x, out float d);\n"
+"void dkewlers(in vec2 x, out float d);\n"
+"void dfarbrausch(in vec2 x, out float d);\n"
+"void d5711(in vec2 x, out float ret);\n"
 "\n"
 "void main()\n"
 "{\n"
@@ -5072,6 +4671,45 @@ void Loadnormal()
 #endif
     progress += .2/(float)nsymbols;
 }
+void Loaddbox3()
+{
+    int dbox3_size = strlen(dbox3_source);
+    dbox3_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dbox3_handle, 1, (GLchar **)&dbox3_source, &dbox3_size);
+    glCompileShader(dbox3_handle);
+#ifdef DEBUG
+    printf("---> dbox3 Shader:\n");
+    debug(dbox3_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadrot3()
+{
+    int rot3_size = strlen(rot3_source);
+    rot3_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(rot3_handle, 1, (GLchar **)&rot3_source, &rot3_size);
+    glCompileShader(rot3_handle);
+#ifdef DEBUG
+    printf("---> rot3 Shader:\n");
+    debug(rot3_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddbox210()
+{
+    int dbox210_size = strlen(dbox210_source);
+    dbox210_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dbox210_handle, 1, (GLchar **)&dbox210_source, &dbox210_size);
+    glCompileShader(dbox210_handle);
+#ifdef DEBUG
+    printf("---> dbox210 Shader:\n");
+    debug(dbox210_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
 void Loaddspline2()
 {
     int dspline2_size = strlen(dspline2_source);
@@ -5107,19 +4745,6 @@ void Loadmfnoise()
 #ifdef DEBUG
     printf("---> mfnoise Shader:\n");
     debug(mfnoise_handle);
-    printf(">>>>\n");
-#endif
-    progress += .2/(float)nsymbols;
-}
-void Loaddbox3()
-{
-    int dbox3_size = strlen(dbox3_source);
-    dbox3_handle = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(dbox3_handle, 1, (GLchar **)&dbox3_source, &dbox3_size);
-    glCompileShader(dbox3_handle);
-#ifdef DEBUG
-    printf("---> dbox3 Shader:\n");
-    debug(dbox3_handle);
     printf(">>>>\n");
 #endif
     progress += .2/(float)nsymbols;
@@ -5267,19 +4892,6 @@ void Loadaddwindow()
 #endif
     progress += .2/(float)nsymbols;
 }
-void Loadrot3()
-{
-    int rot3_size = strlen(rot3_source);
-    rot3_handle = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(rot3_handle, 1, (GLchar **)&rot3_source, &rot3_size);
-    glCompileShader(rot3_handle);
-#ifdef DEBUG
-    printf("---> rot3 Shader:\n");
-    debug(rot3_handle);
-    printf(">>>>\n");
-#endif
-    progress += .2/(float)nsymbols;
-}
 void Loadddeadline()
 {
     int ddeadline_size = strlen(ddeadline_source);
@@ -5293,15 +4905,80 @@ void Loadddeadline()
 #endif
     progress += .2/(float)nsymbols;
 }
-void Loadsub()
+void Loaddpolygon()
 {
-    int sub_size = strlen(sub_source);
-    sub_handle = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(sub_handle, 1, (GLchar **)&sub_source, &sub_size);
-    glCompileShader(sub_handle);
+    int dpolygon_size = strlen(dpolygon_source);
+    dpolygon_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dpolygon_handle, 1, (GLchar **)&dpolygon_source, &dpolygon_size);
+    glCompileShader(dpolygon_handle);
 #ifdef DEBUG
-    printf("---> sub Shader:\n");
-    debug(sub_handle);
+    printf("---> dpolygon Shader:\n");
+    debug(dpolygon_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddspacepigs()
+{
+    int dspacepigs_size = strlen(dspacepigs_source);
+    dspacepigs_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dspacepigs_handle, 1, (GLchar **)&dspacepigs_source, &dspacepigs_size);
+    glCompileShader(dspacepigs_handle);
+#ifdef DEBUG
+    printf("---> dspacepigs Shader:\n");
+    debug(dspacepigs_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadanalytical_box()
+{
+    int analytical_box_size = strlen(analytical_box_source);
+    analytical_box_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(analytical_box_handle, 1, (GLchar **)&analytical_box_source, &analytical_box_size);
+    glCompileShader(analytical_box_handle);
+#ifdef DEBUG
+    printf("---> analytical_box Shader:\n");
+    debug(analytical_box_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadhash33()
+{
+    int hash33_size = strlen(hash33_source);
+    hash33_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(hash33_handle, 1, (GLchar **)&hash33_source, &hash33_size);
+    glCompileShader(hash33_handle);
+#ifdef DEBUG
+    printf("---> hash33 Shader:\n");
+    debug(hash33_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddvoronoi3()
+{
+    int dvoronoi3_size = strlen(dvoronoi3_source);
+    dvoronoi3_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dvoronoi3_handle, 1, (GLchar **)&dvoronoi3_source, &dvoronoi3_size);
+    glCompileShader(dvoronoi3_handle);
+#ifdef DEBUG
+    printf("---> dvoronoi3 Shader:\n");
+    debug(dvoronoi3_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddsmoothvoronoi3()
+{
+    int dsmoothvoronoi3_size = strlen(dsmoothvoronoi3_source);
+    dsmoothvoronoi3_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dsmoothvoronoi3_handle, 1, (GLchar **)&dsmoothvoronoi3_source, &dsmoothvoronoi3_size);
+    glCompileShader(dsmoothvoronoi3_handle);
+#ifdef DEBUG
+    printf("---> dsmoothvoronoi3 Shader:\n");
+    debug(dsmoothvoronoi3_handle);
     printf(">>>>\n");
 #endif
     progress += .2/(float)nsymbols;
@@ -5315,6 +4992,162 @@ void Loaddstar()
 #ifdef DEBUG
     printf("---> dstar Shader:\n");
     debug(dstar_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadsmoothmax()
+{
+    int smoothmax_size = strlen(smoothmax_source);
+    smoothmax_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(smoothmax_handle, 1, (GLchar **)&smoothmax_source, &smoothmax_size);
+    glCompileShader(smoothmax_handle);
+#ifdef DEBUG
+    printf("---> smoothmax Shader:\n");
+    debug(smoothmax_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddstar3()
+{
+    int dstar3_size = strlen(dstar3_source);
+    dstar3_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dstar3_handle, 1, (GLchar **)&dstar3_source, &dstar3_size);
+    glCompileShader(dstar3_handle);
+#ifdef DEBUG
+    printf("---> dstar3 Shader:\n");
+    debug(dstar3_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddhexagonpattern()
+{
+    int dhexagonpattern_size = strlen(dhexagonpattern_source);
+    dhexagonpattern_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dhexagonpattern_handle, 1, (GLchar **)&dhexagonpattern_source, &dhexagonpattern_size);
+    glCompileShader(dhexagonpattern_handle);
+#ifdef DEBUG
+    printf("---> dhexagonpattern Shader:\n");
+    debug(dhexagonpattern_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddmercury()
+{
+    int dmercury_size = strlen(dmercury_source);
+    dmercury_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dmercury_handle, 1, (GLchar **)&dmercury_source, &dmercury_size);
+    glCompileShader(dmercury_handle);
+#ifdef DEBUG
+    printf("---> dmercury Shader:\n");
+    debug(dmercury_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddtriangle()
+{
+    int dtriangle_size = strlen(dtriangle_source);
+    dtriangle_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dtriangle_handle, 1, (GLchar **)&dtriangle_source, &dtriangle_size);
+    glCompileShader(dtriangle_handle);
+#ifdef DEBUG
+    printf("---> dtriangle Shader:\n");
+    debug(dtriangle_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadrot()
+{
+    int rot_size = strlen(rot_source);
+    rot_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(rot_handle, 1, (GLchar **)&rot_source, &rot_size);
+    glCompileShader(rot_handle);
+#ifdef DEBUG
+    printf("---> rot Shader:\n");
+    debug(rot_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddschnappsgirls()
+{
+    int dschnappsgirls_size = strlen(dschnappsgirls_source);
+    dschnappsgirls_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dschnappsgirls_handle, 1, (GLchar **)&dschnappsgirls_source, &dschnappsgirls_size);
+    glCompileShader(dschnappsgirls_handle);
+#ifdef DEBUG
+    printf("---> dschnappsgirls Shader:\n");
+    debug(dschnappsgirls_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddhaujobb()
+{
+    int dhaujobb_size = strlen(dhaujobb_source);
+    dhaujobb_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dhaujobb_handle, 1, (GLchar **)&dhaujobb_source, &dhaujobb_size);
+    glCompileShader(dhaujobb_handle);
+#ifdef DEBUG
+    printf("---> dhaujobb Shader:\n");
+    debug(dhaujobb_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddkewlers()
+{
+    int dkewlers_size = strlen(dkewlers_source);
+    dkewlers_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dkewlers_handle, 1, (GLchar **)&dkewlers_source, &dkewlers_size);
+    glCompileShader(dkewlers_handle);
+#ifdef DEBUG
+    printf("---> dkewlers Shader:\n");
+    debug(dkewlers_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loaddfarbrausch()
+{
+    int dfarbrausch_size = strlen(dfarbrausch_source);
+    dfarbrausch_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(dfarbrausch_handle, 1, (GLchar **)&dfarbrausch_source, &dfarbrausch_size);
+    glCompileShader(dfarbrausch_handle);
+#ifdef DEBUG
+    printf("---> dfarbrausch Shader:\n");
+    debug(dfarbrausch_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadd5711()
+{
+    int d5711_size = strlen(d5711_source);
+    d5711_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(d5711_handle, 1, (GLchar **)&d5711_source, &d5711_size);
+    glCompileShader(d5711_handle);
+#ifdef DEBUG
+    printf("---> d5711 Shader:\n");
+    debug(d5711_handle);
+    printf(">>>>\n");
+#endif
+    progress += .2/(float)nsymbols;
+}
+void Loadsub()
+{
+    int sub_size = strlen(sub_source);
+    sub_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(sub_handle, 1, (GLchar **)&sub_source, &sub_size);
+    glCompileShader(sub_handle);
+#ifdef DEBUG
+    printf("---> sub Shader:\n");
+    debug(sub_handle);
     printf(">>>>\n");
 #endif
     progress += .2/(float)nsymbols;
@@ -5363,13 +5196,17 @@ void LoadSymbols()
     updateBar();
     Loadnormal();
     updateBar();
+    Loaddbox3();
+    updateBar();
+    Loadrot3();
+    updateBar();
+    Loaddbox210();
+    updateBar();
     Loaddspline2();
     updateBar();
     Loadzextrude();
     updateBar();
     Loadmfnoise();
-    updateBar();
-    Loaddbox3();
     updateBar();
     Loadrshort();
     updateBar();
@@ -5393,13 +5230,45 @@ void LoadSymbols()
     updateBar();
     Loadaddwindow();
     updateBar();
-    Loadrot3();
-    updateBar();
     Loadddeadline();
     updateBar();
-    Loadsub();
+    Loaddpolygon();
+    updateBar();
+    Loaddspacepigs();
+    updateBar();
+    Loadanalytical_box();
+    updateBar();
+    Loadhash33();
+    updateBar();
+    Loaddvoronoi3();
+    updateBar();
+    Loaddsmoothvoronoi3();
     updateBar();
     Loaddstar();
+    updateBar();
+    Loadsmoothmax();
+    updateBar();
+    Loaddstar3();
+    updateBar();
+    Loaddhexagonpattern();
+    updateBar();
+    Loaddmercury();
+    updateBar();
+    Loaddtriangle();
+    updateBar();
+    Loadrot();
+    updateBar();
+    Loaddschnappsgirls();
+    updateBar();
+    Loaddhaujobb();
+    updateBar();
+    Loaddkewlers();
+    updateBar();
+    Loaddfarbrausch();
+    updateBar();
+    Loadd5711();
+    updateBar();
+    Loadsub();
     updateBar();
     Loaddoctahedron();
     updateBar();
@@ -5479,6 +5348,12 @@ void Loadlogo210()
 #endif
     logo210_program = glCreateProgram();
     glAttachShader(logo210_program,logo210_handle);
+    glAttachShader(logo210_program,dbox3_handle);
+    glAttachShader(logo210_program,rot3_handle);
+    glAttachShader(logo210_program,stroke_handle);
+    glAttachShader(logo210_program,add_handle);
+    glAttachShader(logo210_program,dbox210_handle);
+    glAttachShader(logo210_program,normal_handle);
     glLinkProgram(logo210_program);
 #ifdef DEBUG
     printf("---> logo210 Program:\n");
@@ -5734,6 +5609,25 @@ void Loadhydrant()
 #endif
     hydrant_program = glCreateProgram();
     glAttachShader(hydrant_program,hydrant_handle);
+    glAttachShader(hydrant_program,rand_handle);
+    glAttachShader(hydrant_program,lfnoise_handle);
+    glAttachShader(hydrant_program,mfnoise_handle);
+    glAttachShader(hydrant_program,hash11_handle);
+    glAttachShader(hydrant_program,hash12_handle);
+    glAttachShader(hydrant_program,hash21_handle);
+    glAttachShader(hydrant_program,hash22_handle);
+    glAttachShader(hydrant_program,hash31_handle);
+    glAttachShader(hydrant_program,dvoronoi_handle);
+    glAttachShader(hydrant_program,stroke_handle);
+    glAttachShader(hydrant_program,dbox_handle);
+    glAttachShader(hydrant_program,drhomboid_handle);
+    glAttachShader(hydrant_program,dlinesegment_handle);
+    glAttachShader(hydrant_program,zextrude_handle);
+    glAttachShader(hydrant_program,add_handle);
+    glAttachShader(hydrant_program,normal_handle);
+    glAttachShader(hydrant_program,dpolygon_handle);
+    glAttachShader(hydrant_program,dspacepigs_handle);
+    glAttachShader(hydrant_program,analytical_box_handle);
     glLinkProgram(hydrant_program);
 #ifdef DEBUG
     printf("---> hydrant Program:\n");
@@ -5767,6 +5661,20 @@ void Loadwatercubes()
 #endif
     watercubes_program = glCreateProgram();
     glAttachShader(watercubes_program,watercubes_handle);
+    glAttachShader(watercubes_program,hash22_handle);
+    glAttachShader(watercubes_program,dvoronoi_handle);
+    glAttachShader(watercubes_program,hash33_handle);
+    glAttachShader(watercubes_program,dvoronoi3_handle);
+    glAttachShader(watercubes_program,smoothmin_handle);
+    glAttachShader(watercubes_program,dsmoothvoronoi3_handle);
+    glAttachShader(watercubes_program,rot3_handle);
+    glAttachShader(watercubes_program,add_handle);
+    glAttachShader(watercubes_program,dbox3_handle);
+    glAttachShader(watercubes_program,dstar_handle);
+    glAttachShader(watercubes_program,smoothmax_handle);
+    glAttachShader(watercubes_program,dstar3_handle);
+    glAttachShader(watercubes_program,normal_handle);
+    glAttachShader(watercubes_program,dbox_handle);
     glLinkProgram(watercubes_program);
 #ifdef DEBUG
     printf("---> watercubes Program:\n");
@@ -5800,6 +5708,12 @@ void Loadglitchcity()
 #endif
     glitchcity_program = glCreateProgram();
     glAttachShader(glitchcity_program,glitchcity_handle);
+    glAttachShader(glitchcity_program,hash22_handle);
+    glAttachShader(glitchcity_program,hash12_handle);
+    glAttachShader(glitchcity_program,dvoronoi_handle);
+    glAttachShader(glitchcity_program,add_handle);
+    glAttachShader(glitchcity_program,dbox3_handle);
+    glAttachShader(glitchcity_program,normal_handle);
     glLinkProgram(glitchcity_program);
 #ifdef DEBUG
     printf("---> glitchcity Program:\n");
@@ -5833,6 +5747,23 @@ void Loadgreetings()
 #endif
     greetings_program = glCreateProgram();
     glAttachShader(greetings_program,greetings_handle);
+    glAttachShader(greetings_program,rand_handle);
+    glAttachShader(greetings_program,lfnoise_handle);
+    glAttachShader(greetings_program,dhexagonpattern_handle);
+    glAttachShader(greetings_program,dbox_handle);
+    glAttachShader(greetings_program,dlinesegment_handle);
+    glAttachShader(greetings_program,stroke_handle);
+    glAttachShader(greetings_program,addwindow_handle);
+    glAttachShader(greetings_program,dpolygon_handle);
+    glAttachShader(greetings_program,dmercury_handle);
+    glAttachShader(greetings_program,dcircle_handle);
+    glAttachShader(greetings_program,dtriangle_handle);
+    glAttachShader(greetings_program,rot_handle);
+    glAttachShader(greetings_program,dschnappsgirls_handle);
+    glAttachShader(greetings_program,dhaujobb_handle);
+    glAttachShader(greetings_program,dkewlers_handle);
+    glAttachShader(greetings_program,dfarbrausch_handle);
+    glAttachShader(greetings_program,d5711_handle);
     glLinkProgram(greetings_program);
 #ifdef DEBUG
     printf("---> greetings Program:\n");
