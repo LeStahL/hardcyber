@@ -2498,7 +2498,7 @@ const char *text_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline 2k
 "        new.gba = mix(new.gba, vec3(1.00,0.40,0.39), sm(d));\n"
 "\n"
 "        // Add time overlay\n"
-"        dtime((uv-.45*vec2(.975*a,1.05)), iTime+11., .01, d);\n"
+"        dtime((uv-.45*vec2(.975*a,1.05)), iTime, .01, d);\n"
 "        new.gba = mix(new.gba, c.xxx, sm(d));\n"
 "        \n"
 "        // Add exact millisecond\n"

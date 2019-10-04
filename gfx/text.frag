@@ -109,7 +109,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         new.gba = mix(new.gba, vec3(1.00,0.40,0.39), sm(d));
 
         // Add time overlay
-        dtime((uv-.45*vec2(.975*a,1.05)), iTime+11., .01, d);
+        dtime((uv-.45*vec2(.975*a,1.05)), iTime, .01, d);
         new.gba = mix(new.gba, c.xxx, sm(d));
         
         // Add exact millisecond
