@@ -133,7 +133,7 @@ void dhardcyber(in vec2 x, out float d)
     d_r(x-1.8*c.xy,da);
     d = min(d,da);
     
-    stroke(d, .07, d);
+    stroke(d, .05, d);
     
     d /= 3.;
 }

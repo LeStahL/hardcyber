@@ -159,7 +159,7 @@ vec2 ind = c.yy;
 void scene(in vec3 x, out vec2 sdf)
 {
     vec3 y = x;
-    x.xy += vec2(cos(iTime), sin(iTime));
+    x.xy += vec2(cos(.3*iTime), sin(.3*iTime));
     
     sdf.x = x.z;
     sdf.y = 0.;
@@ -167,16 +167,16 @@ void scene(in vec3 x, out vec2 sdf)
     float db = abs(length(y-.1*c.yyx)-.2), 
         dc;
     dbox3(gR * (y-.1*c.yyx), .2*c.xxx, dc);
-    db = mix(db, abs(dc), clamp(iTime-5.,0.,1.));
+    db = mix(db, abs(dc)-.001, clamp(iTime-5.,0.,1.));
     doctahedron(gR * (y-.1*c.yyx),.4,.4, dc);
-    db = mix(db, abs(dc), clamp(iTime-10.,0.,1.));
+    db = mix(db, abs(dc)-.001, clamp(iTime-10.,0.,1.));
     add(sdf, vec2(db,1.), sdf);
 }
 
 void texture_scene(in vec3 x, out vec2 sdf)
 {
     vec3 y = x;
-    x.xy += vec2(cos(iTime), sin(iTime));
+    x.xy += vec2(cos(.3*iTime), sin(.3*iTime));
     
     sdf.x = x.z;
     sdf.y = 0.;
@@ -201,9 +201,9 @@ void texture_scene(in vec3 x, out vec2 sdf)
     float db = abs(length(y-.1*c.yyx)-.2), 
         dc;
     dbox3(gR * (y-.1*c.yyx), .2*c.xxx, dc);
-    db = mix(db, abs(dc), clamp(iTime-5.,0.,1.));
+    db = mix(db, abs(dc)-.001, clamp(iTime-5.,0.,1.));
     doctahedron(gR * (y-.1*c.yyx),.4,.4, dc);
-    db = mix(db, abs(dc), clamp(iTime-10.,0.,1.));
+    db = mix(db, abs(dc)-.001, clamp(iTime-10.,0.,1.));
     add(sdf, vec2(db,1.), sdf);
 }
 

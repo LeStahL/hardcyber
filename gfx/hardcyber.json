@@ -25,16 +25,10 @@
             "t_start": 42
         },
         {
-            "name": "Spacepigs Hydrant",
-            "prefix": "hydrant",
-            "t_end": 63,
-            "t_start": 53
-        },
-        {
             "name": "Stars, Sky & Street",
             "prefix": "starsky",
-            "t_end": 73,
-            "t_start": 63
+            "t_end": 83,
+            "t_start": 53
         },
         {
             "name": "Voronoi Cubes",
@@ -55,10 +49,16 @@
             "t_start": 103
         },
         {
+            "name": "Spacepigs Hydrant",
+            "prefix": "hydrant",
+            "t_end": 143,
+            "t_start": 133
+        },
+        {
             "name": "Fractal Scene",
             "prefix": "fractal",
             "t_end": 153,
-            "t_start": 133
+            "t_start": 143
         }
     ]
 }
