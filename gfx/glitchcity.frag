@@ -22,82 +22,11 @@ float a = 1.0;
 vec3 color1 =vec3(0.02,0.08,0.18),
     color2 = 2.*vec3(0.08,0.08,0.24);
 
-void hash22(in vec2 p, out vec2 d)
-{
-	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yzx+33.33);
-    d = fract((p3.xx+p3.yz)*p3.zy);
-}
-
-void hash12(in vec2 p, out float d)
-{
-	vec3 p3  = fract(vec3(p.xyx) * .1031);
-    p3 += dot(p3, p3.yzx + 33.33);
-    d = fract((p3.x + p3.y) * p3.z);
-}
-
-void dist(in vec2 a, in vec2 b, out float d)
-{
-    d = length(b-a);
-}
-
-void nearest_controlpoint(in vec2 x, out vec2 p)
-{
-    float dmin = 1.e5, 
-        d;
-    vec2 dp,
-        y = floor(x);
-    
-    float i = 0.;
-    for(float i = -1.; i <= 1.; i += 1.)
-        for(float j = -1.; j <= 1.; j += 1.)
-        {
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            dist(x, dp, d);
-            if(d<dmin)
-            {
-                dmin = d;
-                p = dp;
-            }
-        }
-}
-
-void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)
-{
-    d = 1.e4;
-    vec2 y,
-        dp;
-    
-    nearest_controlpoint(x, p);
-    y = floor(p);
-    
-    control_distance = 1.e4;
-    
-    for(float i = -2.; i <= 2.; i += 1.)
-        for(float j = -2.; j <= 2.; j += 1.)
-        {
-            if(i==0. && j==0.) continue;
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            vec2 o = p - dp;
-            float l = length(o);
-            d = min(d,abs(.5*l-dot(x-dp,o)/l));
-            control_distance = min(control_distance,.5*l);
-        }
-}
-
-void add(in vec2 sda, in vec2 sdb, out vec2 sdf)
-{
-    sdf = (sda.x<sdb.x)?sda:sdb;
-}
-
-void dbox3(in vec3 x, in vec3 b, out float d)
-{
-  vec3 da = abs(x) - b;
-  d = length(max(da,0.0))
-         + min(max(da.x,max(da.y,da.z)),0.0);
-}
+void hash22(in vec2 p, out vec2 d);
+void hash12(in vec2 p, out float d);
+void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
+void add(in vec2 sda, in vec2 sdb, out vec2 sdf);
+void dbox3(in vec3 x, in vec3 b, out float d);
 
 float h;
 void scene(in vec3 x, out vec2 sdf)
@@ -126,19 +55,7 @@ void scene(in vec3 x, out vec2 sdf)
     sdf.x -= .003;
 }
 
-void normal(in vec3 x, out vec3 n, in float dx)
-{
-    vec2 s, na;
-    
-    scene(x,s);
-    scene(x+dx*c.xyy, na);
-    n.x = na.x;
-    scene(x+dx*c.yxy, na);
-    n.y = na.x;
-    scene(x+dx*c.yyx, na);
-    n.z = na.x;
-    n = normalize(n-s.x);
-}
+void normal(in vec3 x, out vec3 n, in float dx);
 
 float sm(in float d)
 {
