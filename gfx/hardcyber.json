@@ -1,6 +1,18 @@
 {
     "scenes": [
         {
+            "name": "Fractal Scene",
+            "prefix": "fractal",
+            "t_end": 0,
+            "t_start": 0
+        },
+        {
+            "name": "Greetings Scene",
+            "prefix": "greetings",
+            "t_end": 0,
+            "t_start": 0
+        },
+        {
             "name": "Deadline Logo",
             "prefix": "deadline",
             "t_end": 20,
@@ -25,7 +37,7 @@
             "t_start": 42
         },
         {
-            "name": "Spacepigs Greetings",
+            "name": "Spacepigs Hydrant",
             "prefix": "hydrant",
             "t_end": 63,
             "t_start": 53

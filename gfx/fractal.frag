@@ -134,9 +134,46 @@ void dbox(in vec2 x, in vec2 b, out float d)
     d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);
 }
 
+void dstar(in vec2 x, in float N, in vec2 R, out float dst)
+{
+    float d = pi/N,
+        p0 = acos(x.x/length(x)),
+        p = mod(p0, d),
+        i = mod(round((p-p0)/d),2.);
+    x = length(x)*vec2(cos(p),sin(p));
+    vec2 a = mix(R,R.yx,i),
+    	p1 = a.x*c.xy,
+        ff = a.y*vec2(cos(d),sin(d))-p1;
+   	ff = ff.yx*c.zx;
+    dst = dot(x-p1,ff)/length(ff);
+}
+
+void doctahedron(in vec3 x, in float h, in float w, out float d){
+    x.xz = abs(x.xz);
+    x.y = abs(x.y)-h;
+    d = max(x.z,x.x)+(x.y*w);    
+}
+
 mat3 gR;
 vec2 ind = c.yy;
 void scene(in vec3 x, out vec2 sdf)
+{
+    vec3 y = x;
+    x.xy += vec2(cos(iTime), sin(iTime));
+    
+    sdf.x = x.z;
+    sdf.y = 0.;
+    
+    float db = abs(length(y-.1*c.yyx)-.2), 
+        dc;
+    dbox3(gR * (y-.1*c.yyx), .2*c.xxx, dc);
+    db = mix(db, abs(dc), clamp(iTime-5.,0.,1.));
+    doctahedron(gR * (y-.1*c.yyx),.4,.4, dc);
+    db = mix(db, abs(dc), clamp(iTime-10.,0.,1.));
+    add(sdf, vec2(db,1.), sdf);
+}
+
+void texture_scene(in vec3 x, out vec2 sdf)
 {
     vec3 y = x;
     x.xy += vec2(cos(iTime), sin(iTime));
@@ -165,6 +202,8 @@ void scene(in vec3 x, out vec2 sdf)
         dc;
     dbox3(gR * (y-.1*c.yyx), .2*c.xxx, dc);
     db = mix(db, abs(dc), clamp(iTime-5.,0.,1.));
+    doctahedron(gR * (y-.1*c.yyx),.4,.4, dc);
+    db = mix(db, abs(dc), clamp(iTime-10.,0.,1.));
     add(sdf, vec2(db,1.), sdf);
 }
 
@@ -182,16 +221,32 @@ void normal(in vec3 x, out vec3 n, in float dx)
     n = normalize(n-s.x);
 }
 
+void texture_normal(in vec3 x, out vec3 n, in float dx)
+{
+    vec2 s, na;
+    
+    texture_scene(x,s);
+    texture_scene(x+dx*c.xyy, na);
+    n.x = na.x;
+    texture_scene(x+dx*c.yxy, na);
+    n.y = na.x;
+    texture_scene(x+dx*c.yyx, na);
+    n.z = na.x;
+    n = normalize(n-s.x);
+}
+
 void palette(in float scale, out vec3 col)
 {
+    scale = clamp(scale, 1.e-2,.99);
     const int N = 5;
-    const vec3 colors[N] = vec3[N](
-vec3(0.20,0.27,0.35),
-vec3(0.29,0.37,0.45),
-vec3(0.36,0.65,0.64),
-vec3(0.66,0.85,0.80),
-vec3(0.95,0.92,0.82)
+    vec3 colors[N] = vec3[N](
+mix(vec3(0.20,0.27,0.35),vec3(1.00,0.00,0.47), clamp(iTime-5.,0.,1.)),
+mix(vec3(0.29,0.37,0.45),vec3(0.80,0.00,0.47), clamp(iTime-5.,0.,1.)),
+mix(vec3(0.36,0.65,0.64),vec3(0.60,0.00,0.47), clamp(iTime-5.,0.,1.)),
+mix(vec3(0.66,0.85,0.80),vec3(0.40,0.00,0.47), clamp(iTime-5.,0.,1.)),
+mix(vec3(0.95,0.92,0.82),c.yyy,clamp(iTime-5.,0.,1.))
     );
+    colors[0] = mix(colors[0], 
 	float index = floor(scale*float(N)), 
         remainder = scale*float(N)-index;
     col = mix(colors[int(index)],colors[int(index)+1], remainder);
@@ -215,7 +270,7 @@ void main()
         dir,
         n, 
         x,
-        c1,
+        c1 = c.yyy,
         o0 = o,
         x0;
     int N = 150,
@@ -238,14 +293,38 @@ void main()
     
     if(i < N)
     {
+        if(s.y == 1.)
+        {
+            vec3 l = .5*c.yyz;
+            normal(x,n, 2.e-5);
+            
+            col = c.xxx;
+            col = .3*col 
+                + .5*col*dot(-l, n)
+                + 1.7*col*pow(abs(dot(reflect(l,n),dir)),2.); 
+        }
+        else col = c.yyy;
+    }
+    else col = c.yyy;
+    
+    for(i = 0; i<N; ++i)
+    {
+     	x = o + d * dir;
+        texture_scene(x,s);
+        if(s.x < 1.e-3)break;
+        d += s.x;//min(s.x,2.e-1);
+    }
+    
+    if(i < N)
+    {
         x0 = x;
         
         vec3 l = x+c.yxy+.5*c.yyx;
-        normal(x,n, 2.e-5);
+        texture_normal(x,n, 2.e-5);
         if(s.y == 0.)
         {
             float na;
-            lfnoise(2.*ind, na);
+            lfnoise(2.*ind-iTime, na);
             palette(.5+.5*na, col);
             
 //             col = length(col)/sqrt(3.)*c.xxx;
@@ -277,10 +356,35 @@ void main()
                     d += s.x;//min(s.x,2.e-3);
                 }
                 
+                if(i < N)
+                {
+                    if(s.y == 1.)
+                    {
+                        vec3 l = .5*c.yyz;
+                        normal(x,n, 2.e-5);
+                        
+                        c1 = c.xxx;
+                        c1 = .3*c1 
+                            + .5*c1*dot(-l, n)
+                            + 1.7*c1*pow(abs(dot(reflect(l,n),dir)),2.); 
+                    }
+                    else c1 = c.yyy;
+                }
+                else c1 = c.yyy;
+                col = mix(col, c1, .54);
+                
+                for(i = 0; i<N; ++i)
+                {
+                    x = o + d * dir;
+                    texture_scene(x,s);
+                    if(s.x < 1.e-3)break;
+                    d += s.x;//min(s.x,2.e-1);
+                }
+                
                 if(i<N)
                 {
                     vec3 l = x+c.yxy+.5*c.yyx;
-                    normal(x,n, 2.e-5);
+                    texture_normal(x,n, 2.e-5);
                     if(s.y == 0.)
                     {
                         float na;
@@ -291,23 +395,26 @@ void main()
                             + .5*c1*dot(-l, n)
                             + .7*c1*pow(abs(dot(reflect(l,n),dir)),2.);
                     }
+//                     else c1 = c.yyy;
                     
                     col = mix(col, c1, .3);
                 }
-                else col = c.yyy;
+//                 else col = c.yyy;
             }
         }
-        else col = c.yyy;
+//         else col *= -1.;
     }
-    else col = c.yyy;
-    
-    float da = (abs(length(x0.xy)-.2)-.03),
-        db;
-    dbox(x.xy, .4*c.xx, db);
-    db = abs(db)-.03;
-    da = mix(da, db, clamp(iTime-5.,0.,1.));
+//     else col = c.yyx;
+        
+    float da = 1.;
+//     (abs(length(x0.xy)-.2)-.03),
+//         db;
+    scene(vec3(uv,.2), s);
+    da = abs(s.x-.1)-.003;
+//     dbox(x.xy, .4*c.xx, db);
+//     db = abs(db)-.03;
+//     da = mix(da, db, clamp(iTime-5.,0.,1.));
     col = mix(col, 8.*col, sm(da/20.));
-    
     col = 1.5*col*col;
     
     gl_FragColor = vec4(clamp(col,0.,1.),1.);

@@ -151,7 +151,6 @@ void smoothmin(in float a, in float b, in float k, out float dst)
     dst = min( a, b ) - h*h*h*k*(1.0/6.0);
 }
 
-
 void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)
 {
     d = 1.e4;
