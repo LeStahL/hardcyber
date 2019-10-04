@@ -59,6 +59,12 @@
             "prefix": "fractal",
             "t_end": 173,
             "t_start": 143
+        },
+        {
+            "name": "Voronoi Net",
+            "prefix": "voronoinet",
+            "t_end": 200,
+            "t_start": 173
         }
     ]
 }

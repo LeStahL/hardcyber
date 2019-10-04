@@ -4060,8 +4060,8 @@ const char *glitchcity_source = "#version 130\n\n"
 "                + .1*col*dot(l, n)\n"
 "                + .6*col*pow(abs(dot(reflect(-l,n),dir)),2.);\n"
 "                \n"
-"            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.xyy))));\n"
-"            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.zyy))));\n"
+"            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.xyx))));\n"
+"            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.zyx))));\n"
 "            \n"
 "        }\n"
 "    }\n"
@@ -4487,6 +4487,258 @@ const char *fractal_source = "#version 130\n\n"
 "    col = 1.5*col*col;\n"
 "    \n"
 "    gl_FragColor = vec4(clamp(col,0.,1.),1.);\n"
+"}\n"
+"\0";
+const char *voronoinet_source = "/* Corfield Imitation 1\n"
+" * Copyright (C) 2019  Alexander Kraus <nr4@z10.info>\n"
+" * \n"
+" * This program is free software: you can redistribute it and/or modify\n"
+" * it under the terms of the GNU General Public License as published by\n"
+" * the Free Software Foundation, either version 3 of the License, or\n"
+" * (at your option) any later version.\n"
+" * \n"
+" * This program is distributed in the hope that it will be useful,\n"
+" * but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+" * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+" * GNU General Public License for more details.\n"
+" * \n"
+" * You should have received a copy of the GNU General Public License\n"
+" * along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
+" */\n"
+"\n"
+"#version 130\n\n"
+"\n"
+"uniform float iTime;\n"
+"uniform vec2 iResolution;\n"
+"\n"
+"uniform float iFader0;\n"
+"uniform float iFader1;\n"
+"uniform float iFader2;\n"
+"uniform float iFader3;\n"
+"uniform float iFader4;\n"
+"uniform float iFader5;\n"
+"uniform float iFader6;\n"
+"uniform float iFader7;\n"
+"\n"
+"float iScale = 1.,\n"
+"    iNote = 0.;\n"
+"\n"
+"// Global constants\n"
+"const float pi = acos(-1.);\n"
+"const vec3 c = vec3(1.0, 0.0, -1.0);\n"
+"float a = 1.0;\n"
+"\n"
+"void hash22(in vec2 p, out vec2 d);\n"
+"void rand(in vec2 x, out float n);\n"
+"void zextrude(in float z, in float d2d, in float h, out float d);\n"
+"void stroke(in float d0, in float s, out float d);\n"
+"void dbox(in vec2 x, in vec2 b, out float d);\n"
+"void dbox3(in vec3 x, in vec3 b, out float d);\n"
+"void smoothmin(in float a, in float b, in float k, out float dst);\n"
+"void dvoronoi(in vec2 x, out float d, out vec2 z, out float pc);\n"
+"void dquadvoronoi(in vec2 x, in float threshold, in float depth, out float d, out float faco)\n"
+"{\n"
+"    d = 1.;\n"
+"    vec2 y = x, \n"
+"        yi;\n"
+"    float size = .5,\n"
+"	    fac = 1.;\n"
+"    faco = 1.;\n"
+"    for(float i=0.; i<depth; i+=1.)\n"
+"    {\n"
+"        float dd, dp;\n"
+"            vec2 ind;\n"
+"            dvoronoi(y/size/.5,dd, ind, dp);\n"
+"        vec2 y0 = y;\n"
+"		float r;\n"
+"        rand(ind+fac,r);\n"
+"        fac *= r*step(r,threshold);\n"
+"        faco *= r;\n"
+"        if(fac != 0.)\n"
+"        {\n"
+"            \n"
+"            //dd = mix(dd,length(y)-.5*size,step(r,threshold));\n"
+"            dd = abs(dd);\n"
+"            smoothmin(d,dd,.01,d);\n"
+"        }\n"
+"        \n"
+"        size *= .5;\n"
+"    }\n"
+"    faco += fac*fac;\n"
+"}\n"
+"void analytical_box(in vec3 o, in vec3 dir, in vec3 size, out float d);\n"
+"void rot3(in vec3 p, out mat3 rot);\n"
+"\n"
+"// Scene\n"
+"float mat;\n"
+"void scene(in vec3 x, out vec2 d)\n"
+"{\n"
+"    d = c.xx;\n"
+"    float dbound;\n"
+"    dbox3(x,vec3(.3*c.xx, .2),dbound);\n"
+"    float da, fac;\n"
+"    dquadvoronoi(x.xy-.1*iTime, .71, 4., da, fac);\n"
+"    \n"
+"    float p = pi/4.;\n"
+"    vec2 cs = vec2(cos(p),sin(p));\n"
+"    mat2 m = mat2(cs.x,cs.y,-cs.y,cs.x);\n"
+"    vec2 y = m*x.xy;\n"
+"    float da9, fac9;\n"
+"    dquadvoronoi(y-12.-.1*iTime, .41,2., da9, fac9);\n"
+"    smoothmin(da,da9,.01,da);\n"
+"    \n"
+"    float r;\n"
+"    rand(202.*fac*fac9*c.xx+3., r);\n"
+"    mat = r;\n"
+"    zextrude(x.z,da,r*.3,da9);\n"
+"    smoothmin(d.x,da9,.4, d.x);\n"
+"    \n"
+"    stroke(da, .015+6.*.045*clamp(iScale,0.,1.), da);\n"
+"    float db;\n"
+"    stroke(da, .011+6.*.033*clamp(iScale,0.,1.), db);\n"
+"   \n"
+"    stroke(d.x,.003,d.x);\n"
+"    dbox3(x,vec3(.33*c.xx, .02),da);\n"
+"    smoothmin(d.x,da,.2,d.x);\n"
+"    smoothmin(d.x,db,.05,d.x);\n"
+"    //d.x = min(d.x, da);\n"
+"    //d.x = min(d.x, db);\n"
+"    \n"
+"//     d.x = max(d.x, dbound);\n"
+"}\n"
+"\n"
+"// Normal\n"
+"void normal(in vec3 x, out vec3 n, in float dx);\n"
+"\n"
+"// Texture\n"
+"void colorize(in vec2 x, out vec3 col)\n"
+"{    \n"
+"    float phi = .1*iTime;\n"
+"    \n"
+"    vec3 white = .4*vec3(0.99,0.29,0.09),\n"
+"        gray = vec3(0.95,0.25,0.05);\n"
+"    float size = .1;\n"
+"    \n"
+"    \n"
+"    vec2 y = mod(x,size)-.5*size;\n"
+"    y = abs(y)-.001;\n"
+"    float d = min(y.x,y.y);\n"
+"\n"
+"    y = mod(x,.2*size)-.1*size;\n"
+"    y = abs(y)-.0002;\n"
+"    d = min(d, min(y.x,y.y));\n"
+"    \n"
+"    col = mix(white, gray, smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d));\n"
+"	col = mix(col, length(col)/length(c.xxx)*c.xxx, .7);\n"
+"}\n"
+"\n"
+"void mainImage( out vec4 fragColor, in vec2 fragCoord )\n"
+"{\n"
+"     // Set up coordinates\n"
+"    a = iResolution.x/iResolution.y;\n"
+"    vec2 uv = fragCoord/iResolution.yy-0.5*vec2(a, 1.0);\n"
+"    vec3 col = c.yyy;\n"
+"    \n"
+"//     if(length(uv) > .5)\n"
+"//     {\n"
+"//         fragColor = vec4(col, 0.);\n"
+"//         return;\n"
+"//     }\n"
+"    \n"
+"    float dhex,\n"
+"                na,\n"
+"                nal;\n"
+"            vec2 ind;\n"
+"            rand(floor(.33*iTime)*c.xx, na);\n"
+"            rand(floor(.33*iTime)*c.xx+1., nal);\n"
+"            na = mix(na,nal,clamp(((.33*iTime-floor(.33*iTime))-.9)/.1,0.,1.));\n"
+"    uv = mix(uv,.5*uv.yx,na);\n"
+"    \n"
+"    // Camera setup\n"
+"    float pp = .3*iTime;\n"
+"    vec3 o = c.yyx+.2*c.yzy,\n"
+"        t = c.yyy,\n"
+"        dir = normalize(t-o),\n"
+"        r = normalize(c.xyy),\n"
+"        u = normalize(cross(r,dir)),\n"
+"        n,\n"
+"        x,\n"
+"        l;\n"
+"    t += uv.x*r + uv.y*u;\n"
+"    dir = normalize(t-o);\n"
+"    vec2 s;\n"
+"    float d = -(o.z-.2)/dir.z;\n"
+"    int N = 250,\n"
+"        i;\n"
+"    \n"
+"    // Graph\n"
+"    //analytical_box(o,dir,vec3(.3*c.xx,.2),d);\n"
+"    x = o + d * dir;\n"
+"    \n"
+"    // Actual Scene\n"
+"    if(x.z>0.)\n"
+"    {\n"
+"\n"
+"        // Raymarching\n"
+"        for(i=0; i<N; ++i)\n"
+"        {\n"
+"            x = o + d * dir;\n"
+"            scene(x,s);\n"
+"            if(s.x < 1.e-4) break;\n"
+"            d += min(1.e-2,s.x);\n"
+"        }\n"
+"\n"
+"        // Illumination\n"
+"        l = normalize(x+c.yxx);\n"
+"        if(i<N)\n"
+"        {\n"
+"            normal(x,n,5.e-4);\n"
+"            \n"
+"            mat3 RR;\n"
+"            rot3(na*1.e3*vec3(1.1,1.5,1.9)+iNote*210.,RR);\n"
+"            col = mix(mix(.0,.3,clamp(x.z/.3,0.,1.))*(.5+.5*mat)*c.xxx,(1.+.8*mat)*abs(RR*RR*vec3(.7,.5,.26)),step(x.z,.08));\n"
+"            col = mix(col,(1.+.8*mat)*abs(RR*vec3(.6,.12,.06)),step(.19,x.z));\n"
+"\n"
+"            col = mix((.5+.5*mat)*col,(1.+.8*mat)*abs(RR*vec3(0.89,0.44,0.23)),(.5+.5*sin(x.z))*step(.19,x.z));\n"
+"            col = mix(col,vec3(0.25,0.23,0.21),(.5+.5*cos(4.*x.z+mat))*step(.19,x.z));\n"
+"            \n"
+"            col = mix(col, clamp(1.9*col,c.yyy,c.xxx), mat*step(.19,x.z));\n"
+"            \n"
+"             col = mix(col, 4.*col, smoothstep(0., 1., 1.-abs(dot(n, 3.*c.xyy))));\n"
+"//             col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.zyy))));\n"
+"        }\n"
+"        else\n"
+"        {\n"
+"            d = -o.z/dir.z;\n"
+"            x = o + d * dir;\n"
+"            n = c.yyx;\n"
+"            l = vec3(x.xy, .8);\n"
+"            colorize(x.xy, col);\n"
+"        }\n"
+"    }\n"
+"    else // Floor with grid\n"
+"    {\n"
+"        d = -o.z/dir.z;\n"
+"        x = o + d * dir;\n"
+"        n = c.yyx;\n"
+"        l = vec3(x.xy, .8);\n"
+"        colorize(x.xy, col);\n"
+"    }\n"
+"    \n"
+"    // Colorize\n"
+"    col = .2*col\n"
+"        + .9*col*abs(dot(l,n))\n"
+"        +.4*col*abs(pow(dot(reflect(-l,n),dir),3.));\n"
+"    \n"
+"//     col = sqrt(col);\n"
+"    col = 1.*col * col;\n"
+"    \n"
+"    fragColor = clamp(vec4(col,1.0),0.,1.);\n"
+"}\n"
+"\n"
+"void main()\n"
+"{\n"
+"    mainImage(gl_FragColor, gl_FragCoord.xy);\n"
 "}\n"
 "\0";
 void Loadrand()
@@ -5273,7 +5525,7 @@ void LoadSymbols()
     Loaddoctahedron();
     updateBar();
 }
-int ocean_program, ocean_handle, logo210_program, logo210_handle, graffiti_program, graffiti_handle, starsky_program, starsky_handle, text_program, text_handle, post_program, post_handle, deadline_program, deadline_handle, hydrant_program, hydrant_handle, watercubes_program, watercubes_handle, glitchcity_program, glitchcity_handle, greetings_program, greetings_handle, fractal_program, fractal_handle;
+int ocean_program, ocean_handle, logo210_program, logo210_handle, graffiti_program, graffiti_handle, starsky_program, starsky_handle, text_program, text_handle, post_program, post_handle, deadline_program, deadline_handle, hydrant_program, hydrant_handle, watercubes_program, watercubes_handle, glitchcity_program, glitchcity_handle, greetings_program, greetings_handle, fractal_program, fractal_handle, voronoinet_program, voronoinet_handle;
 int ocean_iTime_location,ocean_iResolution_location,ocean_iFader0_location,ocean_iFader1_location,ocean_iFader2_location,ocean_iFader3_location,ocean_iFader4_location,ocean_iFader5_location,ocean_iFader6_location,ocean_iFader7_location;
 int logo210_iTime_location,logo210_iResolution_location,logo210_iFader0_location,logo210_iFader1_location,logo210_iFader2_location,logo210_iFader3_location,logo210_iFader4_location,logo210_iFader5_location,logo210_iFader6_location,logo210_iFader7_location;
 int graffiti_iTime_location,graffiti_iResolution_location,graffiti_iFader0_location,graffiti_iFader1_location,graffiti_iFader2_location,graffiti_iFader3_location,graffiti_iFader4_location,graffiti_iFader5_location,graffiti_iFader6_location,graffiti_iFader7_location;
@@ -5286,7 +5538,8 @@ int watercubes_iTime_location,watercubes_iResolution_location,watercubes_iFader0
 int glitchcity_iTime_location,glitchcity_iResolution_location,glitchcity_iFader0_location,glitchcity_iFader1_location,glitchcity_iFader2_location,glitchcity_iFader3_location,glitchcity_iFader4_location,glitchcity_iFader5_location,glitchcity_iFader6_location,glitchcity_iFader7_location;
 int greetings_iTime_location,greetings_iResolution_location,greetings_iFader0_location,greetings_iFader1_location,greetings_iFader2_location,greetings_iFader3_location,greetings_iFader4_location,greetings_iFader5_location,greetings_iFader6_location,greetings_iFader7_location;
 int fractal_iTime_location,fractal_iResolution_location,fractal_iFader0_location,fractal_iFader1_location,fractal_iFader2_location,fractal_iFader3_location,fractal_iFader4_location,fractal_iFader5_location,fractal_iFader6_location,fractal_iFader7_location;
-const int nprograms = 12;
+int voronoinet_iTime_location,voronoinet_iResolution_location,voronoinet_iFader0_location,voronoinet_iFader1_location,voronoinet_iFader2_location,voronoinet_iFader3_location,voronoinet_iFader4_location,voronoinet_iFader5_location,voronoinet_iFader6_location,voronoinet_iFader7_location;
+const int nprograms = 13;
 
 void Loadocean()
 {
@@ -5830,6 +6083,50 @@ void Loadfractal()
     progress += .2/(float)nprograms;
 }
 
+void Loadvoronoinet()
+{
+    int voronoinet_size = strlen(voronoinet_source);
+    voronoinet_handle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(voronoinet_handle, 1, (GLchar **)&voronoinet_source, &voronoinet_size);
+    glCompileShader(voronoinet_handle);
+#ifdef DEBUG
+    printf("---> voronoinet Shader:\n");
+    debug(voronoinet_handle);
+    printf(">>>>\n");
+#endif
+    voronoinet_program = glCreateProgram();
+    glAttachShader(voronoinet_program,voronoinet_handle);
+    glAttachShader(voronoinet_program,hash22_handle);
+    glAttachShader(voronoinet_program,rand_handle);
+    glAttachShader(voronoinet_program,zextrude_handle);
+    glAttachShader(voronoinet_program,stroke_handle);
+    glAttachShader(voronoinet_program,dbox_handle);
+    glAttachShader(voronoinet_program,dbox3_handle);
+    glAttachShader(voronoinet_program,smoothmin_handle);
+    glAttachShader(voronoinet_program,dvoronoi_handle);
+    glAttachShader(voronoinet_program,analytical_box_handle);
+    glAttachShader(voronoinet_program,rot3_handle);
+    glAttachShader(voronoinet_program,normal_handle);
+    glLinkProgram(voronoinet_program);
+#ifdef DEBUG
+    printf("---> voronoinet Program:\n");
+    debugp(voronoinet_program);
+    printf(">>>>\n");
+#endif
+    glUseProgram(voronoinet_program);
+    voronoinet_iTime_location = glGetUniformLocation(voronoinet_program, "iTime");
+    voronoinet_iResolution_location = glGetUniformLocation(voronoinet_program, "iResolution");
+    voronoinet_iFader0_location = glGetUniformLocation(voronoinet_program, "iFader0");
+    voronoinet_iFader1_location = glGetUniformLocation(voronoinet_program, "iFader1");
+    voronoinet_iFader2_location = glGetUniformLocation(voronoinet_program, "iFader2");
+    voronoinet_iFader3_location = glGetUniformLocation(voronoinet_program, "iFader3");
+    voronoinet_iFader4_location = glGetUniformLocation(voronoinet_program, "iFader4");
+    voronoinet_iFader5_location = glGetUniformLocation(voronoinet_program, "iFader5");
+    voronoinet_iFader6_location = glGetUniformLocation(voronoinet_program, "iFader6");
+    voronoinet_iFader7_location = glGetUniformLocation(voronoinet_program, "iFader7");
+    progress += .2/(float)nprograms;
+}
+
 void LoadPrograms()
 {
     Loadocean();
@@ -5855,6 +6152,8 @@ void LoadPrograms()
     Loadgreetings();
     updateBar();
     Loadfractal();
+    updateBar();
+    Loadvoronoinet();
     updateBar();
 }
 #endif

@@ -208,8 +208,8 @@ void main()
                 + .1*col*dot(l, n)
                 + .6*col*pow(abs(dot(reflect(-l,n),dir)),2.);
                 
-            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.xyy))));
-            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.zyy))));
+            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.xyx))));
+            col = mix(col, c.xxx, smoothstep(.63, 1.2, 1.-abs(dot(n, 3.*c.zyx))));
             
         }
     }

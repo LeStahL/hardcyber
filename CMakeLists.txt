@@ -27,7 +27,7 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h)
 set(SFX_SHADER sfx.frag)
 set(STRINGS_FILE font/strings.txt)
-set(FRAGMENT_SHADER_FILES ocean.frag logo210.frag graffiti.frag starsky.frag text.frag post.frag deadline.frag hydrant.frag watercubes.frag glitchcity.frag greetings.frag fractal.frag)
+set(FRAGMENT_SHADER_FILES ocean.frag logo210.frag graffiti.frag starsky.frag text.frag post.frag deadline.frag hydrant.frag watercubes.frag glitchcity.frag greetings.frag fractal.frag voronoinet.frag)
 
 set(FRAGMENT_SHADERS "")
 foreach(shader ${FRAGMENT_SHADER_FILES})

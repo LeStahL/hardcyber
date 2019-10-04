@@ -216,4 +216,25 @@ else if(t < 173)
     }
 #endif
 }
+else if(t < 200)
+{
+    glUseProgram(voronoinet_program);
+    glUniform1f(voronoinet_iTime_location, t-173);
+    glUniform2f(voronoinet_iResolution_location, w, h);
+#ifdef MIDI
+    glUniform1f(voronoinet_iFader0_location, fader0);
+    glUniform1f(voronoinet_iFader1_location, fader1);
+    glUniform1f(voronoinet_iFader2_location, fader2);
+    glUniform1f(voronoinet_iFader3_location, fader3);
+    glUniform1f(voronoinet_iFader4_location, fader4);
+    glUniform1f(voronoinet_iFader5_location, fader5);
+    glUniform1f(voronoinet_iFader6_location, fader6);
+    glUniform1f(voronoinet_iFader7_location, fader7);
+    if(override_index == 10)
+    {
+        select_button(override_index);
+        override_index = 0;
+    }
+#endif
+}
 #endif
