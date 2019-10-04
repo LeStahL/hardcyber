@@ -38,13 +38,7 @@ void rand(in vec2 x, out float n);
 void lfnoise(in vec2 t, out float n);
 void mfnoise(in vec2 x, in float d, in float b, in float e, out float n);
 void dvoronoi(in vec2 x, out float d, out vec2 z, out float dv);
-float dspiral(vec2 x, float a, float d)
-{
-    float p = atan(x.y, x.x),
-        n = floor((abs(length(x)-a*p)+d*p)/(2.*pi*a));
-    p += (n*2.+1.)*pi;
-    return -abs(length(x)-a*p)+d*p;
-}
+float dspiral(vec2 x, float a, float d);
 float sm(float d)
 {
     return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);

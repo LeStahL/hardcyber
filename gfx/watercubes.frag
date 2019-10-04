@@ -17,219 +17,20 @@ float a = 1.0;
 
 vec3 color1, color2;
 
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash22(in vec2 p, out vec2 d)
-{
-	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yzx+33.33);
-    d = fract((p3.xx+p3.yz)*p3.zy);
-}
-
-void dist(in vec2 a, in vec2 b, out float d)
-{
-    d = length(b-a);
-}
-
-void nearest_controlpoint(in vec2 x, out vec2 p)
-{
-    float dmin = 1.e5, 
-        d;
-    vec2 dp,
-        y = floor(x);
-    
-    float i = 0.;
-    for(float i = -1.; i <= 1.; i += 1.)
-        for(float j = -1.; j <= 1.; j += 1.)
-        {
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            dist(x, dp, d);
-            if(d<dmin)
-            {
-                dmin = d;
-                p = dp;
-            }
-        }
-}
-
-void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance)
-{
-    d = 1.e4;
-    vec2 y,
-        dp;
-    
-    nearest_controlpoint(x, p);
-    y = floor(p);
-    
-    control_distance = 1.e4;
-    
-    for(float i = -2.; i <= 2.; i += 1.)
-        for(float j = -2.; j <= 2.; j += 1.)
-        {
-            if(i==0. && j==0.) continue;
-            hash22(y+vec2(i,j), dp);
-            dp += y+vec2(i,j);
-            vec2 o = p - dp;
-            float l = length(o);
-            d = min(d,abs(.5*l-dot(x-dp,o)/l));
-            control_distance = min(control_distance,.5*l);
-        }
-}
-
-// Creative Commons Attribution-ShareAlike 4.0 International Public License
-// Created by David Hoskins.
-// See https://www.shadertoy.com/view/4djSRW
-void hash33(in vec3 p3, out vec3 d)
-{
-	p3 = fract(p3 * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yxz+33.33);
-    d = fract((p3.xxy + p3.yxx)*p3.zyx);
-}
-
-void dist3(in vec3 a, in vec3 b, out float d)
-{
-    d = length(b-a);
-}
-
-void nearest_controlpoint3(in vec3 x, out vec3 p)
-{
-    float dmin = 1.e5, 
-        d;
-    vec3 dp,
-        y = floor(x);
-    
-    for(float i = -1.; i <= 1.; i += 1.)
-        for(float j = -1.; j <= 1.; j += 1.)
-        {
-            for(float k = -1.; k <= 1.; k += 1.)
-            {
-                hash33(y+vec3(i,j,k), dp);
-                dp += y+vec3(i,j,k);
-                dist3(x, dp, d);
-                if(d<dmin)
-                {
-                    dmin = d;
-                    p = dp;
-                }
-            }
-        }
-}
-
-void dvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)
-{
-    d = 1.e4;
-    vec3 y,
-        dp;
-    
-    nearest_controlpoint3(x, p);
-    y = floor(p);
-    
-    control_distance = 1.e4;
-    
-    for(float i = -2.; i <= 2.; i += 1.)
-        for(float j = -2.; j <= 2.; j += 1.)
-        {
-            for(float k = -1.; k <= 1.; k += 1.)
-            {
-                if(i==0. && j==0. && k == 0.) continue;
-                hash33(y+vec3(i,j,k), dp);
-                dp += y+vec3(i,j,k);
-                vec3 o = p - dp;
-                float l = length(o);
-                d = min(d,abs(.5*l-dot(x-dp,o)/l));
-                control_distance = min(control_distance,.5*l);
-            }
-        }
-}
-
-// iq's smooth minimum
-void smoothmin(in float a, in float b, in float k, out float dst)
-{
-    float h = max( k-abs(a-b), 0.0 )/k;
-    dst = min( a, b ) - h*h*h*k*(1.0/6.0);
-}
-
-void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance)
-{
-    d = 1.e4;
-    vec3 y,
-        dp;
-    
-    nearest_controlpoint3(x, p);
-    y = floor(p);
-    
-    control_distance = 1.e4;
-    
-    for(float i = -2.; i <= 2.; i += 1.)
-        for(float j = -2.; j <= 2.; j += 1.)
-        {
-            for(float k = -1.; k <= 1.; k += 1.)
-            {
-                if(i==0. && j==0. && k == 0.) continue;
-                hash33(y+vec3(i,j,k), dp);
-                dp += y+vec3(i,j,k);
-                vec3 o = p - dp;
-                float l = length(o);
-//                 d = min(d,abs(.5*l-dot(x-dp,o)/l));
-                smoothmin(d,abs(.5*l-dot(x-dp,o)/l), .15, d);
-//                 control_distance = min(control_distance,.5*l);
-                smoothmin(control_distance, .5*l, .15, control_distance);
-            }
-        }
-}
+void hash22(in vec2 p, out vec2 d);
+void dvoronoi(in vec2 x, out float d, out vec2 p, out float control_distance);
+void hash33(in vec3 p3, out vec3 d);
+void dvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance);
+void smoothmin(in float a, in float b, in float k, out float dst);
+void dsmoothvoronoi3(in vec3 x, out float d, out vec3 p, out float control_distance);
 
 mat3 gR;
-void rot3(in vec3 p, out mat3 rot)
-{
-    rot = mat3(c.xyyy, cos(p.x), sin(p.x), 0., -sin(p.x), cos(p.x))
-        *mat3(cos(p.y), 0., -sin(p.y), c.yxy, sin(p.y), 0., cos(p.y))
-        *mat3(cos(p.z), -sin(p.z), 0., sin(p.z), cos(p.z), c.yyyx);
-}
-
-void add(in vec2 sda, in vec2 sdb, out vec2 sdf)
-{
-    sdf = (sda.x<sdb.x)?sda:sdb;
-}
-
-void dbox3(in vec3 x, in vec3 b, out float d)
-{
-  vec3 da = abs(x) - b;
-  d = length(max(da,0.0))
-         + min(max(da.x,max(da.y,da.z)),0.0);
-}
-
-void dstar(in vec2 x, in float N, in vec2 R, out float dst)
-{
-    float d = pi/N,
-        p0 = acos(x.x/length(x)),
-        p = mod(p0, d),
-        i = mod(round((p-p0)/d),2.);
-    x = length(x)*vec2(cos(p),sin(p));
-    vec2 a = mix(R,R.yx,i),
-    	p1 = a.x*c.xy,
-        ff = a.y*vec2(cos(d),sin(d))-p1;
-   	ff = ff.yx*c.zx;
-    dst = dot(x-p1,ff)/length(ff);
-}
-
-void smoothmax(in float a, in float b, in float k, out float res)
-{
-    smoothmin(a,b,k,res);
-    res = a + b - res;
-}
-
-void dstar3(in vec3 x, in float N, in vec2 R, out float dst)
-{
-    float d;
-    
-    dstar(x.xy, N, R, dst);
-    dstar(x.yz, N, R, d);
-    smoothmax(-d,-dst,.15,dst);
-    dstar(x.zx, N, R, d);
-    smoothmax(-d,dst,.15,dst);
-}
+void rot3(in vec3 p, out mat3 rot);
+void add(in vec2 sda, in vec2 sdb, out vec2 sdf);
+void dbox3(in vec3 x, in vec3 b, out float d);
+void dstar(in vec2 x, in float N, in vec2 R, out float dst);
+void smoothmax(in float a, in float b, in float k, out float res);
+void dstar3(in vec3 x, in float N, in vec2 R, out float dst);
 
 void scene(in vec3 x, out vec2 sdf)
 {
@@ -252,26 +53,8 @@ void scene(in vec3 x, out vec2 sdf)
     add(sdf, vec2(abs(db+.0002)-.0001, 1.), sdf);
 }
 
-void normal(in vec3 x, out vec3 n, in float dx)
-{
-    vec2 s, na;
-    
-    scene(x,s);
-    scene(x+dx*c.xyy, na);
-    n.x = na.x;
-    scene(x+dx*c.yxy, na);
-    n.y = na.x;
-    scene(x+dx*c.yyx, na);
-    n.z = na.x;
-    n = normalize(n-s.x);
-}
-
-void dbox(in vec2 x, in vec2 b, out float d)
-{
-    vec2 da = abs(x)-b;
-    d = length(max(da,c.yy)) + min(max(da.x,da.y),0.0);
-}
-
+void normal(in vec3 x, out vec3 n, in float dx);
+void dbox(in vec2 x, in vec2 b, out float d);
 float sm(in float d)
 {
     return smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d);
