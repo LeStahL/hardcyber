@@ -20,6 +20,15 @@
 uniform float iTime;
 uniform vec2 iResolution;
 
+uniform float iFader0;
+uniform float iFader1;
+uniform float iFader2;
+uniform float iFader3;
+uniform float iFader4;
+uniform float iFader5;
+uniform float iFader6;
+uniform float iFader7;
+
 const float pi = acos(-1.);
 const vec3 c = vec3(1.,0.,-1.);
 float a = 1.0;

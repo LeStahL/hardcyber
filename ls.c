@@ -548,7 +548,7 @@ void draw()
     glUniform2f(post_iResolution_location, w, h);
     glUniform1f(post_iFSAA_location, fsaa);
     glUniform1i(post_iChannel0_location, 0);
-    glUniform1f(post_iTime_location, t-11);
+    glUniform1f(post_iTime_location, t);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, first_pass_texture);
@@ -562,7 +562,7 @@ void draw()
     glUseProgram(text_program);
     glUniform2f(text_iResolution_location, w, h);
     glUniform1f(text_iFontWidth_location, font_texture_size);
-    glUniform1f(text_iTime_location, t-12);
+    glUniform1f(text_iTime_location, t);
     glUniform1i(text_iChannel0_location, 0);
     glUniform1i(text_iFont_location, 1);
     glUniform1f(text_iFSAA_location, fsaa);

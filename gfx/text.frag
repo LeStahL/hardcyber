@@ -22,6 +22,15 @@ uniform vec2 iResolution;
 uniform sampler2D iChannel0, iFont;
 uniform float iFSAA;
 
+uniform float iFader0;
+uniform float iFader1;
+uniform float iFader2;
+uniform float iFader3;
+uniform float iFader4;
+uniform float iFader5;
+uniform float iFader6;
+uniform float iFader7;
+
 out vec4 gl_FragColor;
 
 // Global constants
@@ -110,9 +119,34 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         new.gba = mix(new.gba, c.xxx, sm(d));
     }
     
-    if(iTime < 0.) 
+    if(iTime < 20.)
     {
-        float sc = smoothstep(0.,1.,clamp(iTime+3.,0.,1.))*(1.-smoothstep(0.,1.,clamp(iTime+1.,0.,1.)));
+        float sc = clamp(iTime-10.,0.,1.)*(1.-clamp(iTime-18.,0.,1.)),
+            da;
+        
+        // window
+        vec3 c1 = new.gba;
+        addwindow(uv, c1, vec2(.72,.15));
+        new.gba = mix(new.gba, c1, sc);
+        
+        // No more partycoding this time!
+        dstring(uv-vec2(-.5,.05), 5., .02, d);
+        
+        // yeah sure.
+        dstring(uv-vec2(-.5,0.), 6., .02, da);
+        d = min(d, da);
+        
+        // well, that worked!
+        dstring(uv-vec2(-.5,-.05), 7., .02, da);
+        d = min(d, da);
+        
+        d = mix(1., d, sc);
+        
+        new.gba = mix(new.gba, c.xxx, sm(d));
+    }
+    else if(iTime < 32.) 
+    {
+        float sc = smoothstep(0.,1.,clamp(iTime-25.,0.,1.))*(1.-smoothstep(0.,1.,clamp(iTime-30.,0.,1.)));
         
         vec3 c1 = new.gba;
         addwindow(uv-vec2(0.,-.3), c1, vec2(.15,.1));
@@ -126,64 +160,63 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
         new.gba = mix(new.gba, c1, sc);
     }
-
-    else if(iTime < 44.)
-    {
-        float da, db;
-        
-        // Once
-        dstring((uv-vec2(-.3,.3)), 21., .1, da);
-        
-        db = abs(mod(uv.x+uv.y,.3)-.15)-.075;
-        vec3 c1 = mix(mix(new.gba,.3*c.xxx,.5), c.xxx, sm(db));
-        
-        db = smoothstep(33.,34.,iTime);
-        da = mix(1., da, db);
-        new.gba = mix(new.gba, c1, sm(da));
-        
-        stroke(da-.02,.001,da);
-        new.gba = mix(new.gba, c.xxx, sm(da));
-        
-        // You
-        dstring(uv-vec2(.35,.34), 22., .05, da);
-        
-        dbox(uv-vec2(.35,.34), vec2(.15,.06), db);
-        db = max(db,-da);
-        float mx = smoothstep(34.,35., iTime);
-        db = mix(1., db, mx);
-        new.gba = mix(new.gba, c.xxx, sm(db));
-        
-        // Offend
-        dstring(uv-vec2(.25,.24), 23., .0277, da);
-        mx = smoothstep(35.,36.,iTime);
-        da = mix(1., da, mx);
-        new.gba = mix(new.gba, .8*c.xxy, sm(da));
-        
-        // You
-        dstring(uv-vec2(.25,.15), 22., .05, da);
-        mx = smoothstep(36.,37.,iTime);
-        da = mix(1., da, mx);
-        new.gba = mix(new.gba, .8*c.xxy, sm(da));
-        
-        // Cannot
-        dstring((uv-vec2(.45,.05)).yx*c.zx, 24., .05, da);
-        
-        dbox((uv-vec2(.45,-.1)), vec2(.05,.3), db);
-        db = max(db,-da);
-        mx = smoothstep(37.,38., iTime);
-        db = mix(1., db, mx);
-        new.gba = mix(new.gba, c.xxx, sm(db));
-
-        // Stop
-        dstring((uv-vec2(.6,.1)).yx*c.zx, 25., .1, da);
-        
-        db = smoothstep(38.,39.,iTime);
-        da = mix(1., da, db);
-        new.gba = mix(new.gba, c1, sm(da));
-        
-        stroke(da-.02,.001,da);
-        new.gba = mix(new.gba, c.xxx, sm(da));
-    }
+//     else if(iTime < 44.)
+//     {
+//         float da, db;
+//         
+//         // Once
+//         dstring((uv-vec2(-.3,.3)), 21., .1, da);
+//         
+//         db = abs(mod(uv.x+uv.y,.3)-.15)-.075;
+//         vec3 c1 = mix(mix(new.gba,.3*c.xxx,.5), c.xxx, sm(db));
+//         
+//         db = smoothstep(33.,34.,iTime);
+//         da = mix(1., da, db);
+//         new.gba = mix(new.gba, c1, sm(da));
+//         
+//         stroke(da-.02,.001,da);
+//         new.gba = mix(new.gba, c.xxx, sm(da));
+//         
+//         // You
+//         dstring(uv-vec2(.35,.34), 22., .05, da);
+//         
+//         dbox(uv-vec2(.35,.34), vec2(.15,.06), db);
+//         db = max(db,-da);
+//         float mx = smoothstep(34.,35., iTime);
+//         db = mix(1., db, mx);
+//         new.gba = mix(new.gba, c.xxx, sm(db));
+//         
+//         // Offend
+//         dstring(uv-vec2(.25,.24), 23., .0277, da);
+//         mx = smoothstep(35.,36.,iTime);
+//         da = mix(1., da, mx);
+//         new.gba = mix(new.gba, .8*c.xxy, sm(da));
+//         
+//         // You
+//         dstring(uv-vec2(.25,.15), 22., .05, da);
+//         mx = smoothstep(36.,37.,iTime);
+//         da = mix(1., da, mx);
+//         new.gba = mix(new.gba, .8*c.xxy, sm(da));
+//         
+//         // Cannot
+//         dstring((uv-vec2(.45,.05)).yx*c.zx, 24., .05, da);
+//         
+//         dbox((uv-vec2(.45,-.1)), vec2(.05,.3), db);
+//         db = max(db,-da);
+//         mx = smoothstep(37.,38., iTime);
+//         db = mix(1., db, mx);
+//         new.gba = mix(new.gba, c.xxx, sm(db));
+// 
+//         // Stop
+//         dstring((uv-vec2(.6,.1)).yx*c.zx, 25., .1, da);
+//         
+//         db = smoothstep(38.,39.,iTime);
+//         da = mix(1., da, db);
+//         new.gba = mix(new.gba, c1, sm(da));
+//         
+//         stroke(da-.02,.001,da);
+//         new.gba = mix(new.gba, c.xxx, sm(da));
+//     }
     else if(iTime < 60.)
     {
         //vec3(0.93,0.36,0.44)
