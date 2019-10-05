@@ -20,6 +20,9 @@ cmake_minimum_required(VERSION 3.12)
 project(hardcyber)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+
+set(MINIFY_64K ON CACHE BOOL "Compress the executable using kkrunchy7 (disables hybrid graphics dGPU exports)")
+
 # Find the right python interpreter version
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
@@ -104,9 +107,10 @@ if(MSVC)
         target_link_libraries(hardcyber User32.lib Winmm.lib ucrt.lib msvcrt.lib)
     endif()
 
-    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4 AND MINIFY_64K AND (MSVC_IDE OR CMAKE_BUILD_TYPE STREQUAL "Release"))
+        target_compile_definitions(hardcyber PRIVATE "$<$<CONFIG:RELEASE>:MINIFY_64K>")
         find_program(KKRUNCHY_K7 kkrunchy_k7.exe HINTS "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/bin")
-        add_custom_command(TARGET hardcyber COMMAND "${KKRUNCHY_K7}" --best "$<TARGET_FILE:hardcyber>" --out "$<TARGET_FILE_DIR:hardcyber>/hardcyberc.exe" POST_BUILD)
+        add_custom_command(TARGET hardcyber COMMAND "$<$<CONFIG:RELEASE>:${KKRUNCHY_K7}>" ARGS --best "$<TARGET_FILE:hardcyber>" --out "$<TARGET_FILE_DIR:hardcyber>/hardcyberc.exe" POST_BUILD)
     endif()
 else()
     find_package(SDL2 REQUIRED)
