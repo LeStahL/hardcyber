@@ -1,0 +1,70 @@
+{
+    "scenes": [
+        {
+            "name": "Deadline Logo",
+            "prefix": "deadline",
+            "t_end": 20,
+            "t_start": 0
+        },
+        {
+            "name": "Team210 Logo",
+            "prefix": "logo210",
+            "t_end": 32,
+            "t_start": 20
+        },
+        {
+            "name": "Hardcyber Graffiti",
+            "prefix": "graffiti",
+            "t_end": 43.38999938964844,
+            "t_start": 32
+        },
+        {
+            "name": "Ocean Scene",
+            "prefix": "ocean",
+            "t_end": 48.08100128173828,
+            "t_start": 43.38999938964844
+        },
+        {
+            "name": "Stars, Sky & Street",
+            "prefix": "starsky",
+            "t_end": 60.233001708984375,
+            "t_start": 48.08100128173828
+        },
+        {
+            "name": "Glitch City",
+            "prefix": "glitchcity",
+            "t_end": 72.38500213623047,
+            "t_start": 60.233001708984375
+        },
+        {
+            "name": "Voronoi Cubes",
+            "prefix": "watercubes",
+            "t_end": 96.68900299072266,
+            "t_start": 72.38500213623047
+        },
+        {
+            "name": "Greetings Scene",
+            "prefix": "greetings",
+            "t_end": 120.99299621582031,
+            "t_start": 96.68900299072266
+        },
+        {
+            "name": "Spacepigs Hydrant",
+            "prefix": "hydrant",
+            "t_end": 135,
+            "t_start": 120.99299621582031
+        },
+        {
+            "name": "Fractal Scene",
+            "prefix": "fractal",
+            "t_end": 169.60000610351562,
+            "t_start": 135
+        },
+        {
+            "name": "Voronoi Net",
+            "prefix": "voronoinet",
+            "t_end": 194.375,
+            "t_start": 169.60000610351562
+        }
+    ]
+}

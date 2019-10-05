@@ -246,5 +246,7 @@ void main()
     col = 2.*col*col;
     col = mix(col, c.yyy, clamp(iTime-9.,0.,1.));
     
+    col = mix(col, 1.5*col, iScale);
+    
     gl_FragColor = vec4(clamp(col,0.,1.), 1.);
 }

@@ -156,6 +156,13 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
         new.gba = mix(new.gba, c1, sc);
     }
+    else if(iTime < 52.)
+    {
+        vec3 c1 = vec3(1.00,0.33,0.38),
+            c2 = vec3(0.94,0.91,0.60);
+            
+//         float sc = smoothstep(44.,45.,iTime)*(1.-smoothstep(45.,
+    }
 //     else if(iTime < 44.)
 //     {
 //         float da, db;

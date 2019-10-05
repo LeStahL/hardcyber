@@ -1,10 +1,9 @@
 #ifndef DRAW_HEADER
 #define DRAW_HEADER
-
-if(t < t_team210_logo)
+if(t < t_logo210)
 {
     glUseProgram(deadline_program);
-    glUniform1f(deadline_iTime_location, t-0);
+    glUniform1f(deadline_iTime_location, t-t_deadline);
     glUniform2f(deadline_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(deadline_iFader0_location, fader0);
@@ -17,10 +16,10 @@ if(t < t_team210_logo)
     glUniform1f(deadline_iFader7_location, fader7);
 #endif
 }
-else if(t < t_grafitti_logo)
+else if(t < t_graffiti)
 {
     glUseProgram(logo210_program);
-    glUniform1f(logo210_iTime_location, t-t_team210_logo);
+    glUniform1f(logo210_iTime_location, t-t_logo210);
     glUniform2f(logo210_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(logo210_iFader0_location, fader0);
@@ -33,10 +32,10 @@ else if(t < t_grafitti_logo)
     glUniform1f(logo210_iFader7_location, fader7);
 #endif
 }
-else if(t < t_ocean_logo)
+else if(t < t_ocean)
 {
     glUseProgram(graffiti_program);
-    glUniform1f(graffiti_iTime_location, t-t_grafitti_logo);
+    glUniform1f(graffiti_iTime_location, t-t_graffiti);
     glUniform2f(graffiti_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(graffiti_iFader0_location, fader0);
@@ -49,10 +48,10 @@ else if(t < t_ocean_logo)
     glUniform1f(graffiti_iFader7_location, fader7);
 #endif
 }
-else if(t < t_stars_sky_street_logo)
+else if(t < t_starsky)
 {
     glUseProgram(ocean_program);
-    glUniform1f(ocean_iTime_location, t-t_ocean_logo);
+    glUniform1f(ocean_iTime_location, t-t_ocean);
     glUniform2f(ocean_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(ocean_iFader0_location, fader0);
@@ -65,10 +64,10 @@ else if(t < t_stars_sky_street_logo)
     glUniform1f(ocean_iFader7_location, fader7);
 #endif
 }
-else if(t < t_voronoi_cubes_logo)
+else if(t < t_glitchcity)
 {
     glUseProgram(starsky_program);
-    glUniform1f(starsky_iTime_location, t-t_stars_sky_street_logo);
+    glUniform1f(starsky_iTime_location, t-t_starsky);
     glUniform2f(starsky_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(starsky_iFader0_location, fader0);
@@ -81,26 +80,10 @@ else if(t < t_voronoi_cubes_logo)
     glUniform1f(starsky_iFader7_location, fader7);
 #endif
 }
-else if(t < t_glitch_city_logo)
-{
-    glUseProgram(watercubes_program);
-    glUniform1f(watercubes_iTime_location, t-t_voronoi_cubes_logo);
-    glUniform2f(watercubes_iResolution_location, w, h);
-#ifdef MIDI
-    glUniform1f(watercubes_iFader0_location, fader0);
-    glUniform1f(watercubes_iFader1_location, fader1);
-    glUniform1f(watercubes_iFader2_location, fader2);
-    glUniform1f(watercubes_iFader3_location, fader3);
-    glUniform1f(watercubes_iFader4_location, fader4);
-    glUniform1f(watercubes_iFader5_location, fader5);
-    glUniform1f(watercubes_iFader6_location, fader6);
-    glUniform1f(watercubes_iFader7_location, fader7);
-#endif
-}
-else if(t < t_greetings_logo)
+else if(t < t_watercubes)
 {
     glUseProgram(glitchcity_program);
-    glUniform1f(glitchcity_iTime_location, t-t_glitch_city_logo);
+    glUniform1f(glitchcity_iTime_location, t-t_glitchcity);
     glUniform2f(glitchcity_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(glitchcity_iFader0_location, fader0);
@@ -113,10 +96,26 @@ else if(t < t_greetings_logo)
     glUniform1f(glitchcity_iFader7_location, fader7);
 #endif
 }
-else if(t < t_spacepigs_logo)
+else if(t < t_greetings)
+{
+    glUseProgram(watercubes_program);
+    glUniform1f(watercubes_iTime_location, t-t_watercubes);
+    glUniform2f(watercubes_iResolution_location, w, h);
+#ifdef MIDI
+    glUniform1f(watercubes_iFader0_location, fader0);
+    glUniform1f(watercubes_iFader1_location, fader1);
+    glUniform1f(watercubes_iFader2_location, fader2);
+    glUniform1f(watercubes_iFader3_location, fader3);
+    glUniform1f(watercubes_iFader4_location, fader4);
+    glUniform1f(watercubes_iFader5_location, fader5);
+    glUniform1f(watercubes_iFader6_location, fader6);
+    glUniform1f(watercubes_iFader7_location, fader7);
+#endif
+}
+else if(t < t_hydrant)
 {
     glUseProgram(greetings_program);
-    glUniform1f(greetings_iTime_location, t-t_greetings_logo);
+    glUniform1f(greetings_iTime_location, t-t_greetings);
     glUniform2f(greetings_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(greetings_iFader0_location, fader0);
@@ -129,10 +128,10 @@ else if(t < t_spacepigs_logo)
     glUniform1f(greetings_iFader7_location, fader7);
 #endif
 }
-else if(t < t_fractal_logo)
+else if(t < t_fractal)
 {
     glUseProgram(hydrant_program);
-    glUniform1f(hydrant_iTime_location, t-t_spacepigs_logo);
+    glUniform1f(hydrant_iTime_location, t-t_hydrant);
     glUniform2f(hydrant_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(hydrant_iFader0_location, fader0);
@@ -145,10 +144,10 @@ else if(t < t_fractal_logo)
     glUniform1f(hydrant_iFader7_location, fader7);
 #endif
 }
-else if(t < t_voronoi_net)
+else if(t < t_voronoinet)
 {
     glUseProgram(fractal_program);
-    glUniform1f(fractal_iTime_location, t-t_fractal_logo);
+    glUniform1f(fractal_iTime_location, t-t_fractal);
     glUniform2f(fractal_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(fractal_iFader0_location, fader0);
@@ -161,10 +160,9 @@ else if(t < t_voronoi_net)
     glUniform1f(fractal_iFader7_location, fader7);
 #endif
 }
-else
-{
+else {
     glUseProgram(voronoinet_program);
-    glUniform1f(voronoinet_iTime_location, t-t_voronoi_net);
+    glUniform1f(voronoinet_iTime_location, t-t_voronoinet);
     glUniform2f(voronoinet_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(voronoinet_iFader0_location, fader0);
@@ -175,11 +173,6 @@ else
     glUniform1f(voronoinet_iFader5_location, fader5);
     glUniform1f(voronoinet_iFader6_location, fader6);
     glUniform1f(voronoinet_iFader7_location, fader7);
-    if(override_index == 10)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
 #endif

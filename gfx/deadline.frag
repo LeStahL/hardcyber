@@ -171,6 +171,9 @@ void main()
     col = mix(c0, col, clamp(iTime,0.,1.));
     
     col = mix(col, vec3(0.18,0.24,0.31), clamp(iTime-19.,0.,1.));
+    
+//     col = mix(col, 2.*c.xyy, iScale);
+    
     gl_FragColor = vec4(clamp(col,0.,1.),1.);
 }
 
