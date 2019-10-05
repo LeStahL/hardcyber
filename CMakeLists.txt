@@ -1,17 +1,17 @@
 # Hardcyber - PC-64k-Intro by Team210 at Deadline 2k19
 # Copyright (C) 2019 Alexander Kraus <nr4@z10.info>
 # Copyright (C) 2019 DaDummy <c.anselm@paindevs.com>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.12)
 project(hardcyber)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-
+# Configurables
 set(MINIFY_64K ON CACHE BOOL "Compress the executable using kkrunchy7 (disables hybrid graphics dGPU exports)")
 
 # Find the right python interpreter version
@@ -29,13 +29,25 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h)
 set(SFX_SHADER sfx.frag)
+set(SHADER_FILES
+        gfx/load.frag
+        gfx/ocean.frag
+        gfx/logo210.frag
+        gfx/graffiti.frag
+        gfx/starsky.frag
+        gfx/text.frag
+        gfx/post.frag
+        gfx/deadline.frag
+        gfx/hydrant.frag
+        gfx/watercubes.frag
+        gfx/glitchcity.frag
+        gfx/greetings.frag
+        gfx/fractal.frag
+        gfx/voronoinet.frag
+        gfx/volclouds.frag
+)
+set(SHADER_SYMBOLS_PATH gfx/symbols/)
 set(STRINGS_FILE font/strings.txt)
-set(FRAGMENT_SHADER_FILES ocean.frag logo210.frag graffiti.frag starsky.frag text.frag post.frag deadline.frag hydrant.frag watercubes.frag glitchcity.frag greetings.frag fractal.frag voronoinet.frag volclouds.frag)
-
-set(FRAGMENT_SHADERS "")
-foreach(shader ${FRAGMENT_SHADER_FILES})
-    list(APPEND FRAGMENT_SHADERS "gfx/${shader}")
-endforeach(shader)
 
 
 #################################
@@ -45,7 +57,7 @@ endforeach(shader)
 set(DEMO_HEADERS common.h draw.h scenes.h pal_linux.h pal_win32.h sequence.h)
 
 set(SFX_HEADER sfx.h)
-add_custom_target(minification
+add_custom_target(minify_sfx
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/minification/
     COMMAND "${Python3_EXECUTABLE}" shader-compressor.py -o "${PROJECT_SOURCE_DIR}/${SFX_HEADER}" "${PROJECT_SOURCE_DIR}/${SFX_SHADER}" --no-minification
     SOURCES minification/shader-compressor.py ${SFX_SHADER}
@@ -53,9 +65,7 @@ add_custom_target(minification
 )
 
 set(SHADER_HEADER shaders.gen.h)
-set(SHADER_FILES gfx/load.frag)
-set(SHADER_SYMBOLS_PATH gfx/symbols/)
-add_custom_target(minification2
+add_custom_target(minify_shaders
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/
     COMMAND "${Python3_EXECUTABLE}" minification/symbolize.py ${SHADER_FILES} -s ${SHADER_SYMBOLS_PATH} -o ${SHADER_HEADER}
     SOURCES minification/symbolize.py minification/Rule.py minification/Token.py minification/GLSLLexer130.py minification/Compressor.py ${SHADER_FILES}
@@ -70,14 +80,6 @@ add_custom_target(texture_packing
     BYPRODUCTS ${FONT_HEADER}
 )
 
-set(SYMBOLS_HEADER gfx/symbols.h)
-add_custom_target(symbolization
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/gfx/
-    COMMAND "${Python3_EXECUTABLE}" symbolize.py ${FRAGMENT_SHADER_FILES} -o symbols.h
-    SOURCES gfx/symbolize.py minification/Rule.py minification/Token.py minification/GLSLLexer130.py minification/Compressor.py ${FRAGMENT_SHADERS}
-    BYPRODUCTS ${SYMBOLS_HEADER}
-)
-
 add_executable(hardcyber
     ls.c
     ${COMMON_HEADERS}
@@ -87,10 +89,9 @@ add_executable(hardcyber
     ${FRAGMENT_SHADERS}
     ${SHADER_FILES}
 )
-add_dependencies(hardcyber minification)
-add_dependencies(hardcyber minification2)
+add_dependencies(hardcyber minify_sfx)
+add_dependencies(hardcyber minify_shaders)
 add_dependencies(hardcyber texture_packing)
-add_dependencies(hardcyber symbolization)
 
 target_include_directories(hardcyber SYSTEM PRIVATE "${OPENGL_INCLUDE_DIR}")
 

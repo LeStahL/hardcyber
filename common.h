@@ -23,6 +23,7 @@
 #include "engine/renderer.h"
 #include "engine/shader.h"
 #include "engine/loader.h"
+#include "scenes.h"
 #include "engine/orchestrator.h"
 
 #include <stddef.h>
@@ -161,8 +162,6 @@ const char *buffersize_names[] =
     "1024x1024 px"
 };
 
-#include "scenes.h"
-
 #ifdef MIDI
 HMIDIOUT hMidiOut;
 #endif
@@ -272,8 +271,6 @@ void jump_to_scene(unsigned int scene_index);
 #define SFX_VAR_ISEQUENCEWIDTH "iSequenceWidth"
 
 #include "font/font.h"
-
-#include "gfx/symbols.h"
 
 #ifdef WIN32
 #	include "pal_win32.h"

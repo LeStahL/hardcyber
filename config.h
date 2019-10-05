@@ -41,6 +41,4 @@ static const struct OpenGLSettings opengl_settings = {
 	1, // samples (for Multisampling)
 };
 
-#define duration (222.0)
-
 #endif

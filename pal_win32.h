@@ -44,6 +44,7 @@ HWND hRecordFilenameEdit, hCaptureWindow, hCaptureDriverComboBox ;
 
 double get_sound_playback_time();
 void set_sound_playback_time(double time);
+void set_sound_playback_range(double time_begin, double time_end);
 
 int flip_buffers()
 {
@@ -464,7 +465,7 @@ void jump_to_scene(unsigned int scene_index)
 {
     if (scene_index < nscenes)
     {
-        set_sound_playback_time(start_times[scene_index]);
+        set_sound_playback_range(start_times[scene_index], duration);
     }
     else
     {
@@ -478,6 +479,9 @@ void initialize_sound()
 	int n_bits_per_sample = 16;
 	WAVEFORMATEX wfx = { WAVE_FORMAT_PCM, channels, sample_rate, sample_rate*channels*n_bits_per_sample / 8, channels*n_bits_per_sample / 8, n_bits_per_sample, 0 };
 	waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL);
+
+    t_start = t_now = 0.;
+    t_end = duration;
 }
 
 double get_sound_playback_time()
@@ -487,13 +491,19 @@ double get_sound_playback_time()
     return t_start + ((double)MMTime.u.sample) / 44100.0;
 }
 
-void set_sound_playback_time(double time)
+void set_sound_playback_time(double time_begin)
+{
+    set_sound_playback_range(time_begin, t_end);
+}
+
+void set_sound_playback_range(double time_begin, double time_end)
 {
     waveOutReset(hWaveOut);
 
-    t_start = time;
-    int delta = clamp((int)(time * (double)sample_rate), 0, music1_size-1);
-    header.lpData = smusic1+delta;
+    t_start = time_begin;
+    t_end = time_end;
+    int delta = clamp((int)(t_start * (double)sample_rate), 0, music1_size-1);
+    header.lpData = smusic1 + delta;
     header.dwBufferLength = 4 * (music1_size-delta);
     waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
     waveOutWrite(hWaveOut, &header, sizeof(WAVEHDR));

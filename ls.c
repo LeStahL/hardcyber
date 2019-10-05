@@ -17,6 +17,7 @@
  */
 
 // #define DEBUG // Shader debug i/o
+// #define DEBUG_SHADER // Shader compile and link errors
 // #define MIDI // APC40 mkII controls
 // #define RECORD // Compile in recording capabilities
 
@@ -205,7 +206,7 @@ void CALLBACK MidiInProc_apc40mk2(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, 
                 waveOutReset(hWaveOut);
                 time_dial = (double)b2/(double)0x7F;
                 
-                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end * (double)sample_rate;
+                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration * (double)sample_rate;
                 header.lpData = min(max(smusic1, smusic1+delta), smusic1+music1_size);
                 header.dwBufferLength = 4 * (music1_size-delta);
                 waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
@@ -218,7 +219,7 @@ void CALLBACK MidiInProc_apc40mk2(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, 
                 waveOutReset(hWaveOut);
                 time_fine_dial = (double)b2/(double)0x7F;
                 
-                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end * (double)sample_rate;
+                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration * (double)sample_rate;
                 header.lpData = min(max(smusic1, smusic1+delta), smusic1+music1_size);
                 header.dwBufferLength = 4 * (music1_size-delta);
                 waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
@@ -231,7 +232,7 @@ void CALLBACK MidiInProc_apc40mk2(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, 
                 waveOutReset(hWaveOut);
                 time_very_fine_dial = (double)b2/(double)0x7F;
                 
-                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end * (double)sample_rate;
+                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration * (double)sample_rate;
                 header.lpData = min(max(smusic1, smusic1+delta), smusic1+music1_size);
                 header.dwBufferLength = 4 * (music1_size-delta);
                 waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
@@ -386,10 +387,8 @@ void load_sound_block(int music_block)
 void load_demo()
 {
     printf("++++ Creating Loading bar.\n");
-    shader_program_gfx_load.linkStatus = GL_TRUE;
     lInitializeLoader();
-#if 0 // FIXME Debug code
-#else
+#ifdef DEBUG_SHADER
     if (shader_program_gfx_load.linkStatus != GL_TRUE)
     {
         printf("    Linker Error. Log:\n%s\n\n", shader_program_gfx_load.linkerError);
@@ -402,29 +401,34 @@ void load_demo()
 
     updateBar();
 
-    load_compressed_sound();
-    music_loading = 1;
-
-    updateBar();
-
     lLoadAllSymbols();
-#if 0 // FIXME Debug code
-#else
+#ifdef DEBUG_SHADER
     for(unsigned int symbolIndex = 0; symbolIndex < lNumberOfSymbols; ++symbolIndex)
     {
-        if ((shader_symbols + symbolIndex)->compileStatus != GL_TRUE)
+        if (shader_symbols[symbolIndex].compileStatus != GL_TRUE)
         {
-            printf("    Compiler Error. Log:\n%s\n\n", (shader_symbols + symbolIndex)->compilerError);
+            printf("    Compiler Error. Log:\n%s\n\n", shader_symbols[symbolIndex].compilerError);
         }
     }
 #endif
 
     lLoadAllPrograms();
-    
-    LoadSymbols();
-    LoadPrograms();
+#ifdef DEBUG_SHADER
+    for (unsigned int programIndex = 0; programIndex < lNumberOfPrograms; ++programIndex)
+    {
+        if (shader_programs[programIndex].linkStatus != GL_TRUE)
+        {
+            printf("    Compiler Error. Log:\n%s\n\n", shader_programs[programIndex].linkerError);
+        }
+    }
+#endif
 
     load_font();
+
+    updateBar();
+
+    load_compressed_sound();
+    music_loading = 1;
 
     updateBar();
 
@@ -532,7 +536,7 @@ void draw()
 #ifdef MIDI
     if(time_dial != 0 ||  time_fine_dial != 0 || time_very_fine_dial != 0)
     {
-        t = t_now + (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end;
+        t = t_now + (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration;
     }
 #endif
     
@@ -541,11 +545,11 @@ void draw()
     quad();
 
     // Render post processing to buffer
-    glUseProgram(post_program);
-    glUniform2f(post_iResolution_location, w, h);
-    glUniform1f(post_iFSAA_location, fsaa);
-    glUniform1i(post_iChannel0_location, 0);
-    glUniform1f(post_iTime_location, t);
+    glUseProgram(shader_program_gfx_post.handle);
+    glUniform2f(shader_uniform_gfx_post_iResolution, w, h);
+    glUniform1f(shader_uniform_gfx_post_iFSAA, fsaa);
+    glUniform1i(shader_uniform_gfx_post_iChannel0, 0);
+    glUniform1f(shader_uniform_gfx_post_iTime, t);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, first_pass_texture);
@@ -556,23 +560,23 @@ void draw()
     // Render to screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
-    glUseProgram(text_program);
-    glUniform2f(text_iResolution_location, w, h);
-    glUniform1f(text_iFontWidth_location, font_texture_size);
-    glUniform1f(text_iTime_location, t);
-    glUniform1i(text_iChannel0_location, 0);
-    glUniform1i(text_iFont_location, 1);
-    glUniform1f(text_iFSAA_location, fsaa);
+    glUseProgram(shader_program_gfx_text.handle);
+    glUniform2f(shader_uniform_gfx_text_iResolution, w, h);
+    glUniform1f(shader_uniform_gfx_text_iFontWidth, font_texture_size);
+    glUniform1f(shader_uniform_gfx_text_iTime, t);
+    glUniform1i(shader_uniform_gfx_text_iChannel0, 0);
+    glUniform1i(shader_uniform_gfx_text_iFont, 1);
+    glUniform1f(shader_uniform_gfx_text_iFSAA, fsaa);
     
 #ifdef MIDI
-    glUniform1f(text_iFader0_location, fader0);
-    glUniform1f(text_iFader1_location, fader1);
-    glUniform1f(text_iFader2_location, fader2);
-    glUniform1f(text_iFader3_location, fader3);
-    glUniform1f(text_iFader4_location, fader4);
-    glUniform1f(text_iFader5_location, fader5);
-    glUniform1f(text_iFader6_location, fader6);
-    glUniform1f(text_iFader7_location, fader7);
+    glUniform1f(shader_uniform_gfx_text_iFader0, fader0);
+    glUniform1f(shader_uniform_gfx_text_iFader1, fader1);
+    glUniform1f(shader_uniform_gfx_text_iFader2, fader2);
+    glUniform1f(shader_uniform_gfx_text_iFader3, fader3);
+    glUniform1f(shader_uniform_gfx_text_iFader4, fader4);
+    glUniform1f(shader_uniform_gfx_text_iFader5, fader5);
+    glUniform1f(shader_uniform_gfx_text_iFader6, fader6);
+    glUniform1f(shader_uniform_gfx_text_iFader7, fader7);
 #endif
     
     glActiveTexture(GL_TEXTURE0);
