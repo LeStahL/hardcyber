@@ -23,6 +23,7 @@ class GLSLLexer130:
         self.source = source
         
         self.rules = []
+        self.rules += [ Rule.Rule("#CRLF", "ENFORCED_CRLF") ]
         self.rules += [ Rule.Rule("#version", "VERSION_DIRECTIVE") ]
         self.rules += [ Rule.Rule("#define", "DEFINE_DIRECTIVE") ]
         self.rules += [ Rule.Rule("/\*(.|\n)*\*/", "MULTILINE_COMMENT") ]
