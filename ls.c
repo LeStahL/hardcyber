@@ -205,7 +205,7 @@ void CALLBACK MidiInProc_apc40mk2(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, 
                 waveOutReset(hWaveOut);
                 time_dial = (double)b2/(double)0x7F;
                 
-                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end * (double)sample_rate;
+                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration * (double)sample_rate;
                 header.lpData = min(max(smusic1, smusic1+delta), smusic1+music1_size);
                 header.dwBufferLength = 4 * (music1_size-delta);
                 waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
@@ -218,7 +218,7 @@ void CALLBACK MidiInProc_apc40mk2(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, 
                 waveOutReset(hWaveOut);
                 time_fine_dial = (double)b2/(double)0x7F;
                 
-                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end * (double)sample_rate;
+                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration * (double)sample_rate;
                 header.lpData = min(max(smusic1, smusic1+delta), smusic1+music1_size);
                 header.dwBufferLength = 4 * (music1_size-delta);
                 waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
@@ -231,7 +231,7 @@ void CALLBACK MidiInProc_apc40mk2(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, 
                 waveOutReset(hWaveOut);
                 time_very_fine_dial = (double)b2/(double)0x7F;
                 
-                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end * (double)sample_rate;
+                int delta = (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration * (double)sample_rate;
                 header.lpData = min(max(smusic1, smusic1+delta), smusic1+music1_size);
                 header.dwBufferLength = 4 * (music1_size-delta);
                 waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
@@ -531,7 +531,7 @@ void draw()
 #ifdef MIDI
     if(time_dial != 0 ||  time_fine_dial != 0 || time_very_fine_dial != 0)
     {
-        t = t_now + (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end;
+        t = t_now + (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * duration;
     }
 #endif
     

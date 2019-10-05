@@ -23,6 +23,7 @@
 #include "engine/renderer.h"
 #include "engine/shader.h"
 #include "engine/loader.h"
+#include "scenes.h"
 #include "engine/orchestrator.h"
 
 #include <stddef.h>
@@ -160,8 +161,6 @@ const char *buffersize_names[] =
     "512x512 px",
     "1024x1024 px"
 };
-
-#include "scenes.h"
 
 #ifdef MIDI
 HMIDIOUT hMidiOut;
