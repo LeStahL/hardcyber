@@ -160,7 +160,8 @@ else if(t < t_voronoinet)
     glUniform1f(fractal_iFader7_location, fader7);
 #endif
 }
-else {
+else if(t < t_volclouds)
+{
     glUseProgram(voronoinet_program);
     glUniform1f(voronoinet_iTime_location, t-t_voronoinet);
     glUniform2f(voronoinet_iResolution_location, w, h);
@@ -173,6 +174,21 @@ else {
     glUniform1f(voronoinet_iFader5_location, fader5);
     glUniform1f(voronoinet_iFader6_location, fader6);
     glUniform1f(voronoinet_iFader7_location, fader7);
+#endif
+}
+else {
+    glUseProgram(volclouds_program);
+    glUniform1f(volclouds_iTime_location, t-t_volclouds);
+    glUniform2f(volclouds_iResolution_location, w, h);
+#ifdef MIDI
+    glUniform1f(volclouds_iFader0_location, fader0);
+    glUniform1f(volclouds_iFader1_location, fader1);
+    glUniform1f(volclouds_iFader2_location, fader2);
+    glUniform1f(volclouds_iFader3_location, fader3);
+    glUniform1f(volclouds_iFader4_location, fader4);
+    glUniform1f(volclouds_iFader5_location, fader5);
+    glUniform1f(volclouds_iFader6_location, fader6);
+    glUniform1f(volclouds_iFader7_location, fader7);
 #endif
 }
 #endif

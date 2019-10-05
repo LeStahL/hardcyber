@@ -65,6 +65,12 @@
             "prefix": "voronoinet",
             "t_end": 194.375,
             "t_start": 169.60000610351562
+        },
+        {
+            "name": "Cool Clouds",
+            "prefix": "volclouds",
+            "t_end": 210.16444396972656,
+            "t_start": 194.375
         }
     ]
 }

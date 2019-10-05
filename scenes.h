@@ -11,8 +11,9 @@
 #define t_hydrant 120.99299621582031
 #define t_fractal 135
 #define t_voronoinet 169.60000610351562
-const double start_times[11] = {t_deadline,t_logo210,t_graffiti,t_ocean,t_starsky,t_glitchcity,t_watercubes,t_greetings,t_hydrant,t_fractal,t_voronoinet};
-const char *scene_names[11] = {"Deadline Logo","Team210 Logo","Hardcyber Graffiti","Ocean Scene","Stars, Sky & Street","Glitch City","Voronoi Cubes","Greetings Scene","Spacepigs Hydrant","Fractal Scene","Voronoi Net"};
+#define t_volclouds 194.375
+const double start_times[12] = {t_deadline,t_logo210,t_graffiti,t_ocean,t_starsky,t_glitchcity,t_watercubes,t_greetings,t_hydrant,t_fractal,t_voronoinet,t_volclouds};
+const char *scene_names[12] = {"Deadline Logo","Team210 Logo","Hardcyber Graffiti","Ocean Scene","Stars, Sky & Street","Glitch City","Voronoi Cubes","Greetings Scene","Spacepigs Hydrant","Fractal Scene","Voronoi Net","Cool Clouds"};
 const unsigned int nscenes = ARRAYSIZE(start_times);
 _STATIC_ASSERT(ARRAYSIZE(start_times) == ARRAYSIZE(scene_names));
 #endif
