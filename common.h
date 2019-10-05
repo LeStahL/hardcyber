@@ -272,8 +272,6 @@ void jump_to_scene(unsigned int scene_index);
 
 #include "font/font.h"
 
-#include "gfx/symbols.h"
-
 #ifdef WIN32
 #	include "pal_win32.h"
 #else

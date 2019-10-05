@@ -7,15 +7,21 @@
 // Generated resources
 #include "shaders.gen.h"
 
+
+#define lNumberOfSymbols (ARRAYSIZE(shader_symbols))
+#define lNumberOfPrograms (ARRAYSIZE(shader_programs))
+
+#define lLoadProgressStep (0.2f / (lNumberOfSymbols + lNumberOfPrograms))
+
+
 static float progress = 0.f;
+
 
 static void lInitializeLoader()
 {
     // Load loading bar shader
     sCompileShaderProgram(&shader_program_gfx_load, shader_symbols);
 }
-
-static unsigned int lNumberOfSymbols = ARRAYSIZE(shader_symbols);
 
 static void lDrawLoadingScreen()
 {
@@ -49,7 +55,7 @@ static void lLoadAllSymbols()
     {
         sCompileSymbol(shader_symbols + symbolIndex);
 
-        // TODO(ca) Implement progress tracking for the new loader (will probably just recycle the loading bar section currently used by the loader for gfx/symbolize.py)
+        progress += lLoadProgressStep;
 
         updateBar();
     }
@@ -61,7 +67,7 @@ static void lLoadAllPrograms()
     {
         sCompileShaderProgram(shader_programs + programIndex, shader_symbols);
 
-        // TODO(ca) Implement progress tracking for the new loader (will probably just recycle the loading bar section currently used by the loader for gfx/symbolize.py)
+        progress += lLoadProgressStep;
 
         updateBar();
     }

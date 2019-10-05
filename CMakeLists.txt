@@ -29,13 +29,25 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h)
 set(SFX_SHADER sfx.frag)
+set(SHADER_FILES
+        gfx/load.frag
+        gfx/ocean.frag
+        gfx/logo210.frag
+        gfx/graffiti.frag
+        gfx/starsky.frag
+        gfx/text.frag
+        gfx/post.frag
+        gfx/deadline.frag
+        gfx/hydrant.frag
+        gfx/watercubes.frag
+        gfx/glitchcity.frag
+        gfx/greetings.frag
+        gfx/fractal.frag
+        gfx/voronoinet.frag
+        gfx/volclouds.frag
+)
+set(SHADER_SYMBOLS_PATH gfx/symbols/)
 set(STRINGS_FILE font/strings.txt)
-set(FRAGMENT_SHADER_FILES ocean.frag logo210.frag graffiti.frag starsky.frag text.frag post.frag deadline.frag hydrant.frag watercubes.frag glitchcity.frag greetings.frag fractal.frag voronoinet.frag volclouds.frag)
-
-set(FRAGMENT_SHADERS "")
-foreach(shader ${FRAGMENT_SHADER_FILES})
-    list(APPEND FRAGMENT_SHADERS "gfx/${shader}")
-endforeach(shader)
 
 
 #################################
@@ -53,8 +65,6 @@ add_custom_target(minify_sfx
 )
 
 set(SHADER_HEADER shaders.gen.h)
-set(SHADER_FILES gfx/load.frag)
-set(SHADER_SYMBOLS_PATH gfx/symbols/)
 add_custom_target(minify_shaders
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/
     COMMAND "${Python3_EXECUTABLE}" minification/symbolize.py ${SHADER_FILES} -s ${SHADER_SYMBOLS_PATH} -o ${SHADER_HEADER}
@@ -70,14 +80,6 @@ add_custom_target(texture_packing
     BYPRODUCTS ${FONT_HEADER}
 )
 
-set(SYMBOLS_HEADER gfx/symbols.h)
-add_custom_target(symbolization
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/gfx/
-    COMMAND "${Python3_EXECUTABLE}" symbolize.py ${FRAGMENT_SHADER_FILES} -o symbols.h
-    SOURCES gfx/symbolize.py minification/Rule.py minification/Token.py minification/GLSLLexer130.py minification/Compressor.py ${FRAGMENT_SHADERS}
-    BYPRODUCTS ${SYMBOLS_HEADER}
-)
-
 add_executable(hardcyber
     ls.c
     ${COMMON_HEADERS}
@@ -90,7 +92,6 @@ add_executable(hardcyber
 add_dependencies(hardcyber minify_sfx)
 add_dependencies(hardcyber minify_shaders)
 add_dependencies(hardcyber texture_packing)
-add_dependencies(hardcyber symbolization)
 
 target_include_directories(hardcyber SYSTEM PRIVATE "${OPENGL_INCLUDE_DIR}")
 
