@@ -25,6 +25,7 @@
 #include "engine/loader.h"
 #include "engine/orchestrator.h"
 
+#include <stddef.h>
 
 #define FALSE (0)
 #define TRUE (1)
@@ -44,6 +45,9 @@
 
 #include <GL/gl.h>
 #include <glext.h>
+
+
+#define clamp(x, minimum, maximum) min(max(x, minimum), maximum)
 
 
 #ifdef DEBUG
@@ -93,6 +97,7 @@ void debugp(int program)
 #else // DEBUG
 #define printf(a)
 #endif //DEBUG
+
 
 // Supported resolutions
 const int nresolutions = 9;
@@ -227,7 +232,7 @@ double t
 unsigned int loading = 1, music_loading = 0;
 int music_block = 0;
 unsigned int snd_framebuffer;
-unsigned int scene_override = 0, override_index = 0;
+unsigned int start_at_scene = 0;
 
 // Music shader globals
 int sample_rate = 44100, channels = 2;
@@ -254,6 +259,7 @@ void load_font();
 void quad();
 void updateBar();
 void draw();
+void jump_to_scene(unsigned int scene_index);
 
 #include "sequence.h"
 

@@ -25,7 +25,7 @@ unsigned int muted = 0.;
 
 int _fltused = 0;
 
-#include <stddef.h>
+#include "common.h"
 
 // Standard library and CRT rewrite for saving executable size
 void *memset(void *ptr, int value, size_t num)
@@ -42,8 +42,6 @@ size_t strlen(const char *str)
     return len;
 }
 
-#include "common.h"
-
 #ifdef MIDI
 
 int btns = 1;
@@ -57,8 +55,8 @@ void select_button(int index)
 
     if(index < 40)
     {
-        override_index = index+1;
-        scene_override = 1;
+        // TODO(ca) Doublecheck if the index is correct!
+        jump_to_scene(index + 1);
     }
     
     DWORD out_msg = 0x9 << 4 | index << 8 | btns << 16;
@@ -535,7 +533,6 @@ void draw()
     if(time_dial != 0 ||  time_fine_dial != 0 || time_very_fine_dial != 0)
     {
         t = t_now + (.9*time_dial+.09*time_fine_dial+.01*time_very_fine_dial) * t_end;
-        scene_override = 0;
     }
 #endif
     
