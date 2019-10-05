@@ -20,7 +20,7 @@
 // #define MIDI // APC40 mkII controls
 // #define RECORD // Compile in recording capabilities
 
-const char *demoname = "Lightcyber/Team210";
+const char *demoname = "Hardcyber/Team210";
 unsigned int muted = 0.;
 
 int _fltused = 0;
