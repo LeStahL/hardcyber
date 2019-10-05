@@ -10,7 +10,7 @@ struct Uniform
     const char* name;
 };
 
-typedef struct ShaderSymbol
+struct ShaderSymbol
 {
     GLuint handle;
     GLuint type;
@@ -23,12 +23,12 @@ typedef struct ShaderSymbol
 #endif
 };
 
-typedef struct ShaderProgram
+struct ShaderProgram
 {
     GLuint handle;
     unsigned char numberOfSymbols;
     unsigned char numberOfUniforms;
-    unsigned short* symbols;
+    const unsigned short* symbols;
     struct Uniform* uniforms;
 #if 0 // FIXME: Debug code
 #else

@@ -127,9 +127,9 @@ for i in range(len(scene_sources)):
     header_source += "    {0, GL_FRAGMENT_SHADER, \"" + scene_sources[i] + "\"},\n"
 header_source += "};\n\n"
 
-# Write out control structure for scene load and information regarding uniforms
+# Write out control structures for scene load and information regarding uniforms
 for i in range(len(scene_names)):
-    header_source += "static unsigned short shader_" + scene_names[i] + "_symbols[] = { "
+    header_source += "const static unsigned short shader_" + scene_names[i] + "_symbols[] = { "
     header_source += str(len(symbol_names) + i) + ","
     for symbol in scene_symbol_lists[i]:
         header_source += str(symbol_names.index(symbol)) + ","
