@@ -386,7 +386,6 @@ void load_sound_block(int music_block)
 void load_demo()
 {
     printf("++++ Creating Loading bar.\n");
-    shader_program_gfx_load.linkStatus = GL_TRUE;
     lInitializeLoader();
 #if 0 // FIXME Debug code
 #else
