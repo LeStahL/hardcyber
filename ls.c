@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define DEBUG // Shader debug i/o
+// #define DEBUG // Shader debug i/o
 // #define MIDI // APC40 mkII controls
 // #define RECORD // Compile in recording capabilities
 
