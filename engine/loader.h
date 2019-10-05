@@ -57,7 +57,14 @@ static void lLoadAllSymbols()
 
 static void lLoadAllPrograms()
 {
-    // TODO(ca) Implement me after adjusting minification/symbolize.py
+    for (unsigned int programIndex = 0; programIndex < lNumberOfPrograms; ++programIndex)
+    {
+        sCompileShaderProgram(shader_programs + programIndex, shader_symbols);
+
+        // TODO(ca) Implement progress tracking for the new loader (will probably just recycle the loading bar section currently used by the loader for gfx/symbolize.py)
+
+        updateBar();
+    }
 }
 
 #endif // LOADER_H

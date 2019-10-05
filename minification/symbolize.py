@@ -140,8 +140,17 @@ for i in range(len(scene_names)):
     header_source += "};\n"
     for j in range(len(scene_uniform_lists[i])):
         header_source += "#define shader_uniform_" + scene_names[i] + "_" + scene_uniform_lists[i][j] + " (shader_" + scene_names[i] + "_uniforms[" + str(j) + "].location)\n"
-    header_source += "static struct ShaderProgram shader_program_" + scene_names[i] + " = { 0, ARRAYSIZE(shader_" + scene_names[i] + "_symbols), ARRAYSIZE(shader_" + scene_names[i] + "_uniforms), shader_" + scene_names[i] + "_symbols, shader_" + scene_names[i] + "_uniforms };\n"
     header_source += "\n"
+header_source += "\n"
+
+# List all scenes into another continous array for simple loading
+header_source += "static struct ShaderProgram shader_programs[] = {\n"
+for i in range(len(scene_names)):
+    header_source += "    { 0, ARRAYSIZE(shader_" + scene_names[i] + "_symbols), ARRAYSIZE(shader_" + scene_names[i] + "_uniforms), shader_" + scene_names[i] + "_symbols, shader_" + scene_names[i] + "_uniforms },\n"
+header_source += "};\n"
+for i in range(len(scene_names)):
+    header_source += "#define shader_program_" + scene_names[i] + " (shader_programs[" + str(i) + "])"
+header_source += "\n\n"
 
 header_source += "#endif\n"
 

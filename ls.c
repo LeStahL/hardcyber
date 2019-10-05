@@ -413,7 +413,16 @@ void load_demo()
 #endif
 
     lLoadAllPrograms();
-    
+#ifdef DEBUG_SHADER
+    for (unsigned int programIndex = 0; programIndex < lNumberOfPrograms; ++programIndex)
+    {
+        if (shader_programs[programIndex].linkStatus != GL_TRUE)
+        {
+            printf("    Compiler Error. Log:\n%s\n\n", shader_programs[programIndex].linkerError);
+        }
+    }
+#endif
+
     LoadSymbols();
     LoadPrograms();
 
