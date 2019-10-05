@@ -21,6 +21,10 @@
 
 #include "common.h"
 
+// Export symbols that make hybrid graphics systems (laptops) use the dedicated GPU
+__declspec(dllexport) unsigned long NvOptimusEnablement = 1;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+
 void *malloc(size_t size)
 {
 	return GlobalAlloc(GMEM_ZEROINIT, size);
