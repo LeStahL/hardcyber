@@ -45,11 +45,11 @@ void main()
         h0,
         res = 34.;
     
-    col1 = mix(col1, vec3(0.91,0.30,0.24), clamp(iTime-4., 0., 1.)); // red
-    col1 = mix(col1, vec3(0.44,0.65,0.35), clamp(iTime-9.,0.,1.)); // green
-    col1 = mix(col1, vec3(0.82,0.14,0.34), clamp(iTime-14.,0.,1.)); // pink
-    col1 = mix(col1, vec3(0.92,0.76,0.20), clamp(iTime-19.,0.,1.)); // orange
-    col1 = mix(col1, .5*c.xxx, clamp(iTime-24.,0.,1.)); // grayscale
+    col1 = mix(col1, vec3(0.91,0.30,0.24), clamp(iTime-3., 0., 1.)); // red
+    col1 = mix(col1, vec3(0.44,0.65,0.35), clamp(iTime-7.,0.,1.)); // green
+    col1 = mix(col1, vec3(0.82,0.14,0.34), clamp(iTime-11.,0.,1.)); // pink
+    col1 = mix(col1, vec3(0.92,0.76,0.20), clamp(iTime-15.,0.,1.)); // orange
+    col1 = mix(col1, .5*c.xxx, clamp(iTime-19.,0.,1.)); // grayscale
     
     dhexagonpattern(res*uv, h, hind);
     h /= res;
@@ -71,40 +71,41 @@ void main()
     addwindow(uv, col, vec2(.6,.4));
     
     float d, da;
-    if(iTime < 4.) dmercury(5.*uv, d);
-    else if(iTime < 9.)
+    if(iTime < 3.) dmercury(5.*uv, d);
+    else if(iTime < 7.)
     {
         dmercury(5.*uv, d);
         dschnappsgirls(5.*uv, da);
-        d = mix(d, da, clamp(iTime-4., 0., 1.));
+        d = mix(d, da, clamp(iTime-3., 0., 1.));
     }
-    else if(iTime < 14.)
+    else if(iTime < 11.)
     {
         dschnappsgirls(5.*uv, d);
         dhaujobb(5.*uv, da);
-        d = mix(d, da, clamp(iTime-9., 0., 1.));
+        d = mix(d, da, clamp(iTime-7., 0., 1.));
     }
-    else if(iTime < 19.)
+    else if(iTime < 15.)
     {
         dhaujobb(5.*uv, d);
         dkewlers(5.*uv, da);
-        d = mix(d, da, clamp(iTime-14., 0., 1.));
+        d = mix(d, da, clamp(iTime-11., 0., 1.));
     }
-    else if(iTime < 24.)
+    else if(iTime < 19.)
     {
         dkewlers(5.*uv, d);
         dfarbrausch(5.*uv, da);
-        d = mix(d, da, clamp(iTime-19., 0., 1.));
+        d = mix(d, da, clamp(iTime-15., 0., 1.));
     }
-    else if(iTime < 29.)
+    else if(iTime < 23.)
     {
         dfarbrausch(5.*uv, d);
         d5711(5.*uv, da);
-        d = mix(d, da, clamp(iTime-24., 0., 1.));
+        d = mix(d, da, clamp(iTime-19., 0., 1.));
     }
+    else d = mix(d, 1., clamp(iTime-23.,0.,1.));
     d /= 5.;
     col = mix(col, 1.9*col1, sm(d));
-    col = mix(col, mix(col, 3.*col1, .5+.5*sin(iTime)), sm((abs(d-.01)-.001)/22.));
+    col = mix(col, mix(col, 3.*col1, .5+.5*iScale), sm((abs(d-.01)-.001)/22.));
     
     gl_FragColor = vec4(clamp(col,0.,1.),1.);
 }
