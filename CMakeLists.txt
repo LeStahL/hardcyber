@@ -45,7 +45,7 @@ endforeach(shader)
 set(DEMO_HEADERS common.h draw.h scenes.h pal_linux.h pal_win32.h sequence.h)
 
 set(SFX_HEADER sfx.h)
-add_custom_target(minification
+add_custom_target(minify_sfx
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/minification/
     COMMAND "${Python3_EXECUTABLE}" shader-compressor.py -o "${PROJECT_SOURCE_DIR}/${SFX_HEADER}" "${PROJECT_SOURCE_DIR}/${SFX_SHADER}" --no-minification
     SOURCES minification/shader-compressor.py ${SFX_SHADER}
@@ -55,7 +55,7 @@ add_custom_target(minification
 set(SHADER_HEADER shaders.gen.h)
 set(SHADER_FILES gfx/load.frag)
 set(SHADER_SYMBOLS_PATH gfx/symbols/)
-add_custom_target(minification2
+add_custom_target(minify_shaders
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/
     COMMAND "${Python3_EXECUTABLE}" minification/symbolize.py ${SHADER_FILES} -s ${SHADER_SYMBOLS_PATH} -o ${SHADER_HEADER}
     SOURCES minification/symbolize.py minification/Rule.py minification/Token.py minification/GLSLLexer130.py minification/Compressor.py ${SHADER_FILES}
@@ -87,8 +87,8 @@ add_executable(hardcyber
     ${FRAGMENT_SHADERS}
     ${SHADER_FILES}
 )
-add_dependencies(hardcyber minification)
-add_dependencies(hardcyber minification2)
+add_dependencies(hardcyber minify_sfx)
+add_dependencies(hardcyber minify_shaders)
 add_dependencies(hardcyber texture_packing)
 add_dependencies(hardcyber symbolization)
 
