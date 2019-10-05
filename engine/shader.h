@@ -15,8 +15,7 @@ struct ShaderSymbol
     GLuint handle;
     GLuint type;
     const char* source;
-#if 0 // FIXME: Debug code
-#else 
+#ifdef DEBUG_SHADER
     GLint compileStatus;
     GLint errorLogLength;
     GLchar *compilerError;
@@ -30,8 +29,7 @@ struct ShaderProgram
     unsigned char numberOfUniforms;
     const unsigned short* symbols;
     struct Uniform* uniforms;
-#if 0 // FIXME: Debug code
-#else
+#ifdef DEBUG_SHADER
     GLint linkStatus;
     GLint errorLogLength;
     GLchar *linkerError;
@@ -46,8 +44,7 @@ static void sCompileSymbol(struct ShaderSymbol* symbol)
         glShaderSource(shaderHandle, 1, &symbol->source, NULL);
         glCompileShader(shaderHandle);
         
-#if 0 // FIXME: Debug code
-#else
+#ifdef DEBUG_SHADER
         glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &symbol->compileStatus);
         if (symbol->compileStatus != GL_TRUE)
         {
@@ -73,8 +70,7 @@ static void sCompileShaderProgram(struct ShaderProgram* program, struct ShaderSy
 
     glLinkProgram(programHandle);
     
-#if 0 // FIXME: Debug code
-#else
+#ifdef DEBUG_SHADER
         glGetShaderiv(programHandle, GL_LINK_STATUS, &program->linkStatus);
         if (program->linkStatus != GL_TRUE)
         {

@@ -17,6 +17,7 @@
  */
 
 // #define DEBUG // Shader debug i/o
+// #define DEBUG_SHADER // Shader compile and link errors
 // #define MIDI // APC40 mkII controls
 // #define RECORD // Compile in recording capabilities
 
@@ -387,8 +388,7 @@ void load_demo()
 {
     printf("++++ Creating Loading bar.\n");
     lInitializeLoader();
-#if 0 // FIXME Debug code
-#else
+#ifdef DEBUG_SHADER
     if (shader_program_gfx_load.linkStatus != GL_TRUE)
     {
         printf("    Linker Error. Log:\n%s\n\n", shader_program_gfx_load.linkerError);
@@ -402,13 +402,12 @@ void load_demo()
     updateBar();
 
     lLoadAllSymbols();
-#if 0 // FIXME Debug code
-#else
+#ifdef DEBUG_SHADER
     for(unsigned int symbolIndex = 0; symbolIndex < lNumberOfSymbols; ++symbolIndex)
     {
-        if ((shader_symbols + symbolIndex)->compileStatus != GL_TRUE)
+        if (shader_symbols[symbolIndex].compileStatus != GL_TRUE)
         {
-            printf("    Compiler Error. Log:\n%s\n\n", (shader_symbols + symbolIndex)->compilerError);
+            printf("    Compiler Error. Log:\n%s\n\n", shader_symbols[symbolIndex].compilerError);
         }
     }
 #endif
