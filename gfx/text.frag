@@ -138,7 +138,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
         d = mix(1., d, sc);
         
-        new.gba = mix(new.gba, c.yyy, sm(d-.01));
+        new.gba = mix(new.gba, c.yyy, sm(d-.005));
         new.gba = mix(new.gba, c.xxx, sm(d));
     }
     else if(iTime < 32.) 

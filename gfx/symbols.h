@@ -2575,7 +2575,7 @@ const char *text_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline 2k
 "        \n"
 "        d = mix(1., d, sc);\n"
 "        \n"
-"        new.gba = mix(new.gba, c.yyy, sm(d-.01));\n"
+"        new.gba = mix(new.gba, c.yyy, sm(d-.005));\n"
 "        new.gba = mix(new.gba, c.xxx, sm(d));\n"
 "    }\n"
 "    else if(iTime < 32.) \n"
