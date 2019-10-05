@@ -27,14 +27,14 @@
         {
             "name": "Stars, Sky & Street",
             "prefix": "starsky",
-            "t_end": 60.233001708984375,
+            "t_end": 61.233001708984375,
             "t_start": 48.08100128173828
         },
         {
             "name": "Glitch City",
             "prefix": "glitchcity",
             "t_end": 72.38500213623047,
-            "t_start": 60.233001708984375
+            "t_start": 61.233001708984375
         },
         {
             "name": "Voronoi Cubes",

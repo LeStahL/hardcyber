@@ -5,7 +5,7 @@
 #define t_graffiti 32
 #define t_ocean 43.38999938964844
 #define t_starsky 48.08100128173828
-#define t_glitchcity 60.233001708984375
+#define t_glitchcity 61.233001708984375
 #define t_watercubes 72.38500213623047
 #define t_greetings 96.68900299072266
 #define t_hydrant 120.99299621582031

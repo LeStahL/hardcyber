@@ -126,18 +126,19 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         new.gba = mix(new.gba, c1, sc);
         
         // No more partycoding this time!
-        dstring(uv-vec2(-.5,.05), 5., .02, d);
+        dstring(uv-vec2(-.55,.05), 5., .02, d);
         
         // yeah sure.
-        dstring(uv-vec2(-.5,0.), 6., .02, da);
+        dstring(uv-vec2(-.55,0.), 6., .02, da);
         d = min(d, da);
         
         // well, that worked!
-        dstring(uv-vec2(-.5,-.05), 7., .02, da);
+        dstring(uv-vec2(-.55,-.05), 7., .02, da);
         d = min(d, da);
         
         d = mix(1., d, sc);
         
+        new.gba = mix(new.gba, c.yyy, sm(d-.01));
         new.gba = mix(new.gba, c.xxx, sm(d));
     }
     else if(iTime < 32.) 
@@ -152,16 +153,32 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         dstring((uv-vec2(-.08,-.35)), 26., .02, da); // present
         d = min(d,da);
 
+//         c1 = mix(c1, c.yyy, sm(d-.01));
         c1 = mix(c1,c.xxx, sm(d));
+        
         
         new.gba = mix(new.gba, c1, sc);
     }
-    else if(iTime < 52.)
+    else if(iTime < 60.)
     {
-        vec3 c1 = vec3(1.00,0.33,0.38),
-            c2 = vec3(0.94,0.91,0.60);
+        vec3 c_1 = vec3(1.00,0.33,0.38),
+            c_2 = vec3(0.94,0.91,0.60);
             
-//         float sc = smoothstep(44.,45.,iTime)*(1.-smoothstep(45.,
+        float sc = smoothstep(54.,55.,iTime)*(1.-smoothstep(60., 61., iTime));
+        
+        dstring(uv-vec2(-.55,.025), 18., .02, d);
+        dstring(uv-vec2(-.55,-.025), 19., .02, da);
+        d = min(d, da);
+        
+        d = mix(1., d, sc);
+        
+        // window
+        vec3 c1 = new.gba;
+        addwindow(uv, c1, vec2(.72,.15));
+        new.gba = mix(new.gba, c1, sc);
+        
+        new.gba = mix(new.gba, c_1, sm(abs(d-.002)-.001));
+        new.gba = mix(new.gba, c_2, sm(d));
     }
 //     else if(iTime < 44.)
 //     {
