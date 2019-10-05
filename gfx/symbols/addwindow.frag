@@ -8,7 +8,8 @@ void dbox(in vec2 x, in vec2 b, out float d);
 void dlinesegment(in vec2 x, in vec2 p1, in vec2 p2, out float d);
 void stroke(in float d0, in float s, out float d);
 
-#define sm(d) smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d) #CRLF
+// #define sm(d) smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d) #CRLF FIXME
+#define sm(d) smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d)
 
 void addwindow(in vec2 uv, inout vec3 col, in vec2 dimensions)
 {

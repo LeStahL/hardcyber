@@ -1,14 +1,9 @@
 uniform float iTime;
 uniform vec2 iResolution;
 
-uniform float iFader0;
-uniform float iFader1;
-uniform float iFader2;
-uniform float iFader3;
-uniform float iFader4;
-uniform float iFader5;
-uniform float iFader6;
-uniform float iFader7;
+float iScale;
+
+void scale(out float s);
 
 // Global constants
 const float pi = acos(-1.);
@@ -77,6 +72,7 @@ void colorize(in vec2 uv, out vec3 col)
 
 void main()
 {
+    scale(iScale);
     vec2 uv = (gl_FragCoord.xy-.5*iResolution.xy)/iResolution.y,
         s;
     

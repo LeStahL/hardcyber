@@ -17,6 +17,8 @@
  
 #version 130
 
+void scale(out float s);
+
 uniform float iFSAA;
 uniform vec2 iResolution;
 uniform sampler2D iChannel0;
@@ -256,9 +258,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord_ )
     float a = iResolution.x/iResolution.y;
     vec2 uv = fragCoord/iResolution.yy-0.5*vec2(a, 1.0);
     
-    nbeats = mod(iTime, 60./29.);
-    iScale = nbeats-30./29.;
-    iScale = smoothstep(-5./29., 0., iScale)*(1.-smoothstep(0., 15./29., iScale));
+    scale(iScale);
+    
+// //     nbeats = mod(iTime, 60./29.);
+//     iScale = nbeats-30./29.;
+//     iScale = smoothstep(-5./29., 0., iScale)*(1.-smoothstep(0., 15./29., iScale));
     
     vec3 col = texture(iChannel0, fragCoord/iResolution).rgb;
     float delta = 0.;

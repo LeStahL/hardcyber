@@ -6,7 +6,8 @@ void dbox(in vec2 x, in vec2 b, out float d);
 
 uniform vec2 iResolution;
 
-#define sm(d) smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d) #CRLF
+// #define sm(d) smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d) #CRLF FIXME
+#define sm(d) smoothstep(1.5/iResolution.y, -1.5/iResolution.y, d)
 
 void addprogressbar(in vec2 uv, inout vec3 col, in vec2 dimensions, in float progress)
 {

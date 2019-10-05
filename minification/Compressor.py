@@ -17,7 +17,7 @@
 import GLSLLexer130
 
 def compress(source):
-    #return source
+    return source
     newcode = ""
     lexer = GLSLLexer130.GLSLLexer130(source)
     token = lexer.token()

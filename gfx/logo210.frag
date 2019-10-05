@@ -20,20 +20,15 @@
 uniform float iTime;
 uniform vec2 iResolution;
 
-uniform float iFader0;
-uniform float iFader1;
-uniform float iFader2;
-uniform float iFader3;
-uniform float iFader4;
-uniform float iFader5;
-uniform float iFader6;
-uniform float iFader7;
+float iScale;
+
+void scale(out float s);
 
 const float pi = acos(-1.);
 const vec3 c = vec3(1.,0.,-1.);
 float a = 1.0;
 
-float nbeats, iScale;
+float nbeats;
 
 void dbox3(in vec3 x, in vec3 b, out float d);
 void rot3(in vec3 p, out mat3 rot);
@@ -79,6 +74,7 @@ void normal(in vec3 x, out vec3 n, in float dx);
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
+    scale(iScale);
     float a = iResolution.x/iResolution.y;
     vec2 uv = fragCoord/iResolution.yy-0.5*vec2(a, 1.0);
     

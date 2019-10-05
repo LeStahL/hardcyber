@@ -20,14 +20,7 @@
 uniform float iTime;
 uniform vec2 iResolution;
 
-uniform float iFader0;
-uniform float iFader1;
-uniform float iFader2;
-uniform float iFader3;
-uniform float iFader4;
-uniform float iFader5;
-uniform float iFader6;
-uniform float iFader7;
+void scale(out float s);
 
 float iScale = 1.,
     iNote = 0.;
@@ -143,17 +136,13 @@ void colorize(in vec2 x, out vec3 col)
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
+    scale(iScale);
+    
      // Set up coordinates
     a = iResolution.x/iResolution.y;
     vec2 uv = fragCoord/iResolution.yy-0.5*vec2(a, 1.0);
     vec3 col = c.yyy;
-    
-//     if(length(uv) > .5)
-//     {
-//         fragColor = vec4(col, 0.);
-//         return;
-//     }
-    
+
     float dhex,
                 na,
                 nal;
