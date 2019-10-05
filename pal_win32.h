@@ -36,6 +36,9 @@ HGLRC glrc;
 HWND hRecordFilenameEdit, hCaptureWindow, hCaptureDriverComboBox ;
 #endif 
 
+double get_sound_playback_time();
+void set_sound_playback_time(double time);
+
 int flip_buffers()
 {
 	SwapBuffers(hdc);
@@ -145,8 +148,7 @@ LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 break;
 				case 10:
 				{
-					override_index = SendMessage(hSender, CB_GETCURSEL, 0, 0);
-					scene_override = override_index > 0;
+                    start_at_scene = SendMessage(hSender, CB_GETCURSEL, 0, 0);
 				}
 				break;
 #ifdef RECORDING
@@ -439,18 +441,29 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
     
 	load_demo();
 
-	// Main loop
-	t_start = 0.;
-	while(flip_buffers())
+    jump_to_scene(start_at_scene);
+
+    // Main loop
+    while(flip_buffers())
 	{
-		static MMTIME MMTime = { TIME_SAMPLES, 0};
-		waveOutGetPosition(hWaveOut, &MMTime, sizeof(MMTIME));
-		t_now = ((double)MMTime.u.sample)/( 44100.0);
+        t_now = get_sound_playback_time();
 
 		draw();
 	}
 
 	return 0;
+}
+
+void jump_to_scene(unsigned int scene_index)
+{
+    if (scene_index < nscenes)
+    {
+        set_sound_playback_time(start_times[scene_index]);
+    }
+    else
+    {
+        printf("Midi scene override failed - index out of bounds: %d", scene_index);
+    }
 }
 
 void initialize_sound()
@@ -459,11 +472,25 @@ void initialize_sound()
 	int n_bits_per_sample = 16;
 	WAVEFORMATEX wfx = { WAVE_FORMAT_PCM, channels, sample_rate, sample_rate*channels*n_bits_per_sample / 8, channels*n_bits_per_sample / 8, n_bits_per_sample, 0 };
 	waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL);
+}
 
-	header.lpData = smusic1;
-	header.dwBufferLength = 4 * music1_size;
-	waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
-	waveOutWrite(hWaveOut, &header, sizeof(WAVEHDR));
+double get_sound_playback_time()
+{
+    static MMTIME MMTime = { TIME_SAMPLES, 0};
+    waveOutGetPosition(hWaveOut, &MMTime, sizeof(MMTIME));
+    return t_start + ((double)MMTime.u.sample) / 44100.0;
+}
+
+void set_sound_playback_time(double time)
+{
+    waveOutReset(hWaveOut);
+
+    t_start = time;
+    int delta = clamp((int)(time * (double)sample_rate), 0, music1_size-1);
+    header.lpData = smusic1+delta;
+    header.dwBufferLength = 4 * (music1_size-delta);
+    waveOutPrepareHeader(hWaveOut, &header, sizeof(WAVEHDR));
+    waveOutWrite(hWaveOut, &header, sizeof(WAVEHDR));
 }
 
 #endif

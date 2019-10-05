@@ -1,12 +1,7 @@
 #ifndef DRAW_HEADER
 #define DRAW_HEADER
-if(scene_override)
-{
-    if(override_index == 1) t = t_now;
-    else t = t_now + start_times[override_index - 2];
-}
 
-if(t < 20)
+if(t < t_team210_logo)
 {
     glUseProgram(deadline_program);
     glUniform1f(deadline_iTime_location, t-0);
@@ -20,17 +15,12 @@ if(t < 20)
     glUniform1f(deadline_iFader5_location, fader5);
     glUniform1f(deadline_iFader6_location, fader6);
     glUniform1f(deadline_iFader7_location, fader7);
-    if(override_index == 0)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 32)
+else if(t < t_grafitti_logo)
 {
     glUseProgram(logo210_program);
-    glUniform1f(logo210_iTime_location, t-20);
+    glUniform1f(logo210_iTime_location, t-t_team210_logo);
     glUniform2f(logo210_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(logo210_iFader0_location, fader0);
@@ -41,17 +31,12 @@ else if(t < 32)
     glUniform1f(logo210_iFader5_location, fader5);
     glUniform1f(logo210_iFader6_location, fader6);
     glUniform1f(logo210_iFader7_location, fader7);
-    if(override_index == 1)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 42)
+else if(t < t_ocean_logo)
 {
     glUseProgram(graffiti_program);
-    glUniform1f(graffiti_iTime_location, t-32);
+    glUniform1f(graffiti_iTime_location, t-t_grafitti_logo);
     glUniform2f(graffiti_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(graffiti_iFader0_location, fader0);
@@ -62,17 +47,12 @@ else if(t < 42)
     glUniform1f(graffiti_iFader5_location, fader5);
     glUniform1f(graffiti_iFader6_location, fader6);
     glUniform1f(graffiti_iFader7_location, fader7);
-    if(override_index == 2)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 53)
+else if(t < t_stars_sky_street_logo)
 {
     glUseProgram(ocean_program);
-    glUniform1f(ocean_iTime_location, t-42);
+    glUniform1f(ocean_iTime_location, t-t_ocean_logo);
     glUniform2f(ocean_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(ocean_iFader0_location, fader0);
@@ -83,17 +63,12 @@ else if(t < 53)
     glUniform1f(ocean_iFader5_location, fader5);
     glUniform1f(ocean_iFader6_location, fader6);
     glUniform1f(ocean_iFader7_location, fader7);
-    if(override_index == 3)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 73)
+else if(t < t_voronoi_cubes_logo)
 {
     glUseProgram(starsky_program);
-    glUniform1f(starsky_iTime_location, t-53);
+    glUniform1f(starsky_iTime_location, t-t_stars_sky_street_logo);
     glUniform2f(starsky_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(starsky_iFader0_location, fader0);
@@ -104,17 +79,12 @@ else if(t < 73)
     glUniform1f(starsky_iFader5_location, fader5);
     glUniform1f(starsky_iFader6_location, fader6);
     glUniform1f(starsky_iFader7_location, fader7);
-    if(override_index == 4)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 93)
+else if(t < t_glitch_city_logo)
 {
     glUseProgram(watercubes_program);
-    glUniform1f(watercubes_iTime_location, t-73);
+    glUniform1f(watercubes_iTime_location, t-t_voronoi_cubes_logo);
     glUniform2f(watercubes_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(watercubes_iFader0_location, fader0);
@@ -125,17 +95,12 @@ else if(t < 93)
     glUniform1f(watercubes_iFader5_location, fader5);
     glUniform1f(watercubes_iFader6_location, fader6);
     glUniform1f(watercubes_iFader7_location, fader7);
-    if(override_index == 5)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 103)
+else if(t < t_greetings_logo)
 {
     glUseProgram(glitchcity_program);
-    glUniform1f(glitchcity_iTime_location, t-93);
+    glUniform1f(glitchcity_iTime_location, t-t_glitch_city_logo);
     glUniform2f(glitchcity_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(glitchcity_iFader0_location, fader0);
@@ -146,17 +111,12 @@ else if(t < 103)
     glUniform1f(glitchcity_iFader5_location, fader5);
     glUniform1f(glitchcity_iFader6_location, fader6);
     glUniform1f(glitchcity_iFader7_location, fader7);
-    if(override_index == 6)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 133)
+else if(t < t_spacepigs_logo)
 {
     glUseProgram(greetings_program);
-    glUniform1f(greetings_iTime_location, t-103);
+    glUniform1f(greetings_iTime_location, t-t_greetings_logo);
     glUniform2f(greetings_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(greetings_iFader0_location, fader0);
@@ -167,17 +127,12 @@ else if(t < 133)
     glUniform1f(greetings_iFader5_location, fader5);
     glUniform1f(greetings_iFader6_location, fader6);
     glUniform1f(greetings_iFader7_location, fader7);
-    if(override_index == 7)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 143)
+else if(t < t_fractal_logo)
 {
     glUseProgram(hydrant_program);
-    glUniform1f(hydrant_iTime_location, t-133);
+    glUniform1f(hydrant_iTime_location, t-t_spacepigs_logo);
     glUniform2f(hydrant_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(hydrant_iFader0_location, fader0);
@@ -188,17 +143,12 @@ else if(t < 143)
     glUniform1f(hydrant_iFader5_location, fader5);
     glUniform1f(hydrant_iFader6_location, fader6);
     glUniform1f(hydrant_iFader7_location, fader7);
-    if(override_index == 8)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 173)
+else if(t < t_voronoi_net)
 {
     glUseProgram(fractal_program);
-    glUniform1f(fractal_iTime_location, t-143);
+    glUniform1f(fractal_iTime_location, t-t_fractal_logo);
     glUniform2f(fractal_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(fractal_iFader0_location, fader0);
@@ -209,17 +159,12 @@ else if(t < 173)
     glUniform1f(fractal_iFader5_location, fader5);
     glUniform1f(fractal_iFader6_location, fader6);
     glUniform1f(fractal_iFader7_location, fader7);
-    if(override_index == 9)
-    {
-        select_button(override_index);
-        override_index = 0;
-    }
 #endif
 }
-else if(t < 200)
+else
 {
     glUseProgram(voronoinet_program);
-    glUniform1f(voronoinet_iTime_location, t-173);
+    glUniform1f(voronoinet_iTime_location, t-t_voronoi_net);
     glUniform2f(voronoinet_iResolution_location, w, h);
 #ifdef MIDI
     glUniform1f(voronoinet_iFader0_location, fader0);
