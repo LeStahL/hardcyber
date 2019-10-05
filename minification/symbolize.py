@@ -149,7 +149,7 @@ for i in range(len(scene_names)):
     header_source += "    { 0, ARRAYSIZE(shader_" + scene_names[i] + "_symbols), ARRAYSIZE(shader_" + scene_names[i] + "_uniforms), shader_" + scene_names[i] + "_symbols, shader_" + scene_names[i] + "_uniforms },\n"
 header_source += "};\n"
 for i in range(len(scene_names)):
-    header_source += "#define shader_program_" + scene_names[i] + " (shader_programs[" + str(i) + "])"
+    header_source += "#define shader_program_" + scene_names[i] + " (shader_programs[" + str(i) + "])\n"
 header_source += "\n\n"
 
 header_source += "#endif\n"
