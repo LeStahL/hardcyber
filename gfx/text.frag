@@ -159,7 +159,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
         new.gba = mix(new.gba, c1, sc);
     }
-    else if(iTime < 60.)
+    else if(iTime < 60.) // star sky, once you offend
     {
         float da;
         vec3 c_1 = vec3(1.00,0.33,0.38),
@@ -167,8 +167,39 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             
         float sc = smoothstep(54.,55.,iTime)*(1.-smoothstep(60., 61., iTime));
         
-        dstring(uv-vec2(-.55,.025), 18., .02, d);
-        dstring(uv-vec2(-.55,-.025), 19., .02, da);
+        dstring(uv-vec2(-.55,.025), 18., .03, d);
+        dstring(uv-vec2(-.55,-.025), 19., .03, da);
+        d = min(d, da);
+        
+        d = mix(1., d, sc);
+        
+        // window
+        vec3 c1 = new.gba;
+        addwindow(uv, c1, vec2(.72,.15));
+        new.gba = mix(new.gba, c1, sc);
+        
+        new.gba = mix(new.gba, c_1, sm(abs(d-.002)-.001));
+        new.gba = mix(new.gba, c_2, sm(d));
+    }
+    
+    else if(iTime < 121.) // greetings
+    {
+        
+    }
+    else if(iTime < 135.) // spacepigs diss
+    {
+        float da;
+        vec3 c_1 = vec3(1.00,0.33,0.38),
+            c_2 = vec3(0.94,0.91,0.60);
+            
+        float sc = smoothstep(125.,126.,iTime)*(1.-smoothstep(133., 134., iTime));
+        
+        dstring(uv-vec2(-.55,.075), 20., .027, d);
+        dstring(uv-vec2(-.55,.025), 21., .027, da);
+        d = min(d, da);
+        dstring(uv-vec2(-.55,-.025), 22., .027, da);
+        d = min(d, da);
+        dstring(uv-vec2(-.55,-.075), 23., .027, da);//eurer
         d = min(d, da);
         
         d = mix(1., d, sc);

@@ -38,9 +38,9 @@ void scene(in vec3 x, out vec2 sdf)
         db = length(x)-.4,
         dc;
     dbox3(x,.2,dc);
-    db = mix(db, dc, clamp(iTime-5., 0., 1.));
+    db = mix(db, dc, clamp(iTime-7., 0., 1.));
     dstar3(x, 6., vec2(.2,.5), dc);
-    db = mix(db, dc, clamp(iTime-10., 0.,1.));
+    db = mix(db, dc, clamp(iTime-15., 0.,1.));
 //     db = mix(db, dc, .6+.6*sin(iTime));
     dsmoothvoronoi3(rel*x, vi, yi, vip);
     sdf = vec2(abs(vi/rel)-.0001, 0.);
@@ -77,11 +77,10 @@ void main()
         s;
     
     rot3(vec3(1.1,1.3,1.5)*iTime, gR);
-    color1 = mix(vec3(0.47,0.21,0.22), vec3(0.17,0.24,0.30), clamp(iTime-5.,0.,1.));
-    color1 = mix(color1, vec3(0.52,0.85,0.31), clamp(iTime-10., 0., 1.));
-    color2 = mix(vec3(0.22,0.21,0.47), .3*vec3(1.00,0.59,0.22), clamp(iTime-5.,0.,1.));
-    color2 = mix(color2, .15
-    *c.xxx, clamp(iTime-10., 0., 1.));
+    color1 = mix(vec3(0.47,0.21,0.22), vec3(0.17,0.24,0.30), clamp(iTime-7.,0.,1.));
+    color1 = mix(color1, vec3(0.52,0.85,0.31), clamp(iTime-15., 0., 1.));
+    color2 = mix(vec3(0.22,0.21,0.47), .3*vec3(1.00,0.59,0.22), clamp(iTime-7.,0.,1.));
+    color2 = mix(color2, .15*c.xxx, clamp(iTime-15., 0., 1.));
     
     vec3 col = c.xxx,
         o = c.yyx,
