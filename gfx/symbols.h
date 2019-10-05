@@ -2598,6 +2598,7 @@ const char *text_source = "/* Hardcyber - PC-64k-Intro by Team210 at Deadline 2k
 "    }\n"
 "    else if(iTime < 60.)\n"
 "    {\n"
+"        float da;\n"
 "        vec3 c_1 = vec3(1.00,0.33,0.38),\n"
 "            c_2 = vec3(0.94,0.91,0.60);\n"
 "            \n"

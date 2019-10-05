@@ -161,6 +161,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     }
     else if(iTime < 60.)
     {
+        float da;
         vec3 c_1 = vec3(1.00,0.33,0.38),
             c_2 = vec3(0.94,0.91,0.60);
             
