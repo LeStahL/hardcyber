@@ -23,9 +23,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Configurables
 set(MINIFY_64K ON CACHE BOOL "Compress the executable using kkrunchy7 (disables hybrid graphics dGPU exports)")
 
+# Tell CMake to run qt tools when necessary (For Qt5 GUIs among other things)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 # Find the right python interpreter version
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+find_package(Qt5 COMPONENTS Widgets)
 
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h)
 set(SFX_SHADER sfx.frag)
@@ -118,3 +124,24 @@ else()
     target_include_directories(hardcyber SYSTEM PRIVATE ${SDL2_INCLUDE_DIRS})
     target_link_libraries(hardcyber ${SDL2_LIBRARIES})
 endif()
+
+
+#################################
+# Studio executable
+#################################
+
+add_executable(studio
+    studio/studio.cpp
+    studio/mainwindow.cpp
+    studio/mainwindow.ui
+    studio/demoapi.cpp
+    studio/renderviewwidget.cpp
+    ${COMMON_HEADERS}
+)
+
+add_dependencies(studio minify_sfx)
+add_dependencies(studio minify_shaders)
+add_dependencies(studio texture_packing)
+
+target_link_libraries(studio Qt5::Widgets)
+target_link_libraries(studio OpenGL::GL)
