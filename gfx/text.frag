@@ -212,168 +212,17 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         new.gba = mix(new.gba, c_1, sm(abs(d-.002)-.001));
         new.gba = mix(new.gba, c_2, sm(d));
     }
-//     else if(iTime < 44.)
-//     {
-//         float da, db;
-//         
-//         // Once
-//         dstring((uv-vec2(-.3,.3)), 21., .1, da);
-//         
-//         db = abs(mod(uv.x+uv.y,.3)-.15)-.075;
-//         vec3 c1 = mix(mix(new.gba,.3*c.xxx,.5), c.xxx, sm(db));
-//         
-//         db = smoothstep(33.,34.,iTime);
-//         da = mix(1., da, db);
-//         new.gba = mix(new.gba, c1, sm(da));
-//         
-//         stroke(da-.02,.001,da);
-//         new.gba = mix(new.gba, c.xxx, sm(da));
-//         
-//         // You
-//         dstring(uv-vec2(.35,.34), 22., .05, da);
-//         
-//         dbox(uv-vec2(.35,.34), vec2(.15,.06), db);
-//         db = max(db,-da);
-//         float mx = smoothstep(34.,35., iTime);
-//         db = mix(1., db, mx);
-//         new.gba = mix(new.gba, c.xxx, sm(db));
-//         
-//         // Offend
-//         dstring(uv-vec2(.25,.24), 23., .0277, da);
-//         mx = smoothstep(35.,36.,iTime);
-//         da = mix(1., da, mx);
-//         new.gba = mix(new.gba, .8*c.xxy, sm(da));
-//         
-//         // You
-//         dstring(uv-vec2(.25,.15), 22., .05, da);
-//         mx = smoothstep(36.,37.,iTime);
-//         da = mix(1., da, mx);
-//         new.gba = mix(new.gba, .8*c.xxy, sm(da));
-//         
-//         // Cannot
-//         dstring((uv-vec2(.45,.05)).yx*c.zx, 24., .05, da);
-//         
-//         dbox((uv-vec2(.45,-.1)), vec2(.05,.3), db);
-//         db = max(db,-da);
-//         mx = smoothstep(37.,38., iTime);
-//         db = mix(1., db, mx);
-//         new.gba = mix(new.gba, c.xxx, sm(db));
-// 
-//         // Stop
-//         dstring((uv-vec2(.6,.1)).yx*c.zx, 25., .1, da);
-//         
-//         db = smoothstep(38.,39.,iTime);
-//         da = mix(1., da, db);
-//         new.gba = mix(new.gba, c1, sm(da));
-//         
-//         stroke(da-.02,.001,da);
-//         new.gba = mix(new.gba, c.xxx, sm(da));
-//     }
-//     else if(iTime < 60.)
-//     {
-//         //vec3(0.93,0.36,0.44)
-//         float da, db;
-//         
-//         db = abs(mod(uv.x+uv.y,.3)-.15)-.075;
-//         vec3 c1 = mix(mix(new.gba,vec3(0.93,0.36,0.44),.5), c.xxx, sm(db));
-//         
-//         // Banging your head against 
-//         dstring((uv-vec2(-.3,.3)), 38., .02, da);
-//         
-//         db = smoothstep(45.,46.,iTime)-smoothstep(50.,51.,iTime);
-//         da = mix(1., da, db);
-//         stroke(da-.005,.0025,db);
-//         new.gba = mix(new.gba, c.yyy, sm(db));
-//         
-//         new.gba = mix(new.gba, c1, sm(da-.0025));
-//         
-//         db = da+.0025;
-//         new.gba = mix(new.gba,2.*c1, sm(db));
-//         
-//         // a wall for one hour burns 
-//         dstring((uv-vec2(-.3,.25)), 39., .02, da);
-//         
-//         db = smoothstep(46.,47.,iTime)-smoothstep(51.,52.,iTime);
-//         da = mix(1., da, db);
-//         stroke(da-.005,.0025,db);
-//         new.gba = mix(new.gba,c.yyy, sm(db));
-//         
-//         new.gba = mix(new.gba, c1, sm(da-.0025));
-//         
-//         db = da+.0025;
-//         new.gba = mix(new.gba,2.*c1, sm(db));
-//         
-//         // 150 kilocalories. Want to
-//         dstring((uv-vec2(-.3,.2)), 40., .02, da);
-//         
-//         db = smoothstep(47.,48.,iTime)-smoothstep(52.,53.,iTime);
-//         da = mix(1., da, db);
-//         stroke(da-.005,.0025,db);
-//         new.gba = mix(new.gba,c.yyy, sm(db));
-//         
-//         new.gba = mix(new.gba, c1, sm(da-.0025));
-//         
-//         db = da+.0025;
-//         new.gba = mix(new.gba, 2.*c1, sm(db));
-//         
-//         // start losing some weight?
-//         dstring((uv-vec2(-.3,.15)), 41., .02, da);
-//         
-//         db = smoothstep(48.,49.,iTime)-smoothstep(53.,54.,iTime);
-//         da = mix(1., da, db);
-//         stroke(da-.005,.0025,db);
-//         new.gba = mix(new.gba, c.yyy, sm(db));
-//         
-//         new.gba = mix(new.gba, c1, sm(da-.0025));
-//         
-//         db = da+.0025;
-//         new.gba = mix(new.gba, 2.*c1, sm(db));
-//         
-//         new.gba = clamp(new.gba,0.,1.);
-//     }
-//     else if(iTime < 130.)
-//     {
-//         float da, db;
-//         
-//         dbox(uv-vec2(.05,.3), vec2(1.6,.055), da);
-//         da = mix(1.,da,smoothstep(125.,126.,iTime));
-//         new.gba = mix(new.gba, mix(new.gba,c.xxx,.5), sm(da));
-//         
-//         // Wait, what?
-//         dstring((uv-vec2(-.4,.3)), 28., .05, da);
-//         
-//         lfnoise(55.*uv, db);
-//         stroke(db,0.535,db);
-//         vec3 c1 = mix(mix(new.gba,c.yyy,.3), c.yyy, sm(db/50.));
-//         
-//         db = smoothstep(125.,126.,iTime);
-//         da = mix(1., da, db);
-//         new.gba = mix(new.gba, c1, sm(da));
-//         
-//         stroke(da-.01,.001,da);
-//         new.gba = mix(new.gba, c.yyy, sm(da));
-//     }
-//     else
-//     {
-//         float da;
-//         dstring(uv-vec2(-.55,0.), 27., .025, da);
-//         da = mix(1., da, smoothstep(172.,172.5,iTime));
-//         new.gba = mix(new.gba, c.yyy, smoothstep(172.,172.5,iTime));
-//         new.gba = mix(new.gba, vec3(.9,.2,.03), sm(da));
-//         stroke(da-.005, .001, da);
-//         new.gba = mix(new.gba, c.xxx, sm(da));
-//     }
-    
-    //FIXME: remove debug lines
-//     vec2 ad = abs(mod(uv-.05,.02)-.01)-.001;
-//     new.gba = mix(new.gba, c.yyx, sm(min(ad.x,ad.y)));
-//     
-//     ad = abs(mod(uv-.05,.1)-.05)-.001;
-//     new.gba = mix(new.gba, c.yxy, sm(min(ad.x,ad.y)));
-//     
-//     ad = abs(uv)-.002;
-//     new.gba = mix(new.gba, c.xxx, sm(min(ad.x,ad.y)));
-    //FIXME remove until here
+    else
+    {
+//         col = mix(col, c.yyy, clamp((iTime-212)/5., 0., 1.));
+        float da;
+        dstring(uv-vec2(-.55,0.), 27., .025, da);
+        da = mix(1., da, smoothstep(212.,217.,iTime));
+        new.gba = mix(new.gba, c.yyy, smoothstep(212.,217.,iTime));
+        new.gba = mix(new.gba, vec3(.9,.2,.03), sm(da));
+        stroke(da-.005, .001, da);
+        new.gba = mix(new.gba, c.xxx, sm(da));
+    }
     
     
     // 
