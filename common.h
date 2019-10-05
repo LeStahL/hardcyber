@@ -25,6 +25,7 @@
 #include "engine/loader.h"
 #include "engine/orchestrator.h"
 
+#include <stddef.h>
 
 #define FALSE (0)
 #define TRUE (1)
@@ -44,6 +45,9 @@
 
 #include <GL/gl.h>
 #include <glext.h>
+
+
+#define clamp(x, minimum, maximum) min(max(x, minimum), maximum)
 
 
 #ifdef DEBUG
@@ -93,6 +97,7 @@ void debugp(int program)
 #else // DEBUG
 #define printf(a)
 #endif //DEBUG
+
 
 // Supported resolutions
 const int nresolutions = 9;

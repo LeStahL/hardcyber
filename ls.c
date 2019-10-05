@@ -25,7 +25,7 @@ unsigned int muted = 0.;
 
 int _fltused = 0;
 
-#include <stddef.h>
+#include "common.h"
 
 // Standard library and CRT rewrite for saving executable size
 void *memset(void *ptr, int value, size_t num)
@@ -41,8 +41,6 @@ size_t strlen(const char *str)
     while(str[len] != '\0') ++len;
     return len;
 }
-
-#include "common.h"
 
 #ifdef MIDI
 
