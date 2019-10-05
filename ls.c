@@ -401,11 +401,6 @@ void load_demo()
 
     updateBar();
 
-    load_compressed_sound();
-    music_loading = 1;
-
-    updateBar();
-
     lLoadAllSymbols();
 #if 0 // FIXME Debug code
 #else
@@ -424,6 +419,11 @@ void load_demo()
     LoadPrograms();
 
     load_font();
+
+    updateBar();
+
+    load_compressed_sound();
+    music_loading = 1;
 
     updateBar();
 
