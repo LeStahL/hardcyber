@@ -8,8 +8,8 @@ MainWindow::MainWindow()
 {
     window.setupUi(this);
 
-    setControlsTimeRange(0.0, 1.0);
-    setControlsTimeNow(0.5);
+    setTimeRange(0.0, 1.0);
+    setTimeNow(0.5);
 
     connect(window.timeNowSlider, &QSlider::valueChanged, this, &MainWindow::onChangeTimeNowSlider);
     connect(window.timeNowSpinBox,static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::onChangeTimeNowSpinBox);
@@ -21,8 +21,9 @@ void MainWindow::setTimeNow(double timeNow)
 {
     if (abs(DemoApi::api.getTimeNow() - timeNow) >= 1 / TimeNowSliderFactor)
     {
-        DemoApi::api.setTimeStart(timeNow);
+        DemoApi::api.setTimeNow(timeNow);
         setControlsTimeNow(timeNow);
+        window.renderViewWidget->update();
     }
 }
 
