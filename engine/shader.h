@@ -80,8 +80,6 @@ static void sCompileShaderProgram(struct ShaderProgram* program, struct ShaderSy
         }
 #endif
     
-    glUseProgram(programHandle);
-    
     for (size_t index = 0; index < program->numberOfUniforms; ++index)
     {
         program->uniforms[index].location = glGetUniformLocation(programHandle, program->uniforms[index].name);
