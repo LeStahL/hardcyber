@@ -39,8 +39,8 @@ static PFNGLACTIVETEXTUREPROC glActiveTexture;
 static void rInitializeRenderer()
 {
 #ifdef DEBUG_SHADER
-    printf("    OpenGL version %s", glGetString(GL_VERSION));
-    printf("    GLSL version   %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    log_info("OpenGL version %s", glGetString(GL_VERSION));
+    log_info("GLSL version   %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 #endif
 
     // OpenGL extensions
