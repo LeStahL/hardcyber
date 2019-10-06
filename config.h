@@ -19,6 +19,17 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifdef DEBUG_SHADER
+#   ifdef DEMO
+#       define log_info printf
+#   else
+#       include <QtGlobal>
+#       define log_info qInfo
+#   endif
+#else
+#   define log_info(...)
+#endif
+
 #include "config_types.h"
 
 static const struct OpenGLSettings opengl_settings = {
