@@ -23,6 +23,26 @@ static void lInitializeLoader()
     sCompileShaderProgram(&shader_program_gfx_load, shader_symbols);
 }
 
+#ifdef DEBUG_SHADER
+static const char* lGetShaderError()
+{
+    for (size_t index = 0; index < shader_program_gfx_load.numberOfSymbols; ++index)
+    {
+        if (shader_symbols[shader_program_gfx_load.symbols[index]].compileStatus != GL_TRUE)
+        {
+            return shader_symbols[shader_program_gfx_load.symbols[index]].compilerError;
+        }
+    }
+
+    if (shader_program_gfx_load.linkStatus != GL_TRUE)
+    {
+        return shader_program_gfx_load.linkerError;
+    }
+
+    return NULL;
+}
+#endif
+
 static void lDrawLoadingScreen()
 {
     glClear(GL_COLOR_BUFFER_BIT);
