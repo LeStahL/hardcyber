@@ -34,7 +34,7 @@ void MainWindow::setTimeRange(double timeStart, double timeEnd)
        )
     {
         DemoApi::api.setTimeStart(timeStart);
-        DemoApi::api.setTimeEnd(timeStart);
+        DemoApi::api.setTimeEnd(timeEnd);
         setControlsTimeRange(timeStart, timeEnd);
     }
 }
