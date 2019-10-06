@@ -1,5 +1,12 @@
 #include "demoapi.h"
 
+
+// We want the extra API for playing around with shaders
+#define DEBUG_SHADER
+
+#include <malloc.h>
+#include <stdio.h>
+
 extern "C" {
 #include "config.h"
 #include "engine/renderer.h"
