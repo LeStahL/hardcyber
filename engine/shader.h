@@ -71,7 +71,7 @@ static void sCompileShaderProgram(struct ShaderProgram* program, struct ShaderSy
     glLinkProgram(programHandle);
     
 #ifdef DEBUG_SHADER
-        glGetShaderiv(programHandle, GL_LINK_STATUS, &program->linkStatus);
+        glGetProgramiv(programHandle, GL_LINK_STATUS, &program->linkStatus);
         if (program->linkStatus != GL_TRUE)
         {
             glGetProgramiv(programHandle, GL_INFO_LOG_LENGTH, &program->errorLogLength);
