@@ -100,6 +100,13 @@ void debugp(int program)
 #endif //DEBUG
 
 
+#ifndef MINIFY_64K
+// Export symbols that make hybrid graphics systems (laptops) use the dedicated GPU
+__declspec(dllexport) unsigned long NvOptimusEnablement = 1;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+#endif
+
+
 // Supported resolutions
 const int nresolutions = 9;
 const char *resolution_names[] = 

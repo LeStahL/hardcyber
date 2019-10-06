@@ -21,6 +21,8 @@
 // #define MIDI // APC40 mkII controls
 // #define RECORD // Compile in recording capabilities
 
+#define DEMO
+
 const char *demoname = "Hardcyber/Team210";
 unsigned int muted = 0.;
 

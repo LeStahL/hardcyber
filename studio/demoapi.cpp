@@ -1,5 +1,14 @@
 #include "demoapi.h"
 
+
+// We want the extra API for playing around with shaders
+#define DEBUG_SHADER
+
+#include <malloc.h>
+#include <stdio.h>
+
+#include <QOpenGLContext>
+
 extern "C" {
 #include "config.h"
 #include "engine/renderer.h"
@@ -19,6 +28,12 @@ void DemoApi::initializeGL()
 {
     rInitializeRenderer();
     lInitializeLoader();
+
+    const char* load_error = lGetShaderError();
+    if (load_error != NULL)
+    {
+        qFatal("Error loading shader: %s", load_error);
+    }
 }
 
 void DemoApi::resizeView(int w, int h)
@@ -31,6 +46,7 @@ void DemoApi::resizeView(int w, int h)
 void DemoApi::setTimeNow(double now)
 {
     t_now = now;
+    progress = now;
 }
 
 double DemoApi::getTimeNow() const
