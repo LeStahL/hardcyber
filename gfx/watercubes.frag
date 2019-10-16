@@ -27,6 +27,8 @@ void dstar(in vec2 x, in float N, in vec2 R, out float dst);
 void smoothmax(in float a, in float b, in float k, out float res);
 void dstar3(in vec3 x, in float N, in vec2 R, out float dst);
 
+void analytical_sphere(in vec3 o, in vec3 dir, in float R, out vec2 d);
+
 void scene(in vec3 x, out vec2 sdf)
 {
     if(length(x) > .5) sdf = vec2(length(x)-.5,-1.);
@@ -98,6 +100,10 @@ void main()
     float d = .5;
     t = uv.x * r + uv.y * u;
     dir = normalize(t-o);
+    
+    vec2 sp;
+    analytical_sphere(o, dir, .4, sp);
+    d = sp.x;
     
     for(i = 0; i<N; ++i)
     {
