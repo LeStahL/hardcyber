@@ -13,7 +13,7 @@
 #define t_fractal (135)
 #define t_voronoinet (169.60000610351562)
 #define t_volclouds (194.375)
-#define duration (210.16444396972656)
+#define duration (224.16444396972656)
 
 const double start_times[] = {
     t_deadline,
